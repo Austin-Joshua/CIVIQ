@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("OPS_MANAGER")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Zone {
+  id               String   @id @default(uuid())
+  name             String
+  geometry         String?  // Stored as JSON string
+  cleanlinessScore Float    @default(100.0)
+  bins             Bin[]
+}
+
+model Bin {
+  id               String   @id @default(uuid())
+  locationLat      Float
+  locationLng      Float
+  capacity         Float    // In liters
+  currentFillLevel Float    // 0 to 100 percentage
+  type             String   @default("GENERAL") // GENERAL, RECYCLING, COMPOST, HAZARDOUS
+  lastCollected    DateTime?
+  zone             Zone     @relation(fields: [zoneId], references: [id])
+  zoneId           String
+}
+
+model Vehicle {
+  id        String   @id @default(uuid())
+  capacity  Float
+  status    String   @default("IDLE") // IDLE, ON_ROUTE, MAINTENANCE
+  lat       Float
+  lng       Float
+  routes    Route[]
+}
+
+model Route {
+  id                String   @id @default(uuid())
+  waypoints         String   // Array of points or bin IDs stored as JSON string
+  estimatedDuration Float    // In minutes
+  emissionsSaved    Float    // In kg
+  createdAt         DateTime @default(now())
+  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId         String
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  type      String   // OVERFLOW_RISK, SERVICE_GAP
+  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
+  message   String
+  timestamp DateTime @default(now())
+  resolved  Boolean  @default(false)
+}
