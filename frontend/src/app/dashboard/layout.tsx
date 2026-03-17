@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!token) return null;
 
   return (
-    <div className="min-h-screen bg-[#060d08] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Sidebar />
       <div className="lg:pl-64 flex flex-col min-h-screen">
         <TopHeader />

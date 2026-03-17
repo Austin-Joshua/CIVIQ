@@ -10,16 +10,16 @@ export default function Loading() {
       
       {/* Loading Text */}
       <div className="text-center space-y-2">
-        <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] animate-pulse">
+        <h3 className="text-sm font-bold text-foreground uppercase tracking-[0.2em] animate-pulse">
           Synthesizing Data
         </h3>
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-muted-foreground">
           Loading urban intelligence vectors...
         </p>
       </div>
 
       {/* Progress Bar Mock */}
-      <div className="w-48 h-1 bg-white/[0.05] rounded-full overflow-hidden">
+      <div className="w-48 h-1 bg-muted rounded-full overflow-hidden">
         <div className="w-full h-full bg-emerald-500 origin-left animate-[scale-x_2s_ease-in-out_infinite]" />
       </div>
     </div>
