@@ -45,7 +45,7 @@ export function Sidebar() {
         isMobileSidebarOpen ? "translate-x-0 w-72" : "-translate-x-full w-64"
       )}>
         <div className="flex items-center justify-between pt-8 pb-4 px-6 mb-2">
-          <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity">
             <div className="w-16 h-16 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-2xl shadow-emerald-500/20 border border-white/10">
               <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover" />
             </div>
@@ -53,7 +53,7 @@ export function Sidebar() {
               <span className="text-foreground font-black text-4xl tracking-tighter block leading-none">CIVIQ</span>
               <p className="text-[10px] text-primary font-black uppercase tracking-[0.4em] mt-1.5 opacity-80">Urban OS</p>
             </div>
-          </div>
+          </Link>
           
           {/* Mobile Close Button */}
           <button 
