@@ -1,7 +1,7 @@
 'use client';
 
 import { useUIStore } from '@/store/uiStore';
-import { ReportSidePanel } from '@/components/ui/Cards';
+import { ReportModal } from '@/components/ui/Cards';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -197,13 +197,13 @@ export function GlobalReportView() {
   };
 
   return (
-    <ReportSidePanel 
+    <ReportModal 
       isOpen={!!activeReport} 
       onClose={closeReport}
       title={type === 'stat' ? `${data.label} Analysis` : `Incident Report: ${data.type}`}
       subtitle={type === 'stat' ? 'Platform Operational Intelligence' : `Detected ${data.time}`}
     >
       {renderContent()}
-    </ReportSidePanel>
+    </ReportModal>
   );
 }

@@ -44,14 +44,14 @@ export function Sidebar() {
         "fixed left-0 top-0 z-50 h-screen bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 lg:w-64 flex flex-col",
         isMobileSidebarOpen ? "translate-x-0 w-72" : "-translate-x-full w-64"
       )}>
-        <div className="flex items-center justify-between px-5 py-5 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+        <div className="flex items-center justify-between pt-8 pb-4 px-6 mb-2">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-2xl shadow-emerald-500/20 border border-white/10">
               <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover" />
             </div>
             <div>
-              <span className="text-foreground font-bold text-lg tracking-tight">CIVIQ</span>
-              <p className="text-[10px] text-primary font-medium uppercase tracking-widest -mt-0.5">Urban OS</p>
+              <span className="text-foreground font-black text-4xl tracking-tighter block leading-none">CIVIQ</span>
+              <p className="text-[10px] text-primary font-black uppercase tracking-[0.4em] mt-1.5 opacity-80">Urban OS</p>
             </div>
           </div>
           
@@ -95,10 +95,6 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-border bg-muted/5">
-          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] text-center">CIVIQ Platform v1.2</p>
-        </div>
       </aside>
     </>
   );

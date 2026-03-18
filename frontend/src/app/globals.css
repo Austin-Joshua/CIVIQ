@@ -71,29 +71,30 @@
   }
   
   .dark {
-    --background: 222 47% 4%;
+    --background: 222 47% 2%;
     --foreground: 210 40% 98%;
     
-    --card: 222 47% 7%;
+    --card: 222 47% 4%;
     --card-foreground: 210 40% 98%;
     
-    --popover: 222 47% 4%;
+    --popover: 222 47% 2%;
     --popover-foreground: 210 40% 98%;
     
+    /* Vibrant Logo Emerald */
     --primary: 161 72% 45%;
-    --primary-foreground: 222 47% 4%;
+    --primary-foreground: 222 47% 2%;
     
-    --secondary: 217 33% 12%;
+    --secondary: 217 33% 8%;
     --secondary-foreground: 210 40% 98%;
     
-    --muted: 217 33% 12%;
+    --muted: 217 33% 8%;
     --muted-foreground: 215 20% 65%;
     
-    --accent: 217 33% 15%;
+    --accent: 217 33% 10%;
     --accent-foreground: 210 40% 98%;
     
-    --border: 217 33% 15%;
-    --input: 217 33% 15%;
+    --border: 217 33% 12%;
+    --input: 217 33% 12%;
     --ring: 161 72% 45%;
 
     --chart-grid: 210 40% 98% / 0.05;
