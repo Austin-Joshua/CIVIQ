@@ -1,17 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
-  BarChart3, 
+  Map as MapIcon, 
+  Route, 
+  TrendingUp, 
   Leaf, 
-  Trash2, 
-  AlertCircle, 
-  Zap, 
-  ArrowUpRight, 
-  Clock, 
+  ChevronRight, 
+  BarChart3,
+  Trash2,
+  AlertCircle,
+  Zap,
+  ArrowUpRight,
   MoreHorizontal,
-  ChevronRight,
-  Filter
+  Filter,
+  CheckCheck
 } from 'lucide-react';
 import { 
   Bar, 
@@ -25,8 +28,10 @@ import {
   LineChart
 } from 'recharts';
 import { StatCard, AlertCard, SectionHeader } from '@/components/ui/Cards';
+import { DynamicChart } from '@/components/ui/DynamicChart';
 import { useAuthStore } from '@/store/authStore';
 import { cn } from '@/lib/utils';
+import { useIsMounted } from '@/hooks/useIsMounted';
 
 const MOCK_CHART_DATA = [
   { name: '06:00', waste: 400 },
@@ -46,24 +51,19 @@ const MOCK_ZONE_DATA = [
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useIsMounted();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1">
-            Welcome back, {user?.name?.split(' ')[0] || 'Operator'}
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-foreground mb-1">
+            Welcome, {isMounted ? (user?.name?.split(' ')[0] || 'Operator') : 'Operator'}
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Current city status: <span className="text-emerald-500 dark:text-emerald-400 font-medium">Eco-Resilient</span>. Overall cleanliness score 82.4.
+          <p className="text-muted-foreground font-medium">
+            City status: <span className="text-emerald-500 font-bold">Stable</span>. Cleanliness score 82.4.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -79,39 +79,42 @@ export default function DashboardPage() {
       {/* Primary Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          label="City Cleanliness"
+          label="Cleanliness"
           value="82.4"
           unit="/100"
           change={{ value: '2.1%', positive: true }}
           icon={BarChart3}
           iconColor="text-emerald-400"
           gradient="from-emerald-500/10 to-transparent"
+          onClick={() => {}}
         />
         <StatCard 
-          label="Today's Waste Forecast"
+          label="Waste Forecast"
           value="14.2"
           unit="Tons"
           change={{ value: '0.5%', positive: false }}
           icon={Trash2}
           iconColor="text-teal-400"
           gradient="from-teal-500/10 to-transparent"
+          onClick={() => {}}
         />
         <StatCard 
-          label="Active Alerts"
+          label="Alerts"
           value="12"
           change={{ value: '3 resolved', positive: true }}
           icon={AlertCircle}
           iconColor="text-orange-400"
           gradient="from-orange-500/10 to-transparent"
+          onClick={() => {}}
         />
         <StatCard 
-          label="Carbon Savings"
-          value="482"
-          unit="kg CO2"
-          change={{ value: '12.4%', positive: true }}
-          icon={Leaf}
+          label="Zones"
+          value="4"
+          change={{ value: 'All Active', positive: true }}
+          icon={MapIcon}
           iconColor="text-emerald-300"
           gradient="from-emerald-300/10 to-transparent"
+          onClick={() => {}}
         />
       </div>
 
@@ -121,8 +124,8 @@ export default function DashboardPage() {
         {/* Main Chart Panel */}
         <div className="lg:col-span-2 bg-card/50 border border-border rounded-2xl p-6">
           <SectionHeader 
-            title="Real-time Waste Generation" 
-            subtitle="Generation patterns across all active city zones"
+            title="Waste Generation" 
+            subtitle="Current patterns across zones"
             action={
               <button className="text-muted-foreground hover:text-foreground transition-colors">
                 <MoreHorizontal className="w-5 h-5" />
@@ -131,7 +134,8 @@ export default function DashboardPage() {
           />
           
           <div className="h-[280px] w-full mt-6">
-            <ResponsiveContainer width="100%" height="100%">
+            <DynamicChart>
+              <ResponsiveContainer width="100%" height="100%">
               <BarChart data={MOCK_CHART_DATA}>
                 <defs>
                   <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -143,22 +147,26 @@ export default function DashboardPage() {
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} 
+                  tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} 
                   dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} 
+                  tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} 
                 />
                 <Tooltip 
-                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  cursor={{ fill: 'rgba(16,185,129,0.08)' }}
                   contentStyle={{ 
-                    backgroundColor: '#070f0a', 
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    fontSize: '12px'
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    color: 'hsl(var(--foreground))',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
                   }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
                 <Bar dataKey="waste" radius={[4, 4, 0, 0]}>
                   {MOCK_CHART_DATA.map((entry, index) => (
@@ -167,20 +175,17 @@ export default function DashboardPage() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            </DynamicChart>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
+          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-border">
             <div className="text-center">
               <p className="text-muted-foreground/60 text-[10px] uppercase font-bold tracking-widest mb-1">Peak Time</p>
-              <p className="text-foreground font-semibold text-sm">12:15 PM</p>
+              <p className="text-foreground font-black text-sm">12:15 PM</p>
             </div>
-            <div className="text-center border-x border-border">
+            <div className="text-center border-l border-border">
               <p className="text-muted-foreground/60 text-[10px] uppercase font-bold tracking-widest mb-1">Total Daily</p>
-              <p className="text-foreground font-semibold text-sm">3,402kg</p>
-            </div>
-            <div className="text-center">
-              <p className="text-muted-foreground/60 text-[10px] uppercase font-bold tracking-widest mb-1">Efficiency</p>
-              <p className="text-emerald-500 dark:text-emerald-400 font-semibold text-sm">94.2%</p>
+              <p className="text-foreground font-black text-sm">3,402kg</p>
             </div>
           </div>
         </div>
@@ -189,8 +194,8 @@ export default function DashboardPage() {
         <div className="space-y-6">
           <div className="bg-card/50 border border-border rounded-2xl p-6">
             <SectionHeader 
-              title="Priority Alerts" 
-              subtitle="Critical service updates for field ops"
+              title="Alerts" 
+              subtitle="Infrastructure updates"
             />
             <div className="space-y-3 mt-4">
               <AlertCard 
@@ -221,12 +226,12 @@ export default function DashboardPage() {
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
               <Zap className="w-12 h-12 text-primary" />
             </div>
-            <h3 className="text-sm font-semibold text-foreground mb-2">AI Optimization Tip</h3>
-            <p className="text-primary/70 text-xs leading-relaxed mb-4">
-              "Predicted bin overflows in Zone C can be mitigated by rerouting vehicle V09 from Zone B, saving an estimated 14% fuel."
+            <h3 className="text-sm font-black text-foreground mb-2">Optimization Tip</h3>
+            <p className="text-primary/70 text-xs font-medium leading-relaxed mb-4">
+              "Predicted overflows in Zone C can be mitigated by rerouting vehicle V09, saving 14% fuel."
             </p>
-            <button className="text-primary text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 hover:gap-2.5 transition-all">
-              Apply Optimization <ArrowUpRight className="w-3.5 h-3.5" />
+            <button className="text-primary text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              Apply <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -235,12 +240,12 @@ export default function DashboardPage() {
       {/* Zone Cleanliness Ranking */}
       <div className="bg-card/50 border border-border rounded-2xl p-6">
         <SectionHeader 
-          title="Sustainability Ranking by Zone" 
-          subtitle="Top performing districts in urban waste diversion"
+          title="Zone Rankings" 
+          subtitle="Top performing districts"
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {MOCK_ZONE_DATA.map((zone) => (
-            <div key={zone.name} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
+            <div key={zone.name} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all hover:bg-card/80">
               <div className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold",
                 zone.score >= 80 ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" :
@@ -267,6 +272,8 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+
     </div>
   );
 }

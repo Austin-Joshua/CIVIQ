@@ -3,129 +3,163 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Leaf, Loader2, Lock, Mail, User, ChevronDown } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  Shield, 
+  Globe, 
+  Zap, 
+  BarChart3, 
+  Users, 
+  Database, 
+  Layout, 
+  ArrowUpRight,
+  Maximize2,
+  CheckCircle2,
+  Cpu,
+  Fingerprint,
+  Bot
+} from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
-const ROLES = [
-  { value: 'ADMIN', label: 'Administrator' },
-  { value: 'OPS_MANAGER', label: 'Operations Manager' },
-  { value: 'ANALYST', label: 'Analyst' },
-  { value: 'FIELD_OPERATOR', label: 'Field Operator' },
-];
-
 export default function SignupPage() {
-  const router = useRouter();
-  const setAuth = useAuthStore((s) => s.setAuth);
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'OPS_MANAGER' });
-  const [showPass, setShowPass] = useState(false);
-  const [error, setError] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { setAuth } = useAuthStore();
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Signup failed');
-      setAuth(data.user, data.token);
+      // Mock signup for UI demonstration
+      setAuth({ id: '1', name: name, email: email, role: 'ADMIN' }, 'mock-token');
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary/10 blur-3xl animate-pulse" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-teal-500/10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+    <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-md px-6 py-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-              <Leaf className="w-6 h-6 text-white" />
+      <div className="relative z-10 w-full max-w-7xl bg-card/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+         {/* Visual Side */}
+         <div className="hidden lg:block relative bg-slate-900 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-600/20 to-emerald-900/40 z-10" />
+            
+            <div className="absolute inset-0 flex flex-col justify-end p-20 z-20">
+              <div className="space-y-6">
+                <div className="relative group">
+                  <div className="absolute -inset-4 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative w-32 h-32 rounded-[2.5rem] bg-slate-950/40 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.1)] group-hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                    <img src="/logo.png" className="w-20 h-20 object-cover relative z-10 drop-shadow-2xl" alt="CIVIQ" />
+                  </div>
+                </div>
+                <h2 className="text-5xl font-black tracking-tighter leading-tight text-white">
+                  Built for <br /> Scale.
+                </h2>
+                <div className="h-1 w-20 bg-emerald-500 rounded-full" />
+                <p className="text-slate-300 font-medium text-lg leading-relaxed max-w-sm">
+                  Initialize your district node and start transforming waste into actionable intelligence.
+                </p>
+              </div>
             </div>
-            <span className="text-3xl font-bold text-foreground tracking-tight">CIVIQ</span>
+
+            {/* Stats removed for cleaner SaaS UI */}
           </div>
-          <p className="text-primary text-sm font-medium tracking-wide uppercase">Urban Intelligence OS</p>
-        </div>
 
-        <div className="bg-card/50 backdrop-blur-xl border border-border rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-xl font-semibold text-foreground mb-1">Create your account</h2>
-          <p className="text-sm text-muted-foreground mb-6">Join the CIVIQ command network</p>
-
-          {error && (
-            <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400">{error}</div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1.5">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required
-                  className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
-                  placeholder="Your full name" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1.5">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required
-                  className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
-                  placeholder="you@civiq.city" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1.5">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input type={showPass ? 'text' : 'password'} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required
-                  className="w-full pl-10 pr-10 py-2.5 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
-                  placeholder="Min 8 characters" />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1.5">Role</label>
-              <div className="relative">
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all appearance-none">
-                  {ROLES.map((r) => (
-                    <option key={r.value} value={r.value}>{r.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <button type="submit" disabled={loading}
-              className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 disabled:opacity-60">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {loading ? 'Creating account…' : 'Create Account'}
+          {/* Form Side */}
+          <div className="p-8 lg:p-20 flex flex-col justify-center">
+            <button 
+              onClick={() => router.push('/')}
+              className="flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-colors mb-8 lg:mb-12 group w-fit p-1 -ml-1"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
+              <span className="text-[10px] lg:text-xs font-black uppercase tracking-widest">Back to Vision</span>
             </button>
-          </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-5">
-            Already have an account?{' '}
-            <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium transition-colors">Sign in</Link>
-          </p>
+            {/* Mobile Logo */}
+            <div className="lg:hidden mb-10 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-slate-950/40 backdrop-blur-3xl border border-white/10 flex items-center justify-center shadow-xl">
+                <img src="/logo.png" className="w-8 h-8 object-cover" alt="CIVIQ" />
+              </div>
+              <div>
+                <span className="text-foreground font-black text-xl tracking-tighter block">CIVIQ</span>
+                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Urban OS</span>
+              </div>
+            </div>
+
+            <div className="mb-10">
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-foreground mb-4">Sign Up</h1>
+              <p className="text-muted-foreground font-medium">Create your administrative node credentials.</p>
+            </div>
+
+            <div className="max-w-md w-full mx-auto">
+              <form onSubmit={handleSignup} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="Operator Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-5 py-3 bg-background/50 border border-border rounded-xl focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all text-sm font-medium"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="admin@civiq.city"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-5 py-3 bg-background/50 border border-border rounded-xl focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all text-sm font-medium"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Password</label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-5 py-3 bg-background/50 border border-border rounded-xl focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all text-sm font-medium"
+                    required
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black rounded-xl transition-all shadow-xl shadow-emerald-900/40 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest text-xs mt-4"
+                >
+                  {loading ? 'Processing...' : 'Deploy Node'} 
+                  {!loading && <ArrowRight className="w-4 h-4" />}
+                </button>
+              </form>
+            </div>
+
+            <p className="mt-10 text-center text-sm text-muted-foreground font-medium">
+              Already have a node?{' '}
+              <Link href="/auth/login" className="text-emerald-500 font-black hover:underline underline-offset-4 decoration-2">
+                Authorized Login
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

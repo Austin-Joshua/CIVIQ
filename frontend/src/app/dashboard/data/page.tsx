@@ -55,7 +55,7 @@ export default function DataManagementPage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <SectionHeader title="Data Integration & Management" subtitle="Import external datasets, manage system backups, and run mock data generators." />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -154,9 +154,57 @@ export default function DataManagementPage() {
             <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
               Synthesize 30 days of standard telemetry data across all active zones for simulation purposes. This will overwrite existing simulations.
             </p>
-            <button className="px-4 py-2 bg-orange-500/20 hover:bg-orange-500/30 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-widest rounded-xl transition-all border border-orange-500/30">
-              Run Generator Script
+            <button 
+              onClick={() => {
+                setIsUploading(true);
+                setTimeout(() => {
+                  setIsUploading(false);
+                  toast({
+                    title: "Mock Data Generated",
+                    description: "Simulation telemetry for 42 zones has been synthesized.",
+                    type: "success"
+                  });
+                }, 2000);
+              }}
+              disabled={isUploading}
+              className="px-4 py-2 bg-orange-500/20 hover:bg-orange-500/30 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-widest rounded-xl transition-all border border-orange-500/30 disabled:opacity-50"
+            >
+              {isUploading ? 'Generating...' : 'Run Generator Script'}
             </button>
+          </div>
+
+          <div className="bg-card/50 border border-border rounded-3xl p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-bold text-foreground">Data Exports</h3>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {[
+                { name: 'Monthly Sustainability Report', date: 'Mar 15, 2024', size: '1.2 MB' },
+                { name: 'Fleet Performance Audit', date: 'Mar 12, 2024', size: '850 KB' },
+                { name: 'Zone C Telemetry Export', date: 'Mar 10, 2024', size: '4.5 MB' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-background/50 border border-border rounded-xl group hover:border-primary/30 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-foreground/5 flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-foreground">{item.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{item.date} • {item.size}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => toast({ title: 'Export Started', description: `Downloading ${item.name}...`, type: 'success' })}
+                    className="text-[10px] font-bold text-primary hover:underline uppercase tracking-widest"
+                  >
+                    Download
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

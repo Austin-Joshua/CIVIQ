@@ -1,104 +1,105 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Map, Route, TrendingUp, Recycle,
-  Layers, AlertTriangle, Sliders, Settings, Bell,
-  User, LogOut, Leaf, ChevronRight, Activity, Database, FileText
+  Layers, AlertTriangle, Sliders, Settings,
+  Leaf, ChevronRight, Activity, Database, FileText, X
 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
 import { cn } from '@/lib/utils';
+import { useUIStore } from '@/store/uiStore';
 
-const NAV_ITEMS = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Command Center' },
-  { href: '/dashboard/map', icon: Map, label: 'Command Map' },
-  { href: '/dashboard/routes', icon: Route, label: 'Route Intelligence' },
-  { href: '/dashboard/forecast', icon: TrendingUp, label: 'Waste Forecast' },
-  { href: '/dashboard/recycling', icon: Recycle, label: 'Recycling Planner' },
-  { href: '/dashboard/landfill', icon: Layers, label: 'Landfill Intel' },
-  { href: '/dashboard/risk', icon: AlertTriangle, label: 'Risk Monitor' },
-  { href: '/dashboard/simulator', icon: Sliders, label: 'Decision Simulator' },
-  { href: '/dashboard/analytics', icon: Activity, label: 'Analytics' },
+export const NAV_ITEMS = [
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Command Nexus' },
+  { href: '/dashboard/map', icon: Map, label: 'Geospatial Map' },
+  { href: '/dashboard/routes', icon: Route, label: 'Route Intel' },
+  { href: '/dashboard/forecast', icon: TrendingUp, label: 'Predictive Ops' },
+  { href: '/dashboard/recycling', icon: Recycle, label: 'Sustainability' },
+  { href: '/dashboard/landfill', icon: Layers, label: 'Waste Management' },
+  { href: '/dashboard/risk', icon: AlertTriangle, label: 'Risk Evaluation' },
+  { href: '/dashboard/simulator', icon: Sliders, label: 'Sim Engine' },
+  { href: '/dashboard/analytics', icon: Activity, label: 'Urban Intel' },
+  { href: '/dashboard/data', icon: Database, label: 'Identity Sync' },
+  { href: '/dashboard/activity', icon: FileText, label: 'Audit Console' },
+  { href: '/dashboard/settings', icon: Settings, label: 'System Settings' },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout } = useAuthStore();
-
-  const handleLogout = () => {
-    logout();
-    router.push('/auth/login');
-  };
+  const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 h-screen bg-background border-r border-border fixed left-0 top-0 z-30">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-border">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow shadow-emerald-900/20 flex-shrink-0">
-          <Leaf className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <span className="text-foreground font-bold text-lg tracking-tight">CIVIQ</span>
-          <p className="text-[10px] text-primary font-medium uppercase tracking-widest -mt-0.5">Urban OS</p>
-        </div>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={closeMobileSidebar}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        <p className="text-[10px] text-muted-foreground/60 font-semibold uppercase tracking-widest px-2 mb-2">Platform</p>
-        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-          const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
-          return (
-            <Link key={href} href={href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group',
-                isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
-              )}>
-              <Icon className={cn('w-4 h-4 flex-shrink-0', isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground')} />
-              <span>{label}</span>
-              {isActive && <ChevronRight className="w-3 h-3 ml-auto text-primary/50" />}
-            </Link>
-          );
-        })}
-
-        <div className="my-3 border-t border-border" />
-        <p className="text-[10px] text-muted-foreground/60 font-semibold uppercase tracking-widest px-2 mb-2">Account & Utilities</p>
-        <Link href="/dashboard/data" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all">
-          <Database className="w-4 h-4 text-muted-foreground/80" /><span>Data Management</span>
-        </Link>
-        <Link href="/dashboard/activity" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all">
-          <FileText className="w-4 h-4 text-muted-foreground/80" /><span>Activity Logs</span>
-        </Link>
-        <Link href="/dashboard/notifications" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all">
-          <Bell className="w-4 h-4 text-muted-foreground/80" /><span>Notifications</span>
-        </Link>
-        <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all">
-          <Settings className="w-4 h-4 text-muted-foreground/80" /><span>Settings</span>
-        </Link>
-        <Link href="/dashboard/profile" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all">
-          <User className="w-4 h-4 text-muted-foreground/80" /><span>Profile</span>
-        </Link>
-      </nav>
-
-      {/* User footer */}
-      <div className="px-3 py-4 border-t border-border">
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {user?.name?.[0]?.toUpperCase() || 'U'}
+      {/* Sidebar Container */}
+      <aside className={cn(
+        "fixed left-0 top-0 z-50 h-screen bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 lg:w-64 flex flex-col",
+        isMobileSidebarOpen ? "translate-x-0 w-72" : "-translate-x-full w-64"
+      )}>
+        <div className="flex items-center justify-between px-5 py-5 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+              <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <span className="text-foreground font-bold text-lg tracking-tight">CIVIQ</span>
+              <p className="text-[10px] text-primary font-medium uppercase tracking-widest -mt-0.5">Urban OS</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-foreground/90 text-sm font-medium truncate">{user?.name || 'User'}</p>
-            <p className="text-muted-foreground text-xs truncate">{user?.role?.replace('_', ' ') || 'Operator'}</p>
-          </div>
-          <button onClick={handleLogout} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all">
-            <LogOut className="w-3.5 h-3.5" />
+          
+          {/* Mobile Close Button */}
+          <button 
+            onClick={closeMobileSidebar}
+            className="lg:hidden p-2 rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors"
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+            const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+            return (
+              <Link 
+                key={href} 
+                href={href}
+                onClick={() => {
+                  if (window.innerWidth < 1024) closeMobileSidebar();
+                }}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-75 group relative overflow-hidden interactive-scale',
+                  isActive
+                    ? 'bg-emerald-500/10 text-emerald-500'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-emerald-500/5'
+                )}>
+                <div className={cn(
+                  "absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full transition-transform duration-100",
+                  isActive ? "scale-y-100" : "scale-y-0 group-hover:scale-y-50"
+                )} />
+                <Icon className={cn('w-4 h-4 flex-shrink-0 transition-colors duration-75', isActive ? 'text-emerald-500' : 'text-muted-foreground group-hover:text-emerald-500')} />
+                <span className="tracking-tight">{label}</span>
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-border bg-muted/5">
+          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] text-center">CIVIQ Platform v1.2</p>
+        </div>
+      </aside>
+    </>
   );
 }

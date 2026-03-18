@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { 
   Route as RouteIcon, 
   Clock, 
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/Cards';
+import { MissingKeyOverlay } from '@/components/ui/Maps';
 
 const MOCK_ROUTES = [
   {
@@ -24,8 +26,10 @@ const MOCK_ROUTES = [
     stops: 14,
     completedStops: 6,
     duration: '45m remaining',
-    emissionsSaved: '4.2kg',
-    priority: 'High'
+    impact: '4.2kg',
+    priority: 'High',
+    origin: { lat: 40.710, lng: -74.008 },
+    destination: { lat: 40.725, lng: -74.001 },
   },
   {
     id: 'R-002',
@@ -34,8 +38,10 @@ const MOCK_ROUTES = [
     stops: 22,
     completedStops: 0,
     duration: '1h 20m est.',
-    emissionsSaved: '6.8kg',
-    priority: 'Medium'
+    impact: '6.8kg',
+    priority: 'Medium',
+    origin: { lat: 40.715, lng: -74.015 },
+    destination: { lat: 40.730, lng: -73.995 },
   },
   {
     id: 'R-003',
@@ -44,28 +50,59 @@ const MOCK_ROUTES = [
     stops: 18,
     completedStops: 18,
     duration: 'Finished',
-    emissionsSaved: '5.1kg',
-    priority: 'Low'
+    impact: '5.1kg',
+    priority: 'Low',
+    origin: { lat: 40.705, lng: -74.010 },
+    destination: { lat: 40.715, lng: -73.990 },
   }
 ];
+
+function Directions({ activeRoute }: { activeRoute: any }) {
+  const map = useMap();
+  const routesLibrary = useMapsLibrary('routes');
+  const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
+  const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
+
+  useEffect(() => {
+    if (!routesLibrary || !map) return;
+    setDirectionsService(new routesLibrary.DirectionsService());
+    setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
+  }, [routesLibrary, map]);
+
+  useEffect(() => {
+    if (!directionsService || !directionsRenderer || !activeRoute) return;
+
+    directionsService.route({
+      origin: activeRoute.origin,
+      destination: activeRoute.destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+      provideRouteAlternatives: false,
+    }).then(response => {
+      directionsRenderer.setDirections(response);
+    });
+
+  }, [directionsService, directionsRenderer, activeRoute]);
+
+  return null;
+}
 
 export default function RouteIntelligencePage() {
   const [activeRoute, setActiveRoute] = useState(MOCK_ROUTES[0]);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1 flex items-center gap-3">
-            <RouteIcon className="w-6 h-6 text-emerald-500 dark:text-emerald-400" /> Route Intelligence
+          <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1 flex items-center gap-3">
+            <RouteIcon className="w-8 h-8 text-emerald-500" /> Routes
           </h1>
           <p className="text-muted-foreground text-sm">
             Dynamically optimized collection patterns powered by AI VRP solver.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-all shadow-lg shadow-emerald-900/30">
-            <Play className="w-3.5 h-3.5 fill-current" /> Run Optimizer
+          <button className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl transition-all shadow-xl shadow-emerald-900/30 uppercase tracking-widest">
+            <Play className="w-3.5 h-3.5 fill-current" /> Optimize
           </button>
         </div>
       </div>
@@ -130,8 +167,8 @@ export default function RouteIntelligencePage() {
                   <div>
                     <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider mb-0.5">Impact</p>
                     <div className="flex items-center gap-1.5">
-                      <Leaf className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">{route.emissionsSaved} saved</span>
+                      <Leaf className="w-3 h-3 text-emerald-500" />
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">{route.impact} saved</span>
                     </div>
                   </div>
                 </div>
@@ -149,31 +186,51 @@ export default function RouteIntelligencePage() {
                   <RouteIcon className="w-6 h-6 text-emerald-500 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-foreground">Live Route Feed: {activeRoute.id}</h2>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                    <Clock className="w-3 h-3" /> Updated 14 seconds ago • Operational Zone C
+                  <h2 className="text-xl font-black text-foreground tracking-tighter">Live Feed: {activeRoute.id}</h2>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5 font-medium">
+                    <Clock className="w-3 h-3" /> Updated 14s ago • Zone C
                   </p>
                 </div>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest leading-none mb-1">Estimated Efficiency</span>
-                <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight">96.4%</span>
+                <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest leading-none mb-1">Optimization</span>
+                <span className="text-2xl font-black text-emerald-500 tracking-tighter">96.4%</span>
               </div>
             </div>
 
             <div className="p-6">
               <div className="relative h-64 w-full bg-background rounded-xl border border-border flex items-center justify-center group overflow-hidden">
-                {/* Visual Placeholder for Mini-Map */}
-                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-500/20 via-transparent to-transparent" />
-                <div className="relative z-10 flex flex-col items-center gap-2">
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center animate-pulse">
-                    <MapPin className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
+                {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+                  <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
+                    <Map
+                      mapId={process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || 'DEMO_MAP_ID'}
+                      defaultCenter={{ lat: 40.715, lng: -74.005 }}
+                      defaultZoom={13}
+                      gestureHandling={'greedy'}
+                      disableDefaultUI={true}
+                      className="w-full h-full"
+                    >
+                      <Directions activeRoute={activeRoute} />
+                    </Map>
+                  </APIProvider>
+                ) : (
+                  <div className="absolute inset-0 bg-[#0f172a] flex items-center justify-center">
+                    <div className="text-center space-y-3 opacity-30">
+                      <RouteIcon className="w-12 h-12 mx-auto text-emerald-500 animate-pulse" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em]">Logistics Engine Active (Demo)</p>
+                    </div>
+                    {/* Mock route line */}
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" preserveAspectRatio="none">
+                      <path 
+                        d="M 100 200 Q 300 100 500 200 T 700 150" 
+                        stroke="#10b981" 
+                        strokeWidth="3" 
+                        fill="none" 
+                        strokeDasharray="8 4"
+                      />
+                    </svg>
                   </div>
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest group-hover:text-emerald-500/50 transition-colors">Spatial Feed Loading...</p>
-                </div>
-                
-                {/* Mock Waypoint Path Overlay */}
-                <div className="absolute inset-x-12 top-1/2 h-[2px] bg-gradient-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0 blur-[1px]" />
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -201,16 +258,16 @@ export default function RouteIntelligencePage() {
                   <h3 className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest pl-1 border-l-2 border-teal-500/40">Resource Metrics</h3>
                   <div className="bg-teal-500/[0.03] border border-teal-500/10 rounded-2xl p-4 space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Fuel Consumption</span>
-                      <span className="text-sm font-bold text-teal-600 dark:text-teal-400">12.4 L / 100km</span>
+                      <span className="text-xs text-muted-foreground font-medium">Fuel Consumption</span>
+                      <span className="text-sm font-black text-teal-500">12.4 L / 100km</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Driver Efficiency</span>
-                      <span className="text-sm font-bold text-teal-600 dark:text-teal-400">Optimal</span>
+                      <span className="text-xs text-muted-foreground font-medium">Driver Score</span>
+                      <span className="text-sm font-black text-teal-500">Optimal</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Idle Time Reduction</span>
-                      <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">+14.2%</span>
+                      <span className="text-xs text-muted-foreground font-medium">Idle Reduction</span>
+                      <span className="text-sm font-black text-emerald-500">+14.2%</span>
                     </div>
                   </div>
                   <div className="bg-emerald-600/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3">

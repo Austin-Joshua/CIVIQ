@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Layers, 
   Map as MapIcon, 
@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
+import { DynamicChart } from '@/components/ui/DynamicChart';
 
 const FILL_LEVELS = [
   { name: 'Site Alpha', fill: 82, capacity: 50000 },
@@ -45,20 +46,14 @@ const PROJECTION_DATA = [
 ];
 
 export default function LandfillIntelPage() {
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1 flex items-center gap-3">
-            <Layers className="w-6 h-6 text-emerald-500 dark:text-emerald-400" /> Landfill Intelligence
+          <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1 flex items-center gap-3">
+            <Layers className="w-8 h-8 text-emerald-500" /> Landfill Intelligence
           </h1>
           <p className="text-muted-foreground text-sm">
             Capacity monitoring and lifecycle projections for urban waste facilities.
@@ -79,6 +74,7 @@ export default function LandfillIntelPage() {
           change={{ value: '4.2%', positive: false }}
           icon={Trash2}
           iconColor="text-white/40"
+
         />
         <StatCard 
           label="Remaining Capacity"
@@ -87,6 +83,7 @@ export default function LandfillIntelPage() {
           change={{ value: 'Est. 2.4yrs', positive: false }}
           icon={Database}
           iconColor="text-orange-400"
+
         />
         <StatCard 
           label="Daily Inflow"
@@ -95,6 +92,7 @@ export default function LandfillIntelPage() {
           change={{ value: 'Stable', positive: true }}
           icon={BarChart3}
           iconColor="text-teal-400"
+
         />
         <StatCard 
           label="Environmental Audit"
@@ -103,6 +101,7 @@ export default function LandfillIntelPage() {
           change={{ value: 'Pass', positive: true }}
           icon={Leaf}
           iconColor="text-emerald-400"
+
         />
       </div>
 
@@ -112,7 +111,10 @@ export default function LandfillIntelPage() {
           <SectionHeader title="Active Site Monitoring" subtitle="Real-time fill capacity by facility" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             {FILL_LEVELS.map((site) => (
-              <div key={site.name} className="p-4 bg-card border border-border rounded-xl group hover:border-primary/20 transition-all">
+              <div 
+                key={site.name} 
+                className="p-4 bg-card border border-border rounded-xl group hover:border-primary/20 hover:shadow-lg transition-all"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex flex-col">
                     <span className="text-foreground text-sm font-semibold">{site.name}</span>
@@ -128,7 +130,7 @@ export default function LandfillIntelPage() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-[10px] text-muted-foreground">
-                    <span>Current Utilization</span>
+                    <span>Capacity Usage</span>
                     <span className="font-bold">{site.fill}%</span>
                   </div>
                   <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -149,16 +151,18 @@ export default function LandfillIntelPage() {
 
         {/* Capacity Projection Sidebar */}
         <div className="bg-card/50 border border-border rounded-2xl p-6">
-          <SectionHeader title="Capacity Lifecycle" subtitle="5-Year utilization projection" />
+          <SectionHeader title="Capacity Lifecycle" subtitle="5-Year capacity projection" />
           <div className="h-[200px] w-full mt-6">
-            <ResponsiveContainer width="100%" height="100%">
+            <DynamicChart>
+              <ResponsiveContainer width="100%" height="100%">
               <LineChart data={PROJECTION_DATA}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
                 <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }} itemStyle={{ color: 'hsl(var(--foreground))' }} />
                 <Line type="monotone" dataKey="usage" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b' }} activeDot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
+            </DynamicChart>
           </div>
           <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl space-y-2">
             <div className="flex items-center gap-2">
@@ -172,7 +176,7 @@ export default function LandfillIntelPage() {
         </div>
       </div>
 
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 relative overflow-hidden group">
+      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 relative overflow-hidden group hover:border-primary/40 transition-colors">
         <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
@@ -183,11 +187,15 @@ export default function LandfillIntelPage() {
               <p className="text-xs text-primary/60 mt-1 uppercase tracking-widest font-bold">AI Recommended Action</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-primary/30 hover:bg-primary/10 rounded-xl text-xs font-bold text-primary transition-all group-hover:gap-3">
+          <button 
+            onClick={() => {}}
+            className="flex items-center gap-2 px-4 py-2 border border-primary/30 hover:bg-primary/10 rounded-xl text-xs font-bold text-primary transition-all group-hover:gap-3"
+          >
             Analyze Strategy <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
+
     </div>
   );
 }

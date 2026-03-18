@@ -15,7 +15,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <SectionHeader title="Your Identity" subtitle="Operational credentials and system permissions within the CIVIQ network." />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             </div>
             <div className="bg-card/50 border border-border rounded-2xl p-5">
               <Leaf className="w-5 h-5 text-emerald-500 dark:text-emerald-300 mb-3" />
-              <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest mb-1">CO2 Impact</p>
+              <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest mb-1">Eco Impact</p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">12.4T</p>
             </div>
           </div>

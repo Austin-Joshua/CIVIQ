@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 export function SkeletonCard() {
   return (
     <div className="bg-white/[0.02] border border-white/[0.04] rounded-2xl p-5 animate-pulse">
@@ -38,5 +40,11 @@ export function SkeletonList() {
         ))}
       </div>
     </div>
+  );
+}
+
+export function Skeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("animate-pulse bg-white/[0.05] rounded-xl", className)} />
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Sliders, 
   Zap, 
@@ -30,8 +30,9 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/Cards';
+import { DynamicChart } from '@/components/ui/DynamicChart';
 
-const SIM_DATA = [
+const INITIAL_SIM_DATA = [
   { month: 'Jan', current: 100, simulated: 100 },
   { month: 'Feb', current: 120, simulated: 110 },
   { month: 'Mar', current: 140, simulated: 115 },
@@ -41,36 +42,58 @@ const SIM_DATA = [
 ];
 
 export default function SimulatorPage() {
-  const [mounted, setMounted] = useState(false);
+
+  
   const [params, setParams] = useState({
     collectionFreq: 65,
     recyclingIncentive: 40,
     fuelTax: 20
   });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [simData, setSimData] = useState(INITIAL_SIM_DATA);
 
-  if (!mounted) return null;
+  const handleReset = () => {
+    setParams({
+      collectionFreq: 65,
+      recyclingIncentive: 40,
+      fuelTax: 20
+    });
+    setSimData(INITIAL_SIM_DATA);
+  };
+
+  const handleRunSimulation = () => {
+    // Generate new mock data based on sliders
+    const multiplier = 1 - (params.recyclingIncentive / 200) + (params.collectionFreq / 300);
+    const newSimData = INITIAL_SIM_DATA.map(d => ({
+      ...d,
+      simulated: Math.round(d.current * (multiplier - (INITIAL_SIM_DATA.indexOf(d) * 0.05)))
+    }));
+    setSimData(newSimData);
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1 flex items-center gap-3">
-            <Sliders className="w-6 h-6 text-emerald-500 dark:text-emerald-400" /> Decision Simulator
+          <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1 flex items-center gap-3">
+            <Sliders className="w-8 h-8 text-emerald-500" /> Simulator
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Model hyper-local policy changes and visualize long-term urban sustainability impact.
+          <p className="text-muted-foreground font-medium">
+            Model policy changes and visualize urban impact.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all">
+          <button 
+            onClick={handleReset}
+            className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all"
+          >
             <RotateCcw className="w-3.5 h-3.5" /> Reset Model
           </button>
-          <button className="flex items-center gap-2 px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold rounded-lg transition-all shadow-lg shadow-primary/20 font-bold uppercase tracking-wider">
-            <Play className="w-3.5 h-3.5 fill-current" /> Run Simulation
+          <button 
+            onClick={handleRunSimulation}
+            className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl transition-all shadow-xl shadow-emerald-900/30 uppercase tracking-widest"
+          >
+            <Play className="w-3.5 h-3.5 fill-current" /> Simulate
           </button>
         </div>
       </div>
@@ -126,9 +149,12 @@ export default function SimulatorPage() {
           <div className="bg-card/50 border border-border rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
             <SectionHeader title="Projected Environmental Impact" subtitle="Simulated vs Current historical baseline" />
             
-            <div className="h-[360px] w-full mt-6 scale-100 group-hover:scale-[1.01] transition-transform duration-700">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={SIM_DATA}>
+            <div 
+              className="h-[360px] w-full mt-6 scale-100 group-hover:scale-[1.01] transition-transform duration-700"
+            >
+              <DynamicChart>
+                <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={simData}>
                   <defs>
                     <linearGradient id="simArea" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
@@ -138,13 +164,14 @@ export default function SimulatorPage() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }} itemStyle={{ color: 'hsl(var(--foreground))' }} />
                   <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', opacity: 0.5 }} />
                   <Area type="monotone" dataKey="simulated" fill="url(#simArea)" stroke="none" />
                   <Line type="monotone" dataKey="current" stroke="rgba(255,255,255,0.15)" strokeWidth={2} strokeDasharray="5 5" name="Historical Baseline" dot={false} />
                   <Line type="monotone" dataKey="simulated" stroke="#10b981" strokeWidth={4} name="Simulated Scenario" dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: 'var(--background)' }} />
                 </ComposedChart>
               </ResponsiveContainer>
+              </DynamicChart>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-border">
@@ -171,14 +198,15 @@ export default function SimulatorPage() {
                   <ArrowRight className="w-5 h-5 text-orange-500 dark:text-orange-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest">CO2 Reduced</p>
-                  <p className="text-lg font-bold text-foreground tracking-tight">1.2 Tons</p>
+                  <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest">Impact</p>
+                  <p className="text-lg font-black text-foreground tracking-tighter">1.2 Tons</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

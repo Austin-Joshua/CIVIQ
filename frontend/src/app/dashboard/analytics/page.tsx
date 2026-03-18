@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Activity, 
   TrendingUp, 
@@ -30,6 +30,7 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import { SectionHeader, StatCard } from '@/components/ui/Cards';
+import { DynamicChart } from '@/components/ui/DynamicChart';
 
 const MONTHLY_RECOVERY = [
   { month: 'Jan', value: 820 },
@@ -48,20 +49,14 @@ const TABLE_DATA = [
 ];
 
 export default function AnalyticsPage() {
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1 flex items-center gap-3">
-            <Activity className="w-6 h-6 text-emerald-500 dark:text-emerald-400" /> Analytics Mode
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-foreground mb-1 flex items-center gap-3">
+            <Activity className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" /> Analytics
           </h1>
           <p className="text-muted-foreground text-sm">
             Deep-dive urban sustainability data and comprehensive fleet performance metrics.
@@ -80,7 +75,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total Waste Processed" value="482.4" unit="Tons" icon={BarChart3} />
         <StatCard label="Yearly Growth" value="+14.2" unit="%" icon={TrendingUp} iconColor="text-red-400" />
-        <StatCard label="Fleet Utilization" value="94.2" unit="%" icon={Clock} iconColor="text-teal-400" />
+        <StatCard label="Fleet Usage" value="94.2" unit="%" icon={Clock} iconColor="text-teal-400" />
         <StatCard label="Anomalies Found" value="12" unit="Events" icon={Activity} iconColor="text-orange-400" />
       </div>
 
@@ -89,7 +84,8 @@ export default function AnalyticsPage() {
         <div className="bg-card/50 border border-border rounded-2xl p-6">
           <SectionHeader title="Recovery Performance" subtitle="Monthly material diversion in tons" />
           <div className="h-[300px] w-full mt-6">
-            <ResponsiveContainer width="100%" height="100%">
+            <DynamicChart>
+              <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={MONTHLY_RECOVERY}>
                 <defs>
                   <linearGradient id="analyticsGradient" x1="0" y1="0" x2="0" y2="1">
@@ -97,27 +93,28 @@ export default function AnalyticsPage() {
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsla(var(--chart-grid))" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }} itemStyle={{ color: 'hsl(var(--foreground))' }} />
                 <Area type="step" dataKey="value" stroke="#10b981" strokeWidth={3} fill="url(#analyticsGradient)" />
               </AreaChart>
             </ResponsiveContainer>
+            </DynamicChart>
           </div>
         </div>
 
         {/* Fleet Breakdown */}
         <div className="bg-card/50 border border-border rounded-2xl p-6 shadow-2xl">
-          <SectionHeader title="Zone Efficiency Heatmap" subtitle="Generation vs Diversion capability" />
+          <SectionHeader title="Zone Performance" subtitle="Generation vs Diversion capability" />
           <div className="mt-6 overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-border text-[10px] uppercase font-bold text-muted-foreground/60 tracking-widest">
                   <th className="pb-4 pt-1 font-bold">Zone Name</th>
                   <th className="pb-4 pt-1 font-bold text-center">Generation</th>
-                  <th className="pb-4 pt-1 font-bold text-center">Diversion</th>
-                  <th className="pb-4 pt-1 font-bold text-center">Growth</th>
+                  <th className="pb-4 pt-1 font-bold text-center hidden sm:table-cell">Diversion</th>
+                  <th className="pb-4 pt-1 font-bold text-center hidden md:table-cell">Growth</th>
                   <th className="pb-4 pt-1 font-bold text-right pr-2">Insight</th>
                 </tr>
               </thead>
@@ -129,10 +126,10 @@ export default function AnalyticsPage() {
                       <p className="text-[10px] text-muted-foreground mt-0.5">District Urban-I</p>
                     </td>
                     <td className="py-4 text-center text-sm text-foreground/70 font-medium">{row.generation}</td>
-                    <td className="py-4 text-center">
+                    <td className="py-4 text-center hidden sm:table-cell">
                       <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{row.diversion}</span>
                     </td>
-                    <td className="py-4 text-center">
+                    <td className="py-4 text-center hidden md:table-cell">
                       <span className={cn("text-[11px] font-bold p-1 px-2 rounded-md", row.growth.includes('+') ? "text-red-600 dark:text-red-400 bg-red-400/5 border border-red-500/10" : "text-emerald-600 dark:text-emerald-400 bg-emerald-400/5 border border-emerald-500/10")}>
                         {row.growth}
                       </span>
@@ -157,6 +154,7 @@ export default function AnalyticsPage() {
           </button>
         </div>
       </div>
+
     </div>
   );
 }

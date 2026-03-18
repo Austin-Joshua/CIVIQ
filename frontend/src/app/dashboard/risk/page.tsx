@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   AlertTriangle, 
   ShieldAlert, 
@@ -30,6 +30,7 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import { SectionHeader, StatCard, AlertCard } from '@/components/ui/Cards';
+import { DynamicChart } from '@/components/ui/DynamicChart';
 
 const RISK_RADAR_DATA = [
   { subject: 'Overflow', A: 80, fullMark: 100 },
@@ -47,16 +48,10 @@ const RECENT_RISKS = [
 ];
 
 export default function RiskMonitorPage() {
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1 flex items-center gap-3">
@@ -82,14 +77,16 @@ export default function RiskMonitorPage() {
         <div className="bg-card/50 border border-border rounded-2xl p-6">
           <SectionHeader title="City Risk Profile" subtitle="Multidimensional threat vector analysis" />
           <div className="h-[280px] w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <DynamicChart>
+              <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={RISK_RADAR_DATA}>
                 <PolarGrid stroke="rgba(255,255,255,0.05)" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} />
                 <Radar name="Risk Level" dataKey="A" stroke="#f87171" fill="#f87171" fillOpacity={0.4} />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }} itemStyle={{ color: 'hsl(var(--foreground))' }} />
               </RadarChart>
             </ResponsiveContainer>
+            </DynamicChart>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl">
@@ -109,7 +106,11 @@ export default function RiskMonitorPage() {
             <SectionHeader title="Anomalous Events Feed" subtitle="AI detection of irregular sensor patterns" />
             <div className="space-y-3 mt-6">
               {RECENT_RISKS.map((risk) => (
-                <div key={risk.id} className="p-4 bg-card border border-border rounded-xl flex items-center justify-between group hover:border-primary/20 transition-all">
+                <div 
+                  key={risk.id} 
+                  onClick={() => {}}
+                  className="p-4 bg-card border border-border rounded-xl flex items-center justify-between group cursor-pointer hover:border-primary/20 hover:shadow-lg transition-all"
+                >
                   <div className="flex items-center gap-4">
                     <div className={cn(
                       "w-10 h-10 rounded-xl flex items-center justify-center border",
@@ -186,11 +187,15 @@ export default function RiskMonitorPage() {
               Potential for <span className="text-foreground font-bold">Zone C overflow risk</span> has reached 84%. AI recommends enabling "Overflow Buffer B4" immediately to prevent street-level contamination leaks.
             </p>
           </div>
-          <button className="flex-shrink-0 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-red-900/40">
+          <button 
+            onClick={() => {}}
+            className="flex-shrink-0 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-red-900/40"
+          >
             Activate Buffer Protocol
           </button>
         </div>
       </div>
+
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Recycle, 
   TrendingUp, 
@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
+import { DynamicChart } from '@/components/ui/DynamicChart';
 
 const DIVERSION_DATA = [
   { name: 'Paper/Cardboard', value: 35, color: '#10b981' },
@@ -45,20 +46,14 @@ const IMPACT_DATA = [
 ];
 
 export default function RecyclingPlannerPage() {
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1 flex items-center gap-3">
-            <Recycle className="w-6 h-6 text-emerald-500 dark:text-emerald-400" /> Recycling Diversion Planner
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-foreground mb-1 flex items-center gap-3">
+            <Recycle className="w-6 h-6 md:w-8 md:h-8 text-emerald-500 dark:text-emerald-400" /> Recycling Diversion Planner
           </h1>
           <p className="text-muted-foreground text-sm">
             Optimize material recovery and minimize landfill footprint with AI-driven diversion strategies.
@@ -79,6 +74,7 @@ export default function RecyclingPlannerPage() {
           change={{ value: '1.2%', positive: true }}
           icon={TrendingUp}
           iconColor="text-emerald-400"
+
         />
         <StatCard 
           label="Recovery Goal"
@@ -87,14 +83,16 @@ export default function RecyclingPlannerPage() {
           change={{ value: 'Target: Q4', positive: true }}
           icon={BarChart3}
           iconColor="text-teal-400"
+
         />
         <StatCard 
           label="Emissions Prevented"
           value="1.2"
-          unit="Tons CO2"
+          unit="Eco Impact"
           change={{ value: 'Record Month', positive: true }}
           icon={Leaf}
           iconColor="text-emerald-300"
+
         />
         <StatCard 
           label="Economic Recovery"
@@ -103,6 +101,7 @@ export default function RecyclingPlannerPage() {
           change={{ value: '15.2%', positive: true }}
           icon={Zap}
           iconColor="text-yellow-400"
+
         />
       </div>
 
@@ -111,7 +110,8 @@ export default function RecyclingPlannerPage() {
         <div className="bg-card/50 border border-border rounded-2xl p-6">
           <SectionHeader title="Material Composition" subtitle="Current recovery stream breakdown" />
           <div className="h-[240px] w-full mt-6">
-            <ResponsiveContainer width="100%" height="100%">
+            <DynamicChart>
+              <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={DIVERSION_DATA}
@@ -127,17 +127,24 @@ export default function RecyclingPlannerPage() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
               </PieChart>
             </ResponsiveContainer>
+            </DynamicChart>
           </div>
           <div className="space-y-2 mt-4">
             {DIVERSION_DATA.map((item) => (
-              <div key={item.name} className="flex items-center justify-between">
+              <div 
+                key={item.name} 
+                className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
+                onClick={() => {}}
+              >
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-xs text-muted-foreground">{item.name}</span>
+                  <div className="w-2 h-2 rounded-full group-hover:scale-125 transition-transform" style={{ backgroundColor: item.color }} />
+                  <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{item.name}</span>
                 </div>
                 <span className="text-xs font-bold text-foreground">{item.value}%</span>
               </div>
@@ -149,21 +156,25 @@ export default function RecyclingPlannerPage() {
         <div className="lg:col-span-2 bg-card/50 border border-border rounded-2xl p-6">
           <SectionHeader title="Diversion Impact Trend" subtitle="Actual vs Baseline (Landfill destined)" />
           <div className="h-[280px] w-full mt-6">
-            <ResponsiveContainer width="100%" height="100%">
+            <DynamicChart>
+              <ResponsiveContainer width="100%" height="100%">
               <BarChart data={IMPACT_DATA}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsla(var(--chart-grid))" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }} itemStyle={{ color: 'hsl(var(--foreground))' }} />
                 <Bar dataKey="diverted" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="baseline" fill="rgba(255,255,255,0.05)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="baseline" fill="hsla(var(--foreground), 0.05)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            </DynamicChart>
           </div>
-          <div className="mt-6 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex gap-4">
+          <div 
+            className="mt-6 p-4 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/10 rounded-xl flex gap-4 transition-colors"
+          >
             <Info className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Diversion rates have increased by <span className="text-emerald-600 dark:text-emerald-400 font-bold">18%</span> since the implementation of the new AI route optimization in Zone C.
+              Diversion rates have increased by <span className="text-emerald-600 dark:text-emerald-400 font-bold">18%</span> since the implementation of the new AI route optimization in Zone C. Click to view deep metrics.
             </p>
           </div>
         </div>
@@ -179,7 +190,10 @@ export default function RecyclingPlannerPage() {
               Based on waste stream analysis in the Residential North district, increasing the collection frequency of "Organics" by 20% would potentially divert an additional 1.4 tons of waste per month with minimal operational cost increase.
             </p>
           </div>
-          <button className="flex-shrink-0 px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-primary/20">
+          <button 
+            onClick={() => {}}
+            className="flex-shrink-0 px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-primary/20"
+          >
             Apply Recommendation
           </button>
         </div>

@@ -2,123 +2,258 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Leaf, ArrowRight, Shield, Globe, Zap, BarChart3 } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Shield, 
+  Globe, 
+  Zap, 
+  BarChart3, 
+  Users, 
+  Database, 
+  Layout, 
+  ArrowUpRight,
+  Maximize2,
+  CheckCircle2,
+  Cpu,
+  Fingerprint,
+  Bot
+} from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 export default function LandingPage() {
+  const { token } = useAuthStore();
   const router = useRouter();
 
-  return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/40">
-            <Leaf className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight">CIVIQ</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="#" className="hover:text-primary transition-colors">Platform</a>
-          <a href="#" className="hover:text-primary transition-colors">Solutions</a>
-          <a href="#" className="hover:text-primary transition-colors">Sustainability</a>
-          <a href="#" className="hover:text-primary transition-colors">Intelligence</a>
-        </div>
-        <button 
-          onClick={() => router.push('/auth/login')}
-          className="px-5 py-2 bg-secondary/50 border border-border hover:bg-secondary rounded-full text-sm font-bold transition-all"
-        >
-          Sign In
-        </button>
-      </nav>
+  useEffect(() => {
+    if (token) {
+      router.replace('/dashboard');
+    }
+  }, [token, router]);
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-32 px-6 overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-8">
-            <Zap className="w-3 h-3 fill-current" /> Next-Gen Urban intelligence
+  return (
+    <div className="min-h-screen bg-[#020617] text-white selection:bg-emerald-500/30 overflow-x-hidden font-outfit">
+      {/* Background Gradients */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/15 blur-[150px] rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/10 blur-[200px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
+      </div>
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/40 backdrop-blur-2xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 p-1 bg-slate-900">
+               <img src="/logo.png" className="w-full h-full object-cover" alt="Logo" />
+            </div>
+            <span className="text-3xl font-black tracking-tighter text-white uppercase">CIVIQ</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
-            The Brain Behind <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-400">Clean, Resilient Cities.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            CIVIQ is a comprehensive decision intelligence platform that acts as a digital twin for urban waste infrastructure. Predict. Optimize. Sustain.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="hidden lg:flex items-center gap-10">
+            {['Platform', 'Solutions', 'Vision', 'Network'].map((item) => (
+              <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-black text-slate-400 hover:text-emerald-400 transition-colors tracking-[0.2em] uppercase">
+                {item}
+              </a>
+            ))}
+          </div>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => router.push('/auth/login')}
+              className="text-sm font-bold text-slate-300 hover:text-white transition-colors px-4"
+            >
+              Login
+            </button>
             <button 
               onClick={() => router.push('/auth/signup')}
-              className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-lg"
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 font-bold rounded-xl transition-all shadow-xl shadow-emerald-900/40 text-sm active:scale-95 border border-emerald-400/20"
             >
-              Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="w-full sm:w-auto px-8 py-4 bg-secondary/50 border border-border hover:bg-secondary text-foreground font-bold rounded-2xl transition-all text-lg">
-              Book a Demo
+              Get Started
             </button>
           </div>
         </div>
+      </nav>
 
-        {/* Floating cards preview */}
-        <div className="mt-24 max-w-6xl mx-auto relative px-4 text-foreground">
-          <div className="bg-card/30 border border-border rounded-[2.5rem] p-4 shadow-2xl backdrop-blur-sm self-center">
-             <div className="rounded-[2rem] overflow-hidden border border-border/50 aspect-video bg-background flex items-center justify-center relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="flex flex-col items-center gap-4 opacity-40">
-                   <Globe className="w-16 h-16 text-primary animate-spin-slow" />
-                   <p className="text-sm font-bold uppercase tracking-[0.3em]">Command Center Feed</p>
+      <main className="relative z-10 pt-40">
+        {/* Hero Section */}
+        <section className="px-6 max-w-7xl mx-auto text-center mb-60">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em] mb-12 animate-in fade-in slide-in-from-top-4 duration-1000">
+            <Bot className="w-3.5 h-3.5 fill-current" /> Urban Intelligence OS
+          </div>
+          <h1 className="text-7xl md:text-[9rem] font-black tracking-tighter mb-10 leading-[0.85] animate-in slide-in-from-bottom-5 duration-700">
+            Predict. <br />
+            Optimize. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500">
+              Sustain.
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-slate-400 mb-16 max-w-3xl mx-auto font-medium leading-relaxed animate-in slide-in-from-bottom-6 duration-1000">
+            CIVIQ is the first mission-critical operating system for modern city infrastructure, designed for resilient and clean urban growth.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in slide-in-from-bottom-7 duration-1000">
+            <button 
+              onClick={() => router.push('/auth/signup')}
+              className="w-full sm:w-auto px-12 py-6 bg-white text-slate-950 font-black rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-xl group shadow-2xl shadow-white/10"
+            >
+              Initialize Node <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="w-full sm:w-auto px-12 py-6 bg-slate-900/50 border border-white/10 hover:border-white/20 text-white font-bold rounded-2xl transition-all hover:bg-slate-900 text-xl flex items-center justify-center gap-2">
+              View Roadmap
+            </button>
+          </div>
+        </section>
+
+        {/* Value Prop Icons */}
+        <section id="platform" className="px-6 max-w-7xl mx-auto mb-60">
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { icon: Cpu, title: "Autonomous Monitoring", desc: "Sensors detect and predict infrastructure failures before they happen." },
+                { icon: Fingerprint, title: "Secure Governance", desc: "Blockchain-backed data integrity for municipal records and audits." },
+                { icon: Globe, title: "Zero-Waste Vision", desc: "Fully automated routing and sorting strategies for clean districts." }
+              ].map((item, i) => (
+                <div key={i} className="p-10 bg-slate-900/30 border border-white/5 rounded-[2.5rem] hover:border-emerald-500/30 transition-all hover:-translate-y-2 group">
+                   <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-8 font-black group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                      <item.icon className="w-7 h-7" />
+                   </div>
+                   <h3 className="text-2xl font-black mb-4 tracking-tight">{item.title}</h3>
+                   <p className="text-slate-400 leading-relaxed font-medium">{item.desc}</p>
+                </div>
+              ))}
+           </div>
+        </section>
+
+        {/* Dashboard Preview */}
+        <section className="px-6 max-w-7xl mx-auto mb-60 overflow-hidden">
+           <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight">
+                Total Control. <br />
+                <span className="text-emerald-500">One Interface.</span>
+              </h2>
+           </div>
+           <div className="relative group">
+              <div className="absolute inset-0 bg-emerald-500/20 blur-[120px] rounded-full opacity-30 transition-opacity group-hover:opacity-50" />
+              <div className="relative bg-[#020617] border border-white/10 rounded-[3rem] p-4 shadow-3xl overflow-hidden backdrop-blur-xl transition-transform duration-1000 group-hover:scale-[1.02]">
+                 <img 
+                   src="/dashboard_preview.png" 
+                   className="w-full rounded-[2.5rem] shadow-2xl brightness-90 grayscale-[0.2] group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000" 
+                   alt="CIVIQ Intelligence Portal" 
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-20 group-hover:opacity-0 transition-opacity duration-700" />
+              </div>
+           </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="solutions" className="px-6 py-40 border-y border-white/5 relative">
+          <div className="max-w-7xl mx-auto">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+                <div>
+                   <h2 className="text-5xl md:text-6xl font-black tracking-tighter mb-10 leading-[0.9]">
+                     The Platform for <br />
+                     <span className="text-emerald-500">Public Impact.</span>
+                   </h2>
+                   <div className="space-y-10">
+                      {[
+                        { title: "Real-time Transparency", desc: "Build citizen trust with live dashboards and verified cleanliness metrics." },
+                        { title: "Predictive Logistics", desc: "Optimize vehicle routing by 40% with AI-driven demand forecasting." },
+                        { title: "Multi-Zone Intelligence", desc: "Manage entire districts from a single unified command node." }
+                      ].map((item, i) => (
+                        <div key={i} className="flex gap-8 group">
+                           <div className="w-1.5 h-16 bg-emerald-500/20 rounded-full group-hover:bg-emerald-500 transition-colors" />
+                           <div>
+                              <h4 className="text-xl font-black mb-2 text-white">{item.title}</h4>
+                              <p className="text-slate-400 leading-relaxed font-medium text-lg">{item.desc}</p>
+                           </div>
+                        </div>
+                      ))}
+                   </div>
+                </div>
+                <div className="bg-slate-900/30 border border-white/5 rounded-[3rem] p-12 space-y-10 relative">
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full" />
+                   <div className="space-y-6 relative">
+                      {[
+                        "98% Sensor Network Uptime",
+                        "22 Districts Managed Worldwide",
+                        "34% Average Cost Reduction",
+                        "ISO 27001 Data Compliance"
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-4 text-emerald-400 font-black tracking-tight text-xl">
+                           <CheckCircle2 className="w-6 h-6" />
+                           {item}
+                        </div>
+                      ))}
+                   </div>
+                   <div className="pt-10 border-t border-white/5">
+                      <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-4">Trusted by Municipal Experts</p>
+                      <div className="flex gap-4 opacity-30">
+                         {/* Placeholder for partner logos */}
+                         {[1,2,3,4].map(i => <div key={i} className="w-12 h-12 rounded-xl bg-white/10" />)}
+                      </div>
+                   </div>
                 </div>
              </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features */}
-      <section className="py-32 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { 
-              icon: BarChart3, 
-              title: "AI Forecasting", 
-              desc: "Deep-learning models predict generation peaks with up to 94% accuracy, preventing overflows before they occur." 
-            },
-            { 
-              icon: Zap, 
-              title: "Route Optimization", 
-              desc: "Dynamic VRP solvers reduce fleet fuel consumption by up to 22% while maximizing bin collection efficiency." 
-            },
-            { 
-              icon: Shield, 
-              title: "Risk Monitoring", 
-              desc: "24/7 autonomous monitoring of urban sanitation nodes detected infrastructure anomalies and health risks." 
-            }
-          ].map((feature, i) => (
-            <div key={i} className="p-8 bg-card/20 border border-border rounded-3xl hover:border-primary/40 transition-all hover:bg-card/40">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-                <feature.icon className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed text-sm">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* Call to Action */}
+        <section className="px-6 py-40 text-center">
+           <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 leading-[1]">
+             Ready to <span className="text-emerald-500">Deploy?</span>
+           </h2>
+           <p className="text-xl text-slate-400 mb-16 max-w-2xl mx-auto font-medium">
+             Join the global network of cities transforming waste into intelligence.
+           </p>
+           <button 
+             onClick={() => router.push('/auth/signup')}
+             className="px-16 py-8 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-[2rem] transition-all hover:scale-105 active:scale-95 text-2xl shadow-3xl shadow-emerald-500/20"
+           >
+             Get Started Now
+           </button>
+        </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-border mt-20">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground/60 font-medium">
-          <div className="flex items-center gap-2">
-            <Leaf className="w-4 h-4 text-primary/50" />
-            <span>© 2026 CIVIQ Urban Intelligence. Operating globally.</span>
+        {/* Footer */}
+        <footer className="py-32 border-t border-white/5 bg-slate-950/50">
+          <div className="max-w-7xl mx-auto px-6">
+             <div className="grid grid-cols-1 md:grid-cols-4 gap-20 mb-20 text-center md:text-left">
+                <div className="md:col-span-2">
+                   <div className="flex items-center gap-3 mb-8 justify-center md:justify-start">
+                     <img src="/logo.png" className="w-10 h-10 object-cover rounded-xl" alt="CIVIQ" />
+                     <span className="text-3xl font-black tracking-tighter">CIVIQ</span>
+                   </div>
+                   <p className="text-slate-500 max-w-sm font-medium leading-relaxed mx-auto md:mx-0">
+                     The world's leading urban OS for smart, sustainable waste infrastructure. 
+                     Predicting the future of city life, today.
+                   </p>
+                </div>
+                <div>
+                   <h4 className="text-white font-black uppercase tracking-widest text-xs mb-8">Platform</h4>
+                   <ul className="space-y-4 text-slate-400 font-bold text-sm">
+                      <li>Overview</li>
+                      <li>Solutions</li>
+                      <li>Roadmap</li>
+                      <li>Integrations</li>
+                   </ul>
+                </div>
+                <div>
+                   <h4 className="text-white font-black uppercase tracking-widest text-xs mb-8">Company</h4>
+                   <ul className="space-y-4 text-slate-400 font-bold text-sm">
+                      <li>About</li>
+                      <li>Sustainability</li>
+                      <li>Contact</li>
+                      <li>Portal Login</li>
+                   </ul>
+                </div>
+             </div>
+             <div className="flex flex-col md:flex-row items-center justify-between gap-10 opacity-30 border-t border-white/5 pt-20">
+                <p className="text-xs font-bold uppercase tracking-widest">© 2026 CIVIQ GLOBAL. BUILT FOR CLEAN CITIES.</p>
+                <div className="flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em]">
+                   <a href="#" className="hover:text-emerald-500 transition-colors">Privacy</a>
+                   <a href="#" className="hover:text-emerald-500 transition-colors">Safety</a>
+                   <a href="#" className="hover:text-emerald-500 transition-colors">Legal</a>
+                </div>
+             </div>
           </div>
-          <div className="flex items-center gap-8">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Contact</a>
-            <a href="#" className="hover:text-foreground transition-colors">Status</a>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </main>
     </div>
   );
 }
+
