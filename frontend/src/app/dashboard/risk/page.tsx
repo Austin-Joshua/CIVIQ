@@ -31,6 +31,7 @@ import {
 import { cn } from '@/lib/utils';
 import { SectionHeader, StatCard, AlertCard } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
+import { useUIStore } from '@/store/uiStore';
 
 const RISK_RADAR_DATA = [
   { subject: 'Overflow', A: 80, fullMark: 100 },
@@ -48,6 +49,7 @@ const RECENT_RISKS = [
 ];
 
 export default function RiskMonitorPage() {
+  const { openReport } = useUIStore();
 
 
   return (
@@ -108,7 +110,7 @@ export default function RiskMonitorPage() {
               {RECENT_RISKS.map((risk) => (
                 <div 
                   key={risk.id} 
-                  onClick={() => {}}
+                  onClick={() => openReport('alert', { type: risk.type, severity: risk.risk > 80 ? 'CRITICAL' : 'HIGH', message: `Anomaly detected in ${risk.zone}. Risk score: ${risk.risk}%`, time: '14m ago' })}
                   className="p-4 bg-card border border-border rounded-xl flex items-center justify-between group cursor-pointer hover:border-primary/20 hover:shadow-lg transition-all"
                 >
                   <div className="flex items-center gap-4">

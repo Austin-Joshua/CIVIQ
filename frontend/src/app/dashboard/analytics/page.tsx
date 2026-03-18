@@ -31,6 +31,7 @@ import {
 import { cn } from '@/lib/utils';
 import { SectionHeader, StatCard } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
+import { useUIStore } from '@/store/uiStore';
 
 const MONTHLY_RECOVERY = [
   { month: 'Jan', value: 820 },
@@ -49,6 +50,7 @@ const TABLE_DATA = [
 ];
 
 export default function AnalyticsPage() {
+  const { openReport } = useUIStore();
 
 
   return (
@@ -73,10 +75,10 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Waste Processed" value="482.4" unit="Tons" icon={BarChart3} />
-        <StatCard label="Yearly Growth" value="+14.2" unit="%" icon={TrendingUp} iconColor="text-red-400" />
-        <StatCard label="Fleet Usage" value="94.2" unit="%" icon={Clock} iconColor="text-teal-400" />
-        <StatCard label="Anomalies Found" value="12" unit="Events" icon={Activity} iconColor="text-orange-400" />
+        <StatCard label="Total Waste Processed" value="482.4" unit="Tons" icon={BarChart3} onClick={() => openReport('stat', { label: 'Total Waste Processed', value: '482.4', unit: 'Tons' })} />
+        <StatCard label="Yearly Growth" value="+14.2" unit="%" icon={TrendingUp} iconColor="text-red-400" onClick={() => openReport('stat', { label: 'Yearly Growth', value: '+14.2', unit: '%', change: { value: '14.2%', positive: true } })} />
+        <StatCard label="Fleet Usage" value="94.2" unit="%" icon={Clock} iconColor="text-teal-400" onClick={() => openReport('stat', { label: 'Fleet Usage', value: '94.2', unit: '%' })} />
+        <StatCard label="Anomalies Found" value="12" unit="Events" icon={Activity} iconColor="text-orange-400" onClick={() => openReport('stat', { label: 'Anomalies Found', value: '12', unit: 'Events' })} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

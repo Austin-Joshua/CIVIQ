@@ -29,6 +29,7 @@ import {
 import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
+import { useUIStore } from '@/store/uiStore';
 
 const FILL_LEVELS = [
   { name: 'Site Alpha', fill: 82, capacity: 50000 },
@@ -46,6 +47,7 @@ const PROJECTION_DATA = [
 ];
 
 export default function LandfillIntelPage() {
+  const { openReport } = useUIStore();
 
 
   return (
@@ -74,7 +76,7 @@ export default function LandfillIntelPage() {
           change={{ value: '4.2%', positive: false }}
           icon={Trash2}
           iconColor="text-white/40"
-
+          onClick={() => openReport('stat', { label: 'Residual Waste', value: '18.2K', unit: 'Tons/yr', change: { value: '4.2%', positive: false } })}
         />
         <StatCard 
           label="Remaining Capacity"
@@ -83,7 +85,7 @@ export default function LandfillIntelPage() {
           change={{ value: 'Est. 2.4yrs', positive: false }}
           icon={Database}
           iconColor="text-orange-400"
-
+          onClick={() => openReport('stat', { label: 'Remaining Capacity', value: '24.5', unit: '%', change: { value: 'Est. 2.4yrs', positive: false } })}
         />
         <StatCard 
           label="Daily Inflow"
@@ -92,7 +94,7 @@ export default function LandfillIntelPage() {
           change={{ value: 'Stable', positive: true }}
           icon={BarChart3}
           iconColor="text-teal-400"
-
+          onClick={() => openReport('stat', { label: 'Daily Inflow', value: '142', unit: 'Tons', change: { value: 'Stable', positive: true } })}
         />
         <StatCard 
           label="Environmental Audit"
@@ -101,7 +103,7 @@ export default function LandfillIntelPage() {
           change={{ value: 'Pass', positive: true }}
           icon={Leaf}
           iconColor="text-emerald-400"
-
+          onClick={() => openReport('stat', { label: 'Environmental Audit', value: '98.2', unit: 'Compliance', change: { value: 'Pass', positive: true } })}
         />
       </div>
 

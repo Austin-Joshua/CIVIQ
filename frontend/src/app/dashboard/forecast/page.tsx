@@ -25,6 +25,7 @@ import {
 import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
+import { useUIStore } from '@/store/uiStore';
 
 const FORECAST_DATA = [
   { day: 'Mon', historical: 400, predicted: 420 },
@@ -37,6 +38,7 @@ const FORECAST_DATA = [
 ];
 
 export default function WasteForecastPage() {
+  const { openReport } = useUIStore();
 
 
   return (
@@ -159,11 +161,11 @@ export default function WasteForecastPage() {
         {/* Sidebar panels */}
         <div className="space-y-6">
           <div className="bg-card/50 border border-border rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 mb-6" onClick={() => openReport('alert', { type: 'Critical Peaks', severity: 'HIGH', message: 'Upcoming overflow triggers in Central Market and Industrial Port.', time: 'Next 24-48h' })}>
+              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center cursor-pointer hover:bg-orange-500/20 transition-colors">
                 <Trash2 className="w-5 h-5 text-orange-500 dark:text-orange-400" />
               </div>
-              <div>
+              <div className="cursor-pointer hover:opacity-80 transition-opacity">
                 <h3 className="text-sm font-semibold text-foreground">Critical Peaks</h3>
                 <p className="text-[11px] text-muted-foreground">Upcoming overflow triggers</p>
               </div>

@@ -46,6 +46,8 @@ interface AlertCardProps {
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   message: string;
   time: string;
+  onClick?: () => void;
+  className?: string;
 }
 
 const SEVERITY_STYLES = {
@@ -55,9 +57,17 @@ const SEVERITY_STYLES = {
   LOW: 'bg-blue-500/10 dark:bg-blue-500/15 border-blue-500/20 dark:border-blue-500/30 text-blue-600 dark:text-blue-400',
 };
 
-export function AlertCard({ type, severity, message, time }: AlertCardProps) {
+export function AlertCard({ type, severity, message, time, onClick, className }: AlertCardProps) {
   return (
-    <div className={cn('border rounded-xl p-3.5 flex items-start gap-3', SEVERITY_STYLES[severity])}>
+    <div 
+      onClick={onClick}
+      className={cn(
+        'border rounded-xl p-3.5 flex items-start gap-3 transition-all duration-200', 
+        SEVERITY_STYLES[severity],
+        onClick && 'cursor-pointer hover:brightness-110 active:scale-[0.98] hover:shadow-md',
+        className
+      )}
+    >
       <div className={cn('w-2 h-2 rounded-full mt-1 flex-shrink-0', {
         'bg-red-500 dark:bg-red-400': severity === 'CRITICAL',
         'bg-orange-500 dark:bg-orange-400': severity === 'HIGH',

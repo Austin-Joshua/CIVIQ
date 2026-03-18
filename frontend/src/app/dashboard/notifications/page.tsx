@@ -5,6 +5,7 @@ import { Bell, AlertTriangle, CheckCircle2, Info, Clock, Trash2, Filter, MoreVer
 import { SectionHeader } from '@/components/ui/Cards';
 import { useToast } from '@/components/providers/ToastProvider';
 import { cn } from '@/lib/utils';
+import { useUIStore } from '@/store/uiStore';
 
 const INITIAL_NOTIFICATIONS = [
   {
@@ -50,6 +51,7 @@ const INITIAL_NOTIFICATIONS = [
 ];
 
 export default function NotificationsPage() {
+  const { openReport } = useUIStore();
   const [notifs, setNotifs] = useState(INITIAL_NOTIFICATIONS);
   const [filter, setFilter] = useState('all');
   const { toast } = useToast();
@@ -123,8 +125,9 @@ export default function NotificationsPage() {
           {filteredNotifs.length > 0 ? filteredNotifs.map((notif) => (
             <div 
               key={notif.id} 
+              onClick={() => openReport('alert', { type: notif.title, severity: notif.type.toUpperCase(), message: notif.desc, time: notif.time })}
               className={cn(
-                "p-6 flex items-start gap-4 hover:bg-muted/30 transition-colors group relative",
+                "p-6 flex items-start gap-4 hover:bg-muted/30 transition-colors group relative cursor-pointer",
                 !notif.read && "bg-primary/[0.02]"
               )}
             >

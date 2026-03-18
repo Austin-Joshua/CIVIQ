@@ -4,8 +4,10 @@ import { User, Mail, Shield, MapPin, Calendar, Clock, Edit2, LogOut, Activity, B
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import { SectionHeader } from '@/components/ui/Cards';
+import { useUIStore } from '@/store/uiStore';
 
 export default function ProfilePage() {
+  const { openReport } = useUIStore();
   const { user, logout } = useAuthStore();
   const router = useRouter();
 
@@ -65,17 +67,26 @@ export default function ProfilePage() {
         {/* Stats & Activity */}
         <div className="lg:col-span-2 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-card/50 border border-border rounded-2xl p-5">
+            <div 
+              className="bg-card/50 border border-border rounded-2xl p-5 cursor-pointer hover:bg-emerald-500/5 transition-colors"
+              onClick={() => openReport('stat', { label: 'Commands issued', value: '1,242', unit: 'Actions' })}
+            >
               <Activity className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mb-3" />
               <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest mb-1">Commands issued</p>
               <p className="text-xl font-bold text-foreground">1,242</p>
             </div>
-            <div className="bg-card/50 border border-border rounded-2xl p-5">
+            <div 
+              className="bg-card/50 border border-border rounded-2xl p-5 cursor-pointer hover:bg-teal-500/5 transition-colors"
+              onClick={() => openReport('stat', { label: 'Decisions made', value: '482', unit: 'Logs' })}
+            >
               <BarChart3 className="w-5 h-5 text-teal-500 dark:text-teal-400 mb-3" />
               <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest mb-1">Decisions made</p>
               <p className="text-xl font-bold text-foreground">482</p>
             </div>
-            <div className="bg-card/50 border border-border rounded-2xl p-5">
+            <div 
+              className="bg-card/50 border border-border rounded-2xl p-5 cursor-pointer hover:bg-emerald-500/5 transition-colors"
+              onClick={() => openReport('stat', { label: 'Eco Impact', value: '12.4T', unit: 'CO2 Saved' })}
+            >
               <Leaf className="w-5 h-5 text-emerald-500 dark:text-emerald-300 mb-3" />
               <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest mb-1">Eco Impact</p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">12.4T</p>
@@ -86,7 +97,11 @@ export default function ProfilePage() {
             <h3 className="text-sm font-bold text-foreground uppercase tracking-widest mb-8 border-l-2 border-border pl-4">Session History</h3>
             <div className="space-y-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start gap-4 pb-6 border-b border-border last:border-0 last:pb-0">
+                <div 
+                  key={i} 
+                  onClick={() => openReport('alert', { type: `Session Log: Mar ${17-i}`, severity: 'INFO', message: `System login from IP 192.168.1.${100+i} using biometric verification. Established at HQ Gateway.`, time: `${9+i}:42 AM` })}
+                  className="flex items-start gap-4 pb-6 border-b border-border last:border-0 last:pb-0 cursor-pointer hover:bg-foreground/5 p-2 rounded-xl transition-all"
+                >
                   <div className="w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center flex-shrink-0">
                     <Clock className="w-5 h-5 text-muted-foreground/50" />
                   </div>

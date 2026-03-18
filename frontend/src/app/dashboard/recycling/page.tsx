@@ -29,6 +29,7 @@ import {
 import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
+import { useUIStore } from '@/store/uiStore';
 
 const DIVERSION_DATA = [
   { name: 'Paper/Cardboard', value: 35, color: '#10b981' },
@@ -46,6 +47,7 @@ const IMPACT_DATA = [
 ];
 
 export default function RecyclingPlannerPage() {
+  const { openReport } = useUIStore();
 
 
   return (
@@ -74,7 +76,7 @@ export default function RecyclingPlannerPage() {
           change={{ value: '1.2%', positive: true }}
           icon={TrendingUp}
           iconColor="text-emerald-400"
-
+          onClick={() => openReport('stat', { label: 'Diversion Rate', value: '42.5', unit: '%', change: { value: '1.2%', positive: true } })}
         />
         <StatCard 
           label="Recovery Goal"
@@ -83,7 +85,7 @@ export default function RecyclingPlannerPage() {
           change={{ value: 'Target: Q4', positive: true }}
           icon={BarChart3}
           iconColor="text-teal-400"
-
+          onClick={() => openReport('stat', { label: 'Recovery Goal', value: '55.0', unit: '%', change: { value: 'Target: Q4', positive: true } })}
         />
         <StatCard 
           label="Emissions Prevented"
@@ -92,7 +94,7 @@ export default function RecyclingPlannerPage() {
           change={{ value: 'Record Month', positive: true }}
           icon={Leaf}
           iconColor="text-emerald-300"
-
+          onClick={() => openReport('stat', { label: 'Emissions Prevented', value: '1.2', unit: 'Eco Impact', change: { value: 'Record Month', positive: true } })}
         />
         <StatCard 
           label="Economic Recovery"
@@ -101,7 +103,7 @@ export default function RecyclingPlannerPage() {
           change={{ value: '15.2%', positive: true }}
           icon={Zap}
           iconColor="text-yellow-400"
-
+          onClick={() => openReport('stat', { label: 'Economic Recovery', value: '12.4K', unit: '$ Value', change: { value: '15.2%', positive: true } })}
         />
       </div>
 

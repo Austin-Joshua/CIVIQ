@@ -30,6 +30,7 @@ import {
 import { StatCard, AlertCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
 import { useAuthStore } from '@/store/authStore';
+import { useUIStore } from '@/store/uiStore';
 import { cn } from '@/lib/utils';
 import { useIsMounted } from '@/hooks/useIsMounted';
 
@@ -51,6 +52,7 @@ const MOCK_ZONE_DATA = [
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+  const { openReport } = useUIStore();
   const isMounted = useIsMounted();
 
 
@@ -86,7 +88,7 @@ export default function DashboardPage() {
           icon={BarChart3}
           iconColor="text-emerald-400"
           gradient="from-emerald-500/10 to-transparent"
-          onClick={() => {}}
+          onClick={() => openReport('stat', { label: 'Cleanliness', value: '82.4', unit: '/100', change: { value: '2.1%', positive: true } })}
         />
         <StatCard 
           label="Waste Forecast"
@@ -96,7 +98,7 @@ export default function DashboardPage() {
           icon={Trash2}
           iconColor="text-teal-400"
           gradient="from-teal-500/10 to-transparent"
-          onClick={() => {}}
+          onClick={() => openReport('stat', { label: 'Waste Forecast', value: '14.2', unit: 'Tons', change: { value: '0.5%', positive: false } })}
         />
         <StatCard 
           label="Alerts"
@@ -105,7 +107,7 @@ export default function DashboardPage() {
           icon={AlertCircle}
           iconColor="text-orange-400"
           gradient="from-orange-500/10 to-transparent"
-          onClick={() => {}}
+          onClick={() => openReport('stat', { label: 'Alerts', value: '12', change: { value: '3 resolved', positive: true } })}
         />
         <StatCard 
           label="Zones"
@@ -114,7 +116,7 @@ export default function DashboardPage() {
           icon={MapIcon}
           iconColor="text-emerald-300"
           gradient="from-emerald-300/10 to-transparent"
-          onClick={() => {}}
+          onClick={() => openReport('stat', { label: 'Zones', value: '4', change: { value: 'All Active', positive: true } })}
         />
       </div>
 
@@ -203,18 +205,21 @@ export default function DashboardPage() {
                 severity="CRITICAL" 
                 message="Bin B12 in Zone C is at 98% capacity with blockage." 
                 time="2 mins ago" 
+                onClick={() => openReport('alert', { type: 'Overflow Outbreak', severity: 'CRITICAL', message: 'Bin B12 in Zone C is at 98% capacity with blockage.', time: '2 mins ago' })}
               />
               <AlertCard 
                 type="Service Gap" 
                 severity="MEDIUM" 
                 message="Vehicle V04 scheduled maintenance delayed." 
                 time="14 mins ago" 
+                onClick={() => openReport('alert', { type: 'Service Gap', severity: 'MEDIUM', message: 'Vehicle V04 scheduled maintenance delayed.', time: '14 mins ago' })}
               />
               <AlertCard 
                 type="Infrastructure Risk" 
                 severity="HIGH" 
                 message="Sensor network in Industrial Zone reporting high noise." 
                 time="22 mins ago" 
+                onClick={() => openReport('alert', { type: 'Infrastructure Risk', severity: 'HIGH', message: 'Sensor network in Industrial Zone reporting high noise.', time: '22 mins ago' })}
               />
             </div>
             <button className="w-full mt-4 py-2 border border-border hover:bg-muted/50 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground transition-all flex items-center justify-center gap-2">

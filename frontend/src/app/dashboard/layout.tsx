@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopHeader, MobileBottomNav } from '@/components/layout/Header';
+import { GlobalReportView } from '@/components/layout/GlobalReportView';
 import { useIsMounted } from '@/hooks/useIsMounted';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
         <MobileBottomNav />
       </div>
+      <GlobalReportView />
     </div>
   );
 }

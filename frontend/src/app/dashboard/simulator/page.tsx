@@ -31,6 +31,7 @@ import {
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
+import { useUIStore } from '@/store/uiStore';
 
 const INITIAL_SIM_DATA = [
   { month: 'Jan', current: 100, simulated: 100 },
@@ -42,6 +43,7 @@ const INITIAL_SIM_DATA = [
 ];
 
 export default function SimulatorPage() {
+  const { openReport } = useUIStore();
 
   
   const [params, setParams] = useState({
@@ -175,7 +177,10 @@ export default function SimulatorPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-border">
-              <div className="flex items-center gap-4">
+              <div 
+                className="flex items-center gap-4 cursor-pointer hover:bg-emerald-500/5 p-2 rounded-xl transition-colors"
+                onClick={() => openReport('stat', { label: 'Sustainability Impact', value: '+18.4%', unit: 'Score' })}
+              >
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                   <Leaf className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
                 </div>
@@ -184,7 +189,10 @@ export default function SimulatorPage() {
                   <p className="text-lg font-bold text-foreground tracking-tight">+18.4%</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 border-x border-border px-6">
+              <div 
+                className="flex items-center gap-4 border-x border-border px-6 cursor-pointer hover:bg-teal-500/5 p-2 rounded-xl transition-colors"
+                onClick={() => openReport('stat', { label: 'Economic Gain', value: '42.8K', unit: '$ Value' })}
+              >
                 <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
                   <Zap className="w-5 h-5 text-teal-500 dark:text-teal-400" />
                 </div>
@@ -193,7 +201,10 @@ export default function SimulatorPage() {
                   <p className="text-lg font-bold text-foreground tracking-tight">$42.8K</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div 
+                className="flex items-center gap-4 cursor-pointer hover:bg-orange-500/5 p-2 rounded-xl transition-colors"
+                onClick={() => openReport('stat', { label: 'Waste Impact', value: '1.2', unit: 'Tons' })}
+              >
                 <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
                   <ArrowRight className="w-5 h-5 text-orange-500 dark:text-orange-400" />
                 </div>

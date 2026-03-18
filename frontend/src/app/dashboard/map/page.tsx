@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MissingKeyOverlay } from '@/components/ui/Maps';
+import { useUIStore } from '@/store/uiStore';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || 'DEMO_MAP_ID';
@@ -28,6 +29,7 @@ const MOCK_ASSETS = [
 ];
 
 export default function CommandMapPage() {
+  const { openReport } = useUIStore();
   const [isDemoMode, setIsDemoMode] = useState(!GOOGLE_MAPS_API_KEY);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
@@ -246,7 +248,19 @@ export default function CommandMapPage() {
           
           <div className="space-y-3 overflow-y-auto flex-1 pr-2 custom-scrollbar">
             {filteredAssets.map((asset) => (
-              <div key={asset.id} className="p-4 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-emerald-500/30 hover:bg-slate-800/80 transition-all group cursor-pointer relative overflow-hidden">
+              <div 
+                key={asset.id} 
+                onClick={() => openReport(asset.status === 'Critical' || asset.status === 'Warning' ? 'alert' : 'stat', { 
+                  type: asset.name, 
+                  severity: asset.status.toUpperCase(), 
+                  message: `${asset.type.toUpperCase()} point monitoring active. Current status: ${asset.status}.`, 
+                  time: 'Live Update',
+                  label: asset.name,
+                  value: asset.fill || asset.capacity,
+                  unit: '%'
+                })}
+                className="p-4 bg-slate-900/50 border border-white/5 rounded-2xl hover:border-emerald-500/30 hover:bg-slate-800/80 transition-all group cursor-pointer relative overflow-hidden"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className={cn(
