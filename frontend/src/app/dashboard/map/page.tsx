@@ -175,7 +175,7 @@ export default function CommandMapPage() {
 
         {/* Floating Controls */}
         <div className="absolute top-6 left-6 z-10 space-y-3">
-          <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-3xl w-72">
+          <div className="liquid-glass-panel border-white/10 rounded-2xl p-4 shadow-2xl w-72">
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input 
@@ -183,28 +183,52 @@ export default function CommandMapPage() {
                 placeholder="Search assets..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-950/50 border border-white/5 rounded-xl text-xs text-foreground focus:outline-none focus:border-emerald-400/30 transition-all placeholder:text-slate-600"
+                className="w-full pl-9 pr-3 py-2 bg-background/50 border border-white/5 rounded-xl text-xs text-foreground focus:outline-none focus:border-emerald-400/30 transition-all placeholder:text-slate-500"
               />
             </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { id: 'bin', label: 'Bins', icon: Trash2, color: 'emerald' },
-                { id: 'truck', label: 'Fleet', icon: Truck, color: 'teal' },
-                { id: 'depot', label: 'Sites', icon: Database, color: 'blue' }
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setActiveFilter(activeFilter === f.id ? null : f.id)}
-                  className={cn(
-                    "px-3 py-1.5 border rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all",
-                    activeFilter === f.id 
-                      ? `bg-${f.color}-500/20 border-${f.color}-500 text-${f.color}-400` 
-                      : "bg-white/5 border-white/5 text-slate-500 hover:bg-white/10"
-                  )}
-                >
-                  <f.icon className="w-3 h-3" /> {f.label}
-                </button>
-              ))}
+            
+            <div className="mb-3">
+               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 block">Asset Filters</span>
+               <div className="flex flex-wrap gap-2">
+                 {[
+                   { id: 'bin', label: 'Bins', icon: Trash2, color: 'emerald' },
+                   { id: 'truck', label: 'Fleet', icon: Truck, color: 'teal' },
+                   { id: 'depot', label: 'Sites', icon: Database, color: 'blue' }
+                 ].map((f) => (
+                   <button
+                     key={f.id}
+                     onClick={() => setActiveFilter(activeFilter === f.id ? null : f.id)}
+                     className={cn(
+                       "px-3 py-1.5 border rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all",
+                       activeFilter === f.id 
+                         ? `bg-${f.color}-500/20 border-${f.color}-500/50 text-${f.color}-400 shadow-lg shadow-${f.color}-900/20` 
+                         : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
+                     )}
+                   >
+                     <f.icon className="w-3 h-3" /> {f.label}
+                   </button>
+                 ))}
+               </div>
+            </div>
+
+            <div className="pt-3 border-t border-white/5">
+               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 block">Overlay Controls</span>
+               <div className="grid grid-cols-2 gap-2">
+                  <button className="px-3 py-2 border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center justify-between group transition-all hover:bg-emerald-500/20">
+                     <span>Heatmap</span>
+                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  </button>
+                  <button className="px-3 py-2 border border-white/5 bg-white/5 text-slate-400 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center justify-between transition-all hover:bg-white/10">
+                     <span>Traffic</span>
+                  </button>
+                  <button className="px-3 py-2 border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center justify-between group transition-all hover:bg-emerald-500/20">
+                     <span>Routes</span>
+                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  </button>
+                  <button className="px-3 py-2 border border-white/5 bg-white/5 text-slate-400 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center justify-between transition-all hover:bg-white/10">
+                     <span>Zones</span>
+                  </button>
+               </div>
             </div>
           </div>
         </div>

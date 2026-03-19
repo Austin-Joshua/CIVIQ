@@ -3,7 +3,7 @@
 import { 
   Settings, User, Bell, Shield, Database, Smartphone, Palette, Globe, 
   ChevronRight, Activity, XCircle, CheckCircle2, Terminal, Copy, 
-  ExternalLink, Info, AlertTriangle, Key 
+  ExternalLink, Info, AlertTriangle, Key, Users, Building, CreditCard, TrendingUp, BarChart2
 } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/Cards';
 import { useState, useEffect } from 'react';
@@ -55,6 +55,10 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'general', label: 'General', icon: Settings },
+    { id: 'organization', label: 'Organization', icon: Building },
+    { id: 'team', label: 'Team & Roles', icon: Users },
+    { id: 'billing', label: 'Subscription & Usage', icon: CreditCard },
+    { id: 'audit', label: 'Audit Logs', icon: Activity },
     { id: 'profile', label: 'User Profile', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Security', icon: Shield },
@@ -233,6 +237,237 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </section>
+                </div>
+              )}
+
+              {activeTab === 'organization' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <section className="space-y-8">
+                    <div className="flex items-center gap-3 border-l-2 border-emerald-500/40 pl-3">
+                      <Building className="w-4 h-4 text-emerald-500" />
+                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Organization Profile</h3>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row items-center gap-8 p-6 liquid-glass-panel rounded-2xl">
+                      <div className="w-24 h-24 rounded-3xl bg-emerald-500/20 flex items-center justify-center text-emerald-500 font-bold text-3xl shadow-lg border border-emerald-500/30 glow-accent">
+                        CT
+                      </div>
+                      <div className="space-y-3 text-center md:text-left flex-1">
+                        <div>
+                          <h4 className="text-xl font-black text-foreground">CIVIQ Demo City</h4>
+                          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Enterprise Subscription • 24 Users</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                          <button className="px-4 py-2 bg-emerald-500 text-white text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest shadow-lg shadow-emerald-900/20">Edit Details</button>
+                          <button className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-xs font-bold rounded-lg transition-all">Manage Billing</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Workspace Name</label>
+                        <input type="text" defaultValue="CIVIQ Demo City" className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all shadow-sm" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Primary Domain</label>
+                        <input type="text" defaultValue="demo.civiq.city" className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all shadow-sm" />
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              )}
+
+              {activeTab === 'team' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 border-l-2 border-emerald-500/40 pl-3">
+                      <Users className="w-4 h-4 text-emerald-500" />
+                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Team Management</h3>
+                    </div>
+                    <button className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+                      + Invite User
+                    </button>
+                  </div>
+                  
+                  <div className="liquid-glass border border-border rounded-2xl overflow-hidden shadow-sm">
+                    <div className="grid grid-cols-4 px-6 py-4 border-b border-border/50 bg-muted/20 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                      <div className="col-span-2">User details</div>
+                      <div>Role Assignment</div>
+                      <div className="text-right">Action</div>
+                    </div>
+                    
+                    <div className="divide-y divide-border/50 bg-background/50 backdrop-blur-md">
+                      {[
+                        { name: 'Dr. Sarah Chen', email: 's.chen@civiq.city', role: 'SUPER_ADMIN' },
+                        { name: 'Marcus Johnson', email: 'm.johnson@civiq.city', role: 'OPS_MANAGER' },
+                        { name: 'Elena Rodriguez', email: 'e.rodriguez@civiq.city', role: 'ANALYST' },
+                      ].map((item, i) => (
+                        <div key={i} className="grid grid-cols-4 items-center px-6 py-4 hover:bg-muted/30 transition-colors">
+                          <div className="col-span-2 flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold text-xs border border-emerald-500/30">
+                              {item.name[0]}
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-foreground">{item.name}</p>
+                              <p className="text-[10px] text-muted-foreground">{item.email}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <span className="inline-block px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+                              {item.role}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <button className="text-[10px] uppercase font-bold text-muted-foreground hover:text-emerald-500 transition-colors tracking-widest px-3 py-1.5 hover:bg-emerald-500/10 rounded-lg">
+                              Edit
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'audit' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 border-l-2 border-emerald-500/40 pl-3">
+                      <Activity className="w-4 h-4 text-emerald-500" />
+                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Audit Logs</h3>
+                    </div>
+                    <button className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-xs font-bold rounded-xl transition-all">
+                      Export CSV
+                    </button>
+                  </div>
+                  
+                  <div className="liquid-glass border border-border rounded-2xl overflow-hidden shadow-sm">
+                    <div className="grid grid-cols-12 px-6 py-4 border-b border-border/50 bg-muted/20 text-xs font-black uppercase tracking-widest text-muted-foreground gap-4">
+                      <div className="col-span-3">Timestamp</div>
+                      <div className="col-span-2">User</div>
+                      <div className="col-span-2">Action</div>
+                      <div className="col-span-5">Details</div>
+                    </div>
+                    
+                    <div className="divide-y divide-border/50 bg-background/50 backdrop-blur-md">
+                      {[
+                         { time: '2026-03-19 14:32:01', user: 'Dr. Sarah Chen', action: 'UPDATE_ROLE', details: 'Changed Marcus Johnson to OPS_MANAGER' },
+                         { time: '2026-03-19 12:15:44', user: 'System', action: 'CREATE_ZONE', details: 'Automated zone generation for Downtown area' },
+                         { time: '2026-03-18 09:05:12', user: 'Elena Rodriguez', action: 'EXPORT_DATA', details: 'Downloaded last 30 days waste forecasting data' },
+                         { time: '2026-03-17 18:44:20', user: 'Marcus Johnson', action: 'UPDATE_ROUTE', details: 'Manually overrode route optimization #773' },
+                      ].map((log, i) => (
+                        <div key={i} className="grid grid-cols-12 items-center px-6 py-4 hover:bg-muted/30 transition-colors gap-4">
+                           <div className="col-span-3 text-[11px] font-mono text-muted-foreground">
+                             {log.time}
+                           </div>
+                           <div className="col-span-2 text-xs font-bold text-foreground truncate">
+                             {log.user}
+                           </div>
+                           <div className="col-span-2">
+                             <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+                               {log.action}
+                             </span>
+                           </div>
+                           <div className="col-span-5 text-xs text-muted-foreground truncate" title={log.details}>
+                             {log.details}
+                           </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'billing' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 border-l-2 border-emerald-500/40 pl-3">
+                      <CreditCard className="w-4 h-4 text-emerald-500" />
+                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Subscription & Usage</h3>
+                    </div>
+                    <button className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-xs font-bold rounded-xl transition-all">
+                      Billing History
+                    </button>
+                  </div>
+                  
+                  {/* Subscription Plan Card */}
+                  <div className="p-8 rounded-[2rem] bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none transition-transform group-hover:scale-110" />
+                    
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                       <div>
+                         <div className="flex items-center gap-3 mb-2">
+                           <h4 className="text-2xl font-black tracking-tight text-foreground">Enterprise Multi-Tenant</h4>
+                           <span className="px-2.5 py-1 rounded bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20">Active</span>
+                         </div>
+                         <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">Renews on Oct 1, 2026 • 24/50 Seats Utilized</p>
+                       </div>
+                       <div className="text-left md:text-right">
+                         <p className="text-4xl font-black text-foreground">$4,250<span className="text-lg text-muted-foreground">/mo</span></p>
+                         <button className="mt-4 px-6 py-2 bg-background/50 hover:bg-background/80 backdrop-blur-md border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm">
+                           Change Plan
+                         </button>
+                       </div>
+                    </div>
+                  </div>
+
+                  {/* Usage Analytics */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     <div className="p-6 rounded-2xl bg-card border border-border flex flex-col justify-between group hover:border-emerald-500/30 transition-all">
+                       <div className="flex items-center gap-3 mb-4">
+                         <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                           <Database className="w-5 h-5 text-blue-500" />
+                         </div>
+                         <p className="text-xs font-bold text-foreground uppercase tracking-widest">API Requests</p>
+                       </div>
+                       <div>
+                         <div className="flex items-end gap-2 mb-2">
+                           <span className="text-3xl font-black text-foreground tracking-tight">1.2M</span>
+                           <span className="text-xs font-bold text-muted-foreground mb-1">/ 2M Limit</span>
+                         </div>
+                         <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                           <div className="w-[60%] h-full bg-blue-500" />
+                         </div>
+                       </div>
+                     </div>
+
+                     <div className="p-6 rounded-2xl bg-card border border-border flex flex-col justify-between group hover:border-orange-500/30 transition-all">
+                       <div className="flex items-center gap-3 mb-4">
+                         <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                           <TrendingUp className="w-5 h-5 text-orange-500" />
+                         </div>
+                         <p className="text-xs font-bold text-foreground uppercase tracking-widest">Simulation Compute</p>
+                       </div>
+                       <div>
+                         <div className="flex items-end gap-2 mb-2">
+                           <span className="text-3xl font-black text-foreground tracking-tight">412</span>
+                           <span className="text-xs font-bold text-muted-foreground mb-1">hrs / 500 Limit</span>
+                         </div>
+                         <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                           <div className="w-[82%] h-full bg-orange-500" />
+                         </div>
+                       </div>
+                     </div>
+
+                     <div className="p-6 rounded-2xl bg-card border border-border flex flex-col justify-between group hover:border-emerald-500/30 transition-all md:col-span-2 lg:col-span-1">
+                       <div className="flex items-center gap-3 mb-4">
+                         <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                           <BarChart2 className="w-5 h-5 text-emerald-500" />
+                         </div>
+                         <p className="text-xs font-bold text-foreground uppercase tracking-widest">AI Predictions</p>
+                       </div>
+                       <div>
+                         <div className="flex items-end gap-2 mb-2">
+                           <span className="text-3xl font-black text-foreground tracking-tight">84k</span>
+                           <span className="text-xs font-bold text-muted-foreground mb-1">/ 100k Limit</span>
+                         </div>
+                         <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                           <div className="w-[84%] h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                         </div>
+                       </div>
+                     </div>
+                  </div>
                 </div>
               )}
 

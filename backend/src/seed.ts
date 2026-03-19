@@ -4,6 +4,20 @@ import bcrypt from 'bcrypt';
 async function seed() {
   console.log('🌱 Starting city data seed...');
 
+  // Create demo organization
+  const orgName = 'CIVIQ Demo City';
+  let org = await prisma.organization.findFirst({ where: { name: orgName } });
+  
+  if (!org) {
+    org = await prisma.organization.create({
+      data: {
+        name: orgName,
+        subscriptionPlan: 'ENTERPRISE'
+      }
+    });
+    console.log(`✅ Organization created: ${org.name}`);
+  }
+
   // Create demo admin
   const adminEmail = 'admin@civiq.city';
   const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
@@ -15,7 +29,8 @@ async function seed() {
         email: adminEmail,
         passwordHash,
         name: 'CIVIQ Administrator',
-        role: 'ADMIN',
+        role: 'SUPER_ADMIN',
+        organizationId: org.id
       },
     });
     console.log('✅ Admin user created (admin@civiq.city / civiq2026)');
@@ -30,7 +45,8 @@ async function seed() {
       data: {
         name,
         cleanlinessScore: Math.floor(Math.random() * 40) + 60,
-        geometry: JSON.stringify({ type: 'Polygon', coordinates: [] })
+        geometry: JSON.stringify({ type: 'Polygon', coordinates: [] }),
+        organizationId: org.id
       }
     });
     createdZones.push(zone);
@@ -64,6 +80,7 @@ async function seed() {
         status: statuses[Math.floor(Math.random() * statuses.length)],
         lat: 40.7128 + (Math.random() - 0.5) * 0.02,
         lng: -74.0060 + (Math.random() - 0.5) * 0.02,
+        organizationId: org.id
       }
     });
     console.log(`✅ Vehicle V-0${i} created`);

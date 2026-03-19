@@ -137,6 +137,48 @@
     border-color: color-mix(in srgb, hsl(var(--primary)) 30%, transparent);
   }
 
+  /* Liquid Glass Design System */
+  .liquid-glass {
+    background: linear-gradient(135deg, hsla(var(--card) / 0.5) 0%, hsla(var(--card) / 0.2) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(var(--border) / 0.3);
+    box-shadow: 0 8px 32px 0 hsla(0, 0%, 0%, 0.1);
+  }
+  
+  .dark .liquid-glass {
+    background: linear-gradient(135deg, hsla(var(--card) / 0.3) 0%, hsla(var(--card) / 0.1) 100%);
+    border: 1px solid hsla(var(--border) / 0.2);
+    box-shadow: 0 8px 32px 0 hsla(0, 0%, 0%, 0.3);
+  }
+
+  .liquid-glass-panel {
+    background: hsla(var(--card) / 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsla(var(--border) / 0.4);
+    box-shadow: 0 12px 48px -12px hsla(0, 0%, 0%, 0.2);
+    border-radius: var(--radius);
+  }
+
+  .glow-accent {
+    position: relative;
+  }
+  .glow-accent::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, hsl(var(--primary)), transparent 60%);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(8px);
+    transition: opacity 0.3s ease;
+  }
+  .glow-accent:hover::before {
+    opacity: 0.8;
+  }
+
   .glass-card {
     background-color: hsla(var(--card) / 0.4);
     backdrop-filter: blur(24px);

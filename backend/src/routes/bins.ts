@@ -1,17 +1,22 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
 router.use(authenticateToken);
 
-// Get all bins (with optional zone filtering)
-router.get('/', async (req, res) => {
+// Get all bins (with optional zone filtering and mandatory organization filtering)
+router.get('/', async (req: AuthRequest, res) => {
   try {
     const { zoneId } = req.query;
     const bins = await prisma.bin.findMany({
-      where: zoneId ? { zoneId: String(zoneId) } : {},
+      where: {
+        zone: {
+          organizationId: req.user?.organizationId
+        },
+        ...(zoneId ? { zoneId: String(zoneId) } : {})
+      },
       include: { zone: { select: { name: true } } }
     });
     res.json(bins);
@@ -21,9 +26,20 @@ router.get('/', async (req, res) => {
 });
 
 // Update bin fill level (simulating sensor data update)
-router.patch('/:id/fill', async (req, res) => {
+router.patch('/:id/fill', async (req: AuthRequest, res) => {
   try {
     const { fillLevel } = req.body;
+    
+    // First verify the bin belongs to a zone in the user's organization
+    const existingBin = await prisma.bin.findUnique({
+      where: { id: req.params.id },
+      include: { zone: true }
+    });
+
+    if (!existingBin || existingBin.zone.organizationId !== req.user?.organizationId) {
+       return res.status(404).json({ message: 'Bin not found' });
+    }
+
     const bin = await prisma.bin.update({
       where: { id: req.params.id },
       data: { currentFillLevel: fillLevel }

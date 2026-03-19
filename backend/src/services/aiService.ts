@@ -19,8 +19,13 @@ export const aiService = {
   /**
    * Simulates a time-series waste generation forecast
    */
-  async getWasteForecast(zoneId: string): Promise<PredictionResult> {
-    const zone = await prisma.zone.findUnique({ where: { id: zoneId } });
+  async getWasteForecast(zoneId: string, organizationId: string): Promise<PredictionResult> {
+    const zone = await prisma.zone.findUnique({ 
+      where: { 
+        id: zoneId,
+        organizationId
+      } 
+    });
     if (!zone) throw new Error('Zone not found');
 
     // Simulate high-density urban waste generation logic
@@ -39,9 +44,12 @@ export const aiService = {
   /**
    * Simulates a VRP (Vehicle Routing Problem) optimization
    */
-  async optimizeRoutes(vehicleIds: string[]): Promise<OptimizedRoute[]> {
+  async optimizeRoutes(vehicleIds: string[], organizationId: string): Promise<OptimizedRoute[]> {
     const vehicles = await prisma.vehicle.findMany({
-      where: { id: { in: vehicleIds } }
+      where: { 
+        id: { in: vehicleIds },
+        organizationId
+      }
     });
 
     return vehicles.map(v => ({
@@ -60,7 +68,12 @@ export const aiService = {
   /**
    * Simulates a Sustainability Risk Score
    */
-  async getRiskAssessment(zoneId: string) {
+  async getRiskAssessment(zoneId: string, organizationId: string) {
+    const zone = await prisma.zone.findUnique({
+      where: { id: zoneId, organizationId }
+    });
+    if (!zone) throw new Error('Zone not found');
+
     const bins = await prisma.bin.findMany({ where: { zoneId } });
     const avgFill = bins.reduce((acc, bin) => acc + bin.currentFillLevel, 0) / (bins.length || 1);
     

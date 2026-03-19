@@ -41,13 +41,13 @@ export function Sidebar() {
 
       {/* Sidebar Container */}
       <aside className={cn(
-        "fixed left-0 top-0 z-50 h-screen bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 lg:w-64 flex flex-col",
+        "fixed left-0 top-0 z-50 h-screen liquid-glass border-r border-border transition-transform duration-300 lg:translate-x-0 lg:w-64 flex flex-col",
         isMobileSidebarOpen ? "translate-x-0 w-72" : "-translate-x-full w-64"
       )}>
         <div className="flex items-center justify-between pt-8 pb-4 px-6 mb-2">
           <Link href="/" className="flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity">
-            <div className="w-16 h-16 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-2xl shadow-emerald-500/20 border border-white/10">
-              <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover" />
+            <div className="w-16 h-16 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-2xl shadow-emerald-500/20 border border-white/10 glow-accent">
+              <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover relative z-10" />
             </div>
             <div>
               <span className="text-foreground font-black text-4xl tracking-tighter block leading-none">CIVIQ</span>
@@ -64,8 +64,24 @@ export function Sidebar() {
           </button>
         </div>
 
+        {/* Workspace Selector */}
+        <div className="px-4 mb-4">
+          <div className="w-full flex items-center justify-between px-3 py-2 bg-background/40 hover:bg-background/60 border border-white/5 rounded-xl transition-colors cursor-pointer group">
+            <div className="flex items-center gap-2 truncate">
+              <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold text-xs uppercase">
+                CT
+              </div>
+              <div className="flex flex-col truncate">
+                 <span className="text-xs font-bold text-foreground truncate">CIVIQ Demo City</span>
+                 <span className="text-[9px] uppercase tracking-wider text-muted-foreground">Enterprise</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+          </div>
+        </div>
+
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 px-4 py-2 space-y-1.5 overflow-y-auto">
           {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
             return (
@@ -78,17 +94,18 @@ export function Sidebar() {
                 className={cn(
                   'flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-75 group relative overflow-hidden interactive-scale',
                   isActive
-                    ? 'bg-emerald-500/10 text-emerald-500'
+                    ? 'bg-emerald-500/10 text-emerald-500 glow-accent'
                     : 'text-muted-foreground hover:text-foreground hover:bg-emerald-500/5'
                 )}>
+                {isActive && <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent pointer-events-none" />}
                 <div className={cn(
-                  "absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full transition-transform duration-100",
+                  "absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 transition-transform duration-100 rounded-r-full",
                   isActive ? "scale-y-100" : "scale-y-0 group-hover:scale-y-50"
                 )} />
-                <Icon className={cn('w-4 h-4 flex-shrink-0 transition-colors duration-75', isActive ? 'text-emerald-500' : 'text-muted-foreground group-hover:text-emerald-500')} />
-                <span className="tracking-tight">{label}</span>
+                <Icon className={cn('w-4 h-4 flex-shrink-0 transition-colors duration-75 relative z-10', isActive ? 'text-emerald-500' : 'text-muted-foreground group-hover:text-emerald-500')} />
+                <span className="tracking-tight relative z-10">{label}</span>
                 {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] relative z-10" />
                 )}
               </Link>
             );

@@ -107,7 +107,7 @@ export function TopHeader() {
 
   return (
     <>
-    <header className="sticky top-0 z-20 h-14 flex items-center px-4 lg:px-6 bg-background/80 backdrop-blur-md border-b border-border gap-2 font-outfit">
+    <header className="sticky top-0 z-20 h-14 flex items-center px-4 lg:px-6 liquid-glass border-b border-border gap-2 font-outfit">
       {/* Mobile Menu Toggle */}
       <button 
         onClick={openMobileSidebar}
@@ -149,7 +149,7 @@ export function TopHeader() {
         </button>
 
         {showSearchResults && filteredResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-card/90 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute top-full left-0 right-0 mt-2 liquid-glass-panel border border-border rounded-2xl overflow-hidden z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
              <div className="p-2 space-y-1">
                 {filteredResults.map((item, i) => (
                   <button
@@ -185,29 +185,29 @@ export function TopHeader() {
         {/* Theme toggle */}
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale"
+          className="p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale glow-accent"
         >
-          {isMounted && theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          {isMounted && theme === 'dark' ? <Sun className="w-4 h-4 relative z-10" /> : <Moon className="w-4 h-4 relative z-10" />}
         </button>
 
         {/* Notifications Dropdown */}
         <div ref={notifRef} className="relative">
           <button
             onClick={() => { setShowNotifs(!showNotifs); setShowUserMenu(false); }}
-            className="relative p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale"
+            className="relative p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale glow-accent"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="w-4 h-4 relative z-10" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 min-w-[14px] h-[14px] rounded-full bg-emerald-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg shadow-emerald-500/20">
+              <span className="absolute top-1 right-1 min-w-[14px] h-[14px] rounded-full bg-emerald-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg shadow-emerald-500/20 z-20">
                 {unreadCount}
               </span>
             )}
           </button>
 
           {showNotifs && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute right-0 top-full mt-2 w-80 liquid-glass-panel border border-border rounded-xl overflow-hidden z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-background/50">
                 <h3 className="text-xs font-black text-foreground uppercase tracking-widest">System Alerts</h3>
                 {unreadCount > 0 && (
                   <button
@@ -226,7 +226,7 @@ export function TopHeader() {
                     key={n.id}
                     className={cn(
                       "flex items-center justify-between gap-4 px-4 py-3 border-b border-border/50 last:border-0 transition-colors hover:bg-muted/30",
-                      !n.read ? "bg-primary/[0.02]" : "opacity-70"
+                      !n.read ? "bg-primary/[0.05]" : "opacity-80"
                     )}
                   >
                     <span className={cn(
@@ -258,7 +258,7 @@ export function TopHeader() {
               <Link
                 href="/dashboard/notifications"
                 onClick={() => setShowNotifs(false)}
-                className="block text-center py-2.5 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-border hover:bg-muted/30 transition-colors"
+                className="block text-center py-2.5 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-border hover:bg-muted/30 transition-colors bg-background/50"
               >
                 View all notifications
               </Link>
@@ -272,18 +272,18 @@ export function TopHeader() {
             onClick={() => { setShowUserMenu(!showUserMenu); setShowNotifs(false); }}
             className="flex items-center pl-2 border-l border-border ml-1 hover:opacity-80 transition-opacity"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white text-xs font-bold border border-emerald-400/30">
               {isMounted ? (user?.name?.[0]?.toUpperCase() || 'U') : 'U'}
             </div>
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-100">
+            <div className="absolute right-0 top-full mt-2 w-56 liquid-glass-panel border border-border rounded-xl overflow-hidden z-[60] animate-in fade-in slide-in-from-top-2 duration-100">
               {/* User info */}
-              <div className="px-4 py-3 border-b border-border">
+              <div className="px-4 py-3 border-b border-border/50 bg-background/50">
                 <p className="text-sm font-black text-foreground">{isMounted ? (user?.name || 'Administrator') : 'Administrator'}</p>
                 <p className="text-[11px] text-muted-foreground">{isMounted ? (user?.email || 'admin@civiq.city') : 'admin@civiq.city'}</p>
-                <span className="inline-block mt-1.5 text-[9px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="inline-block mt-1.5 text-[9px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
                   {isMounted ? (user?.role || 'ADMIN') : 'ADMIN'}
                 </span>
               </div>
@@ -306,10 +306,10 @@ export function TopHeader() {
                 </Link>
               </div>
 
-              <div className="border-t border-border py-1">
+              <div className="border-t border-border/50 py-1 bg-background/30">
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-medium text-red-500 hover:bg-red-500/5 transition-colors"
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors"
                 >
                   <LogOut className="w-3.5 h-3.5" /> Sign out
                 </button>

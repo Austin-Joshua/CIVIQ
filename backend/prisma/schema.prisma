@@ -7,14 +7,30 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model Organization {
+  id               String   @id @default(uuid())
+  name             String
+  subscriptionPlan String   @default("ENTERPRISE") // FREE, PRO, ENTERPRISE
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  users    User[]
+  zones    Zone[]
+  vehicles Vehicle[]
+  alerts   Alert[]
+}
+
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         String   @default("OPS_MANAGER")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String   @id @default(uuid())
+  email          String   @unique
+  passwordHash   String
+  name           String
+  role           String   @default("VIEWER") // SUPER_ADMIN, CITY_ADMIN, OPS_MANAGER, ANALYST, FIELD_OPERATOR, VIEWER
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model Zone {
@@ -22,7 +38,10 @@ model Zone {
   name             String
   geometry         String?  // Stored as JSON string
   cleanlinessScore Float    @default(100.0)
-  bins             Bin[]
+  organizationId   String
+  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  bins         Bin[]
 }
 
 model Bin {
@@ -33,17 +52,21 @@ model Bin {
   currentFillLevel Float    // 0 to 100 percentage
   type             String   @default("GENERAL") // GENERAL, RECYCLING, COMPOST, HAZARDOUS
   lastCollected    DateTime?
-  zone             Zone     @relation(fields: [zoneId], references: [id])
   zoneId           String
+
+  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 }
 
 model Vehicle {
-  id        String   @id @default(uuid())
-  capacity  Float
-  status    String   @default("IDLE") // IDLE, ON_ROUTE, MAINTENANCE
-  lat       Float
-  lng       Float
-  routes    Route[]
+  id             String   @id @default(uuid())
+  capacity       Float
+  status         String   @default("IDLE") // IDLE, ON_ROUTE, MAINTENANCE
+  lat            Float
+  lng            Float
+  organizationId String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  routes       Route[]
 }
 
 model Route {
@@ -52,15 +75,20 @@ model Route {
   estimatedDuration Float    // In minutes
   emissionsSaved    Float    // In kg
   createdAt         DateTime @default(now())
-  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id])
   vehicleId         String
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 }
 
 model Alert {
-  id        String   @id @default(uuid())
-  type      String   // OVERFLOW_RISK, SERVICE_GAP
-  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
-  message   String
-  timestamp DateTime @default(now())
-  resolved  Boolean  @default(false)
+  id             String   @id @default(uuid())
+  type           String   // OVERFLOW_RISK, SERVICE_GAP, INCIDENT
+  severity       String   // LOW, MEDIUM, HIGH, CRITICAL
+  message        String
+  timestamp      DateTime @default(now())
+  resolved       Boolean  @default(false)
+  organizationId String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
+

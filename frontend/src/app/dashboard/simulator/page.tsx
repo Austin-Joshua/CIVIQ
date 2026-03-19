@@ -104,7 +104,7 @@ export default function SimulatorPage() {
         
         {/* Parameters Column */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-card/50 border border-border rounded-2xl p-6 shadow-xl">
+          <div className="liquid-glass border border-white/10 rounded-[2rem] p-6 shadow-2xl">
             <SectionHeader title="Simulation Variables" subtitle="Adjust urban policy sliders" />
             
             <div className="space-y-8 mt-8">
@@ -113,47 +113,56 @@ export default function SimulatorPage() {
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Collection Freq</span>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{params.collectionFreq}%</span>
                 </div>
-                <input type="range" value={params.collectionFreq} onChange={(e) => setParams({...params, collectionFreq: parseInt(e.target.value)})} className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-emerald-500" />
+                <input type="range" value={params.collectionFreq} onChange={(e) => setParams({...params, collectionFreq: parseInt(e.target.value)})} className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-400 transition-all" />
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Recycling Incentive</span>
                   <span className="text-xs font-bold text-teal-600 dark:text-teal-400">{params.recyclingIncentive}%</span>
                 </div>
-                <input type="range" value={params.recyclingIncentive} onChange={(e) => setParams({...params, recyclingIncentive: parseInt(e.target.value)})} className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-teal-500" />
+                <input type="range" value={params.recyclingIncentive} onChange={(e) => setParams({...params, recyclingIncentive: parseInt(e.target.value)})} className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-teal-500 hover:accent-teal-400 transition-all" />
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Fleet Fuel Tax</span>
                   <span className="text-xs font-bold text-orange-500 dark:text-orange-400">{params.fuelTax}%</span>
                 </div>
-                <input type="range" value={params.fuelTax} onChange={(e) => setParams({...params, fuelTax: parseInt(e.target.value)})} className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-orange-500" />
+                <input type="range" value={params.fuelTax} onChange={(e) => setParams({...params, fuelTax: parseInt(e.target.value)})} className="w-full h-1 bg-muted rounded-full appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 transition-all" />
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-border space-y-4">
-              <div className="flex items-start gap-3 p-3 bg-foreground/5 border border-border rounded-xl">
-                <Target className="w-4 h-4 text-primary mt-0.5" />
+            <div className="mt-8 pt-6 border-t border-border/50 space-y-4">
+              <div className="flex items-start gap-3 p-4 bg-background/40 hover:bg-background/60 transition-colors border border-white/5 rounded-xl cursor-pointer group">
+                <Target className="w-4 h-4 text-emerald-500 mt-0.5 group-hover:scale-110 transition-transform" />
                 <div>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-1">Target Zone</p>
-                  <p className="text-sm font-semibold text-foreground">Zone C - Industrial</p>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Target Zone</p>
+                  <p className="text-sm font-bold text-foreground">Zone C - Industrial</p>
                 </div>
               </div>
-              <p className="text-[10px] text-muted-foreground/50 leading-relaxed italic">
-                * Simulating changes in Zone C affects 42% of total city waste logistics.
-              </p>
+              
+              {/* Confidence Score readout */}
+              <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/20 blur-2xl rounded-full" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2 border-b border-emerald-500/10 pb-2">AI Confidence Score</p>
+                <div className="flex items-end gap-2">
+                  <span className="text-3xl font-black tracking-tighter text-foreground">94</span>
+                  <span className="text-sm font-bold text-muted-foreground mb-1">%</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed font-medium">Model reliability based on historical matching of selected policy sliders.</p>
+              </div>
+
             </div>
           </div>
         </div>
 
         {/* Results Graph Column */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-card/50 border border-border rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
-            <SectionHeader title="Projected Environmental Impact" subtitle="Simulated vs Current historical baseline" />
+          <div className="liquid-glass-panel border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 blur-3xl rounded-full -mr-48 -mt-48 pointer-events-none" />
             
-            <div 
-              className="h-[360px] w-full mt-6 scale-100 group-hover:scale-[1.01] transition-transform duration-700"
-            >
+            <SectionHeader title="Projected Environmental Impact" subtitle="Simulated vs Current historical baseline across next 6 months" />
+            
+            <div className="h-[360px] w-full mt-6 scale-100 group-hover:scale-[1.01] transition-transform duration-700 relative z-10">
               <DynamicChart>
                 <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={simData}>
@@ -164,56 +173,70 @@ export default function SimulatorPage() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
-                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }} labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }} itemStyle={{ color: 'hsl(var(--foreground))' }} />
-                  <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', opacity: 0.5 }} />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'rgba(2, 6, 23, 0.8)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} labelStyle={{ color: '#fff', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px' }} itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 600 }} />
+                  <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', opacity: 0.6 }} />
                   <Area type="monotone" dataKey="simulated" fill="url(#simArea)" stroke="none" />
                   <Line type="monotone" dataKey="current" stroke="rgba(255,255,255,0.15)" strokeWidth={2} strokeDasharray="5 5" name="Historical Baseline" dot={false} />
-                  <Line type="monotone" dataKey="simulated" stroke="#10b981" strokeWidth={4} name="Simulated Scenario" dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: 'var(--background)' }} />
+                  <Line type="monotone" dataKey="simulated" stroke="#10b981" strokeWidth={4} name="Simulated Scenario" dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#020617' }} activeDot={{ r: 6, strokeWidth: 0 }} />
                 </ComposedChart>
               </ResponsiveContainer>
               </DynamicChart>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-border">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-border/50 relative z-10">
               <div 
-                className="flex items-center gap-4 cursor-pointer hover:bg-emerald-500/5 p-2 rounded-xl transition-colors"
+                className="flex items-center gap-4 cursor-pointer hover:bg-emerald-500/10 p-4 rounded-2xl transition-all border border-transparent hover:border-emerald-500/20 group/stat"
                 onClick={() => openReport('stat', { label: 'Sustainability Impact', value: '+18.4%', unit: 'Score' })}
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                  <Leaf className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover/stat:scale-110 transition-transform">
+                  <Leaf className="w-6 h-6 text-emerald-500 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest">Sustainability</p>
-                  <p className="text-lg font-bold text-foreground tracking-tight">+18.4%</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">Sustainability</p>
+                  <p className="text-xl font-black text-foreground tracking-tight">+18.4%</p>
                 </div>
               </div>
               <div 
-                className="flex items-center gap-4 border-x border-border px-6 cursor-pointer hover:bg-teal-500/5 p-2 rounded-xl transition-colors"
+                className="flex items-center gap-4 cursor-pointer hover:bg-teal-500/10 p-4 rounded-2xl transition-all border border-transparent hover:border-teal-500/20 group/stat"
                 onClick={() => openReport('stat', { label: 'Economic Gain', value: '42.8K', unit: '$ Value' })}
               >
-                <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-teal-500 dark:text-teal-400" />
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center group-hover/stat:scale-110 transition-transform">
+                  <Zap className="w-6 h-6 text-teal-500 dark:text-teal-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest">Economic Gain</p>
-                  <p className="text-lg font-bold text-foreground tracking-tight">$42.8K</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">Economic Gain</p>
+                  <p className="text-xl font-black text-foreground tracking-tight">$42.8K</p>
                 </div>
               </div>
               <div 
-                className="flex items-center gap-4 cursor-pointer hover:bg-orange-500/5 p-2 rounded-xl transition-colors"
+                className="flex items-center gap-4 cursor-pointer hover:bg-orange-500/10 p-4 rounded-2xl transition-all border border-transparent hover:border-orange-500/20 group/stat"
                 onClick={() => openReport('stat', { label: 'Waste Impact', value: '1.2', unit: 'Tons' })}
               >
-                <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-                  <ArrowRight className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center group-hover/stat:scale-110 transition-transform">
+                  <ArrowRight className="w-6 h-6 text-orange-500 dark:text-orange-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest">Impact</p>
-                  <p className="text-lg font-black text-foreground tracking-tighter">1.2 Tons</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">Net Impact</p>
+                  <p className="text-xl font-black text-foreground tracking-tighter">-1.2 Tons</p>
                 </div>
               </div>
             </div>
+            
+            {/* Prediction Explanation */}
+            <div className="mt-6 p-5 rounded-2xl bg-muted/20 border border-white/5 flex gap-4">
+               <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 border border-emerald-500/20">
+                 <Zap className="w-5 h-5 text-emerald-500" />
+               </div>
+               <div>
+                 <p className="text-xs font-black uppercase tracking-widest text-foreground block mb-2">Analysis Insight</p>
+                 <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                   Increasing the <strong>Recycling Incentive</strong> to {params.recyclingIncentive}% correlates strongly with a rapid drop in mixed waste volume during the first 3 months. The model compensates by predicting a minor efficiency loss in collection routes, offset by the fuel tax reduction.
+                 </p>
+               </div>
+            </div>
+
           </div>
         </div>
       </div>
