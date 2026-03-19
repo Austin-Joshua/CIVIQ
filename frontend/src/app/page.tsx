@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import { 
   ArrowRight, 
   Shield, 
@@ -15,40 +17,56 @@ import {
   CheckCircle2,
   Cpu,
   Fingerprint,
-  Bot
+  Bot,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white selection:bg-emerald-500/30 overflow-x-hidden font-outfit">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-emerald-50 dark:from-[#020617] dark:to-[#020617] text-slate-900 dark:text-white selection:bg-emerald-500/30 overflow-x-hidden font-outfit">
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/15 blur-[150px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/10 blur-[200px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/15 blur-[150px] rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/10 blur-[200px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/40 backdrop-blur-2xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl border-b border-slate-200 dark:border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 p-1 bg-slate-900">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-300 dark:border-white/10 p-1 bg-slate-900">
                <img src="/logo.png" className="w-full h-full object-cover" alt="Logo" />
             </div>
-            <span className="text-3xl font-black tracking-tighter text-white uppercase">CIVIQ</span>
+            <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase">CIVIQ</span>
           </div>
           <div className="hidden lg:flex items-center gap-10">
             {['Platform', 'Solutions', 'Vision', 'Network'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-black text-slate-400 hover:text-emerald-400 transition-colors tracking-[0.2em] uppercase">
+              <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-black text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors tracking-[0.2em] uppercase">
                 {item}
               </a>
             ))}
           </div>
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="h-10 w-10 rounded-xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <button 
               onClick={() => router.push('/auth/login')}
-              className="text-sm font-bold text-slate-300 hover:text-white transition-colors px-4"
+              className="text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors px-4"
             >
               Login
             </button>
@@ -82,11 +100,11 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in slide-in-from-bottom-7 duration-1000">
             <button 
               onClick={() => router.push('/auth/signup')}
-              className="w-full sm:w-auto px-12 py-6 bg-white text-slate-950 font-black rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-xl group shadow-2xl shadow-white/10"
+              className="w-full sm:w-auto px-12 py-6 bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-black rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-xl group shadow-2xl shadow-slate-900/10 dark:shadow-white/10"
             >
               Initialize Node <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="w-full sm:w-auto px-12 py-6 bg-slate-900/50 border border-white/10 hover:border-white/20 text-white font-bold rounded-2xl transition-all hover:bg-slate-900 text-xl flex items-center justify-center gap-2">
+            <button className="w-full sm:w-auto px-12 py-6 bg-white/70 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/20 text-slate-900 dark:text-white font-bold rounded-2xl transition-all hover:bg-white dark:hover:bg-slate-900 text-xl flex items-center justify-center gap-2">
               View Roadmap
             </button>
           </div>
@@ -100,12 +118,12 @@ export default function LandingPage() {
                 { icon: Fingerprint, title: "Secure Governance", desc: "Blockchain-backed data integrity for municipal records and audits." },
                 { icon: Globe, title: "Zero-Waste Vision", desc: "Fully automated routing and sorting strategies for clean districts." }
               ].map((item, i) => (
-                <div key={i} className="p-10 bg-slate-900/30 border border-white/5 rounded-[2.5rem] hover:border-emerald-500/30 transition-all hover:-translate-y-2 group">
+                <div key={i} className="p-10 bg-white/70 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 rounded-[2.5rem] hover:border-emerald-500/30 transition-all hover:-translate-y-2 group">
                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-8 font-black group-hover:bg-emerald-500 group-hover:text-white transition-all">
                       <item.icon className="w-7 h-7" />
                    </div>
                    <h3 className="text-2xl font-black mb-4 tracking-tight">{item.title}</h3>
-                   <p className="text-slate-400 leading-relaxed font-medium">{item.desc}</p>
+                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{item.desc}</p>
                 </div>
               ))}
            </div>
@@ -121,7 +139,7 @@ export default function LandingPage() {
            </div>
            <div className="relative group">
               <div className="absolute inset-0 bg-emerald-500/20 blur-[120px] rounded-full opacity-30 transition-opacity group-hover:opacity-50" />
-              <div className="relative bg-[#020617] border border-white/10 rounded-[3rem] p-4 shadow-3xl overflow-hidden backdrop-blur-xl transition-transform duration-1000 group-hover:scale-[1.02]">
+              <div className="relative bg-white dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-[3rem] p-4 shadow-3xl overflow-hidden backdrop-blur-xl transition-transform duration-1000 group-hover:scale-[1.02]">
                   <img 
                     src="/window.svg" 
                    className="w-full rounded-[2.5rem] shadow-2xl brightness-90 grayscale-[0.2] group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000" 
@@ -133,7 +151,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section id="solutions" className="px-6 py-40 border-y border-white/5 relative">
+        <section id="solutions" className="px-6 py-40 border-y border-slate-200 dark:border-white/5 relative">
           <div className="max-w-7xl mx-auto">
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
                 <div>
@@ -150,14 +168,14 @@ export default function LandingPage() {
                         <div key={i} className="flex gap-8 group">
                            <div className="w-1.5 h-16 bg-emerald-500/20 rounded-full group-hover:bg-emerald-500 transition-colors" />
                            <div>
-                              <h4 className="text-xl font-black mb-2 text-white">{item.title}</h4>
-                              <p className="text-slate-400 leading-relaxed font-medium text-lg">{item.desc}</p>
+                              <h4 className="text-xl font-black mb-2 text-slate-900 dark:text-white">{item.title}</h4>
+                              <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium text-lg">{item.desc}</p>
                            </div>
                         </div>
                       ))}
                    </div>
                 </div>
-                <div className="bg-slate-900/30 border border-white/5 rounded-[3rem] p-12 space-y-10 relative">
+                <div className="bg-white/70 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 rounded-[3rem] p-12 space-y-10 relative">
                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full" />
                    <div className="space-y-6 relative">
                       {[
@@ -172,11 +190,11 @@ export default function LandingPage() {
                         </div>
                       ))}
                    </div>
-                   <div className="pt-10 border-t border-white/5">
+                   <div className="pt-10 border-t border-slate-200 dark:border-white/5">
                       <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-4">Trusted by Municipal Experts</p>
                       <div className="flex gap-4 opacity-30">
                          {/* Placeholder for partner logos */}
-                         {[1,2,3,4].map(i => <div key={i} className="w-12 h-12 rounded-xl bg-white/10" />)}
+                         {[1,2,3,4].map(i => <div key={i} className="w-12 h-12 rounded-xl bg-slate-300/40 dark:bg-white/10" />)}
                       </div>
                    </div>
                 </div>
@@ -189,7 +207,7 @@ export default function LandingPage() {
            <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 leading-[1]">
              Ready to <span className="text-emerald-500">Deploy?</span>
            </h2>
-           <p className="text-xl text-slate-400 mb-16 max-w-2xl mx-auto font-medium">
+           <p className="text-xl text-slate-600 dark:text-slate-400 mb-16 max-w-2xl mx-auto font-medium">
              Join the global network of cities transforming waste into intelligence.
            </p>
            <button 
@@ -201,7 +219,7 @@ export default function LandingPage() {
         </section>
 
         {/* Footer */}
-        <footer className="py-32 border-t border-white/5 bg-slate-950/50">
+        <footer className="py-32 border-t border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-950/50">
           <div className="max-w-7xl mx-auto px-6">
              <div className="grid grid-cols-1 md:grid-cols-4 gap-20 mb-20 text-center md:text-left">
                 <div className="md:col-span-2">
@@ -209,14 +227,14 @@ export default function LandingPage() {
                      <img src="/logo.png" className="w-10 h-10 object-cover rounded-xl" alt="CIVIQ" />
                      <span className="text-3xl font-black tracking-tighter">CIVIQ</span>
                    </div>
-                   <p className="text-slate-500 max-w-sm font-medium leading-relaxed mx-auto md:mx-0">
+                   <p className="text-slate-600 dark:text-slate-500 max-w-sm font-medium leading-relaxed mx-auto md:mx-0">
                      The world's leading urban OS for smart, sustainable waste infrastructure. 
                      Predicting the future of city life, today.
                    </p>
                 </div>
                 <div>
-                   <h4 className="text-white font-black uppercase tracking-widest text-xs mb-8">Platform</h4>
-                   <ul className="space-y-4 text-slate-400 font-bold text-sm">
+                   <h4 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-xs mb-8">Platform</h4>
+                   <ul className="space-y-4 text-slate-600 dark:text-slate-400 font-bold text-sm">
                       <li>Overview</li>
                       <li>Solutions</li>
                       <li>Roadmap</li>
@@ -224,8 +242,8 @@ export default function LandingPage() {
                    </ul>
                 </div>
                 <div>
-                   <h4 className="text-white font-black uppercase tracking-widest text-xs mb-8">Company</h4>
-                   <ul className="space-y-4 text-slate-400 font-bold text-sm">
+                   <h4 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-xs mb-8">Company</h4>
+                   <ul className="space-y-4 text-slate-600 dark:text-slate-400 font-bold text-sm">
                       <li>About</li>
                       <li>Sustainability</li>
                       <li>Contact</li>
@@ -233,7 +251,7 @@ export default function LandingPage() {
                    </ul>
                 </div>
              </div>
-             <div className="flex flex-col md:flex-row items-center justify-between gap-10 opacity-30 border-t border-white/5 pt-20">
+             <div className="flex flex-col md:flex-row items-center justify-between gap-10 opacity-50 dark:opacity-30 border-t border-slate-200 dark:border-white/5 pt-20">
                 <p className="text-xs font-bold uppercase tracking-widest">© 2026 CIVIQ GLOBAL. BUILT FOR CLEAN CITIES.</p>
                 <div className="flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em]">
                    <a href="#" className="hover:text-emerald-500 transition-colors">Privacy</a>

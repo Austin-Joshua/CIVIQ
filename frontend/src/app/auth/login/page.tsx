@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { 
   ArrowLeft, 
   ArrowRight, 
   Eye,
-  EyeOff
+  EyeOff,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
@@ -44,10 +47,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotHelp, setShowForgotHelp] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { theme, setTheme } = useTheme();
   const target = searchParams.get('next') || '/dashboard';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const finishLogin = (user: { id: string; name: string; email: string; role: string }, token: string) => {
     setAuth(user, token);
@@ -98,17 +107,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-emerald-50 dark:from-[#020617] dark:to-[#020617] flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden text-slate-900 dark:text-slate-200">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl bg-slate-900 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+      <div className="relative z-10 w-full max-w-7xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+        <button
+          type="button"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="absolute top-6 right-6 z-20 h-10 w-10 rounded-xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors"
+          aria-label="Toggle theme"
+        >
+          {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Form Side */}
-          <div className="p-8 lg:p-20 flex flex-col justify-center bg-slate-900 text-slate-200">
+          <div className="p-8 lg:p-20 flex flex-col justify-center bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200">
             <button 
               onClick={() => router.push('/')}
               className="flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-colors mb-8 lg:mb-12 group w-fit p-1 -ml-1"
@@ -129,8 +146,8 @@ export default function LoginPage() {
             </div>
 
             <div className="mb-10">
-              <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-white mb-4">Login</h1>
-              <p className="text-slate-400 font-medium">Sign in to your account.</p>
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-4">Login</h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">Sign in to your account.</p>
             </div>
 
             <div className="max-w-md w-full mx-auto">
@@ -143,7 +160,7 @@ export default function LoginPage() {
                     placeholder="Enter your username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
+                    className="w-full px-5 py-3 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-500"
                     required
                   />
                 </div>
@@ -156,7 +173,7 @@ export default function LoginPage() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-5 py-3 pr-12 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
+                      className="w-full px-5 py-3 pr-12 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-500"
                       required
                     />
                     <button
@@ -168,7 +185,7 @@ export default function LoginPage() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  <p className="text-[11px] text-slate-500">Any username and password will sign in.</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-500">Any username and password will sign in.</p>
                 </div>
 
                 <button
@@ -180,7 +197,7 @@ export default function LoginPage() {
                 </button>
 
                 {showForgotHelp && (
-                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-slate-200 space-y-1">
+                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-slate-700 dark:text-slate-200 space-y-1">
                     <p><strong>Option 1:</strong> Reset by creating a new account with another email.</p>
                     <p><strong>Option 2:</strong> Use Quick Access below to enter instantly.</p>
                   </div>
@@ -199,7 +216,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={handleGuestAccess}
                   disabled={loading}
-                  className="w-full py-3 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white font-black rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
+                  className="w-full py-3 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600 disabled:opacity-50 text-slate-900 dark:text-white font-black rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
                 >
                   {loading ? 'Please wait...' : 'Quick Access (No Password)'}
                 </button>
@@ -219,7 +236,7 @@ export default function LoginPage() {
           </div>
 
           {/* Visual Side */}
-          <div className="hidden lg:block relative bg-[#022c22] overflow-hidden">
+          <div className="hidden lg:block relative bg-emerald-100 dark:bg-[#022c22] overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#064e3b] to-[#022c22] z-10" />
             <div className="absolute inset-0 flex flex-col justify-center p-20 z-20">
               <div className="space-y-6">
