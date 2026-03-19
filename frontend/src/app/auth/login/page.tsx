@@ -107,14 +107,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-emerald-50/60 dark:from-[#020617] dark:to-[#0a0f1f] flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden text-slate-900 dark:text-slate-200 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-login-from to-login-to flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden text-foreground transition-colors duration-300">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
         <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+      <div className="relative z-10 w-full max-w-7xl bg-panel-bg border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
         <button
           type="button"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -125,7 +125,7 @@ export default function LoginPage() {
         </button>
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Form Side */}
-          <div className="p-8 lg:p-20 flex flex-col justify-center bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200">
+          <div className="p-8 lg:p-20 flex flex-col justify-center bg-panel-bg text-foreground">
             <button 
               onClick={() => router.push('/')}
               className="flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-colors mb-8 lg:mb-12 group w-fit p-1 -ml-1"
@@ -160,7 +160,7 @@ export default function LoginPage() {
                     placeholder="Enter your username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-5 py-3 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-500"
+                    className="w-full px-5 py-3 bg-input-bg border border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground"
                     required
                   />
                 </div>
@@ -173,7 +173,7 @@ export default function LoginPage() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-5 py-3 pr-12 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-500"
+                      className="w-full px-5 py-3 pr-12 bg-input-bg border border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground"
                       required
                     />
                     <button
@@ -216,7 +216,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={handleGuestAccess}
                   disabled={loading}
-                  className="w-full py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 text-slate-900 dark:text-white font-black rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
+                  className="w-full py-3 bg-secondary hover:bg-secondary/80 disabled:opacity-50 text-secondary-foreground font-black rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
                 >
                   {loading ? 'Please wait...' : 'Quick Access (No Password)'}
                 </button>
@@ -236,8 +236,8 @@ export default function LoginPage() {
           </div>
 
           {/* Visual Side */}
-          <div className="hidden lg:block relative bg-emerald-100/80 dark:bg-[#022c22] overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-emerald-900 dark:from-[#064e3b] dark:to-[#022c22] z-10" />
+          <div className="hidden lg:block relative bg-visual-to overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-visual-from to-visual-to z-10" />
             <div className="absolute inset-0 flex flex-col justify-center p-20 z-20">
               <div className="space-y-6">
                 <div className="relative group">

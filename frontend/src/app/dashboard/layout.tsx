@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!token) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/40 dark:from-[#020617] dark:to-[#0a0f1f] text-foreground relative flex transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary text-foreground relative flex transition-colors duration-300">
       <Sidebar />
       <div className={cn(
         "flex-1 flex flex-col min-h-screen relative z-10 transition-all duration-300 ease-in-out w-full",
