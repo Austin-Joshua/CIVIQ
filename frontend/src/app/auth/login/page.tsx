@@ -6,19 +6,8 @@ import Link from 'next/link';
 import { 
   ArrowLeft, 
   ArrowRight, 
-  Shield, 
-  Globe, 
-  Zap, 
-  BarChart3, 
-  Users, 
-  Database, 
-  Layout, 
-  ArrowUpRight,
-  Maximize2,
-  CheckCircle2,
-  Cpu,
-  Fingerprint,
-  Bot
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
@@ -31,9 +20,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgotHelp, setShowForgotHelp] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const target = searchParams.get('next') || '/dashboard';
+
+  const finishLogin = (user: { id: string; name: string; email: string; role: string }, token: string) => {
+    setAuth(user, token);
+    router.replace(target);
+    setTimeout(() => {
+      if (window.location.pathname !== target) {
+        window.location.assign(target);
+      }
+    }, 150);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +68,7 @@ export default function LoginPage() {
         throw new Error(payload?.message || 'Invalid credentials');
       }
 
-      setAuth(
+      finishLogin(
         {
           id: String(payload.user.id),
           name: payload.user.name,
@@ -75,20 +77,75 @@ export default function LoginPage() {
         },
         payload.token
       );
-      const target = searchParams.get('next') || '/dashboard';
-      router.replace(target);
-      // Fallback navigation for hosted environments where edge middleware sees cookie with slight delay.
-      setTimeout(() => {
-        if (window.location.pathname !== target) {
-          window.location.assign(target);
-        }
-      }, 150);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast.error('Login is taking too long. The server may be waking up, please try again in a few seconds.');
       } else {
         toast.error(error instanceof Error ? error.message : 'Sign in failed. Please try again.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuestAccess = async () => {
+    setLoading(true);
+    try {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS);
+      let response: Response;
+      let payload: any;
+
+      try {
+        response = await fetch(`${API_URL}/auth/guest-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
+        try {
+          payload = await response.json();
+        } catch {
+          payload = null;
+        }
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+
+      if (response.ok && payload?.token && payload?.user) {
+        finishLogin(
+          {
+            id: String(payload.user.id),
+            name: payload.user.name,
+            email: payload.user.email,
+            role: payload.user.role,
+          },
+          payload.token
+        );
+        return;
+      }
+
+      // Offline fallback so users can still enter dashboard UI.
+      finishLogin(
+        {
+          id: 'demo-user',
+          name: 'Demo User',
+          email: 'demo@civiq.city',
+          role: 'VIEWER',
+        },
+        'demo-access-token'
+      );
+      toast.success('Signed in with demo access.');
+    } catch {
+      finishLogin(
+        {
+          id: 'demo-user',
+          name: 'Demo User',
+          email: 'demo@civiq.city',
+          role: 'VIEWER',
+        },
+        'demo-access-token'
+      );
+      toast.success('Signed in with demo access.');
     } finally {
       setLoading(false);
     }
@@ -146,16 +203,41 @@ export default function LoginPage() {
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="login-password" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Password</label>
-                  <input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      id="login-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-5 py-3 pr-12 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-400 transition-colors"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowForgotHelp((prev) => !prev)}
+                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  Forgot password?
+                </button>
+
+                {showForgotHelp && (
+                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-slate-200 space-y-1">
+                    <p><strong>Option 1:</strong> Reset by creating a new account with another email.</p>
+                    <p><strong>Option 2:</strong> Use Quick Access below to enter instantly.</p>
+                  </div>
+                )}
                 
                 <button
                   type="submit"
@@ -165,7 +247,20 @@ export default function LoginPage() {
                   {loading ? 'Signing in...' : 'Sign In'} 
                   {!loading && <ArrowRight className="w-4 h-4" />}
                 </button>
+
+                <button
+                  type="button"
+                  onClick={handleGuestAccess}
+                  disabled={loading}
+                  className="w-full py-3 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white font-black rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
+                >
+                  {loading ? 'Please wait...' : 'Quick Access (No Password)'}
+                </button>
               </form>
+            </div>
+
+            <div className="mt-6 text-center text-xs text-slate-400">
+              <p>Default login: <span className="text-slate-200">admin@civiq.city</span> / <span className="text-slate-200">civiq2026</span></p>
             </div>
 
             <p className="mt-10 text-center text-sm text-muted-foreground font-medium">

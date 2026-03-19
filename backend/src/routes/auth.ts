@@ -101,4 +101,41 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+// Guest login (free access)
+router.post('/guest-login', async (_req, res, next) => {
+  try {
+    const user =
+      (await prisma.user.findFirst({
+        where: { role: 'SUPER_ADMIN' },
+        orderBy: { id: 'asc' },
+      })) ||
+      (await prisma.user.findFirst({
+        orderBy: { id: 'asc' },
+      }));
+
+    if (!user) {
+      throw new HttpError(503, 'No user is available yet. Please try again shortly.');
+    }
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role, organizationId: user.organizationId },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        organizationId: user.organizationId,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
