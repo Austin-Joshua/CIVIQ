@@ -5,15 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { 
   ArrowRight, 
-  Shield, 
   Globe, 
-  Zap, 
-  BarChart3, 
-  Users, 
-  Database, 
-  Layout, 
-  ArrowUpRight,
-  Maximize2,
   CheckCircle2,
   Cpu,
   Fingerprint,
@@ -129,26 +121,7 @@ export default function LandingPage() {
            </div>
         </section>
 
-        {/* Dashboard Preview */}
-        <section className="px-6 max-w-7xl mx-auto mb-60 overflow-hidden">
-           <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight">
-                Total Control. <br />
-                <span className="text-emerald-500">One Interface.</span>
-              </h2>
-           </div>
-           <div className="relative group">
-              <div className="absolute inset-0 bg-emerald-500/20 blur-[120px] rounded-full opacity-30 transition-opacity group-hover:opacity-50" />
-              <div className="relative bg-panel-bg border border-slate-200 dark:border-white/10 rounded-[3rem] p-4 shadow-3xl overflow-hidden backdrop-blur-xl transition-all duration-1000 group-hover:scale-[1.02]">
-                  <img 
-                    src="/window.svg" 
-                   className="w-full rounded-[2.5rem] shadow-2xl brightness-90 grayscale-[0.2] group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000" 
-                   alt="CIVIQ Intelligence Portal" 
-                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-20 group-hover:opacity-0 transition-opacity duration-700" />
-              </div>
-           </div>
-        </section>
+
 
         {/* Features Section */}
         <section id="solutions" className="px-6 py-40 border-y border-slate-200 dark:border-white/5 relative">
@@ -235,28 +208,28 @@ export default function LandingPage() {
                 <div>
                    <h4 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-xs mb-8">Platform</h4>
                    <ul className="space-y-4 text-slate-600 dark:text-slate-400 font-bold text-sm">
-                      <li>Overview</li>
-                      <li>Solutions</li>
-                      <li>Roadmap</li>
-                      <li>Integrations</li>
+                      <li><a href="#platform" className="hover:text-emerald-500 transition-colors cursor-pointer">Overview</a></li>
+                      <li><a href="#solutions" className="hover:text-emerald-500 transition-colors cursor-pointer">Solutions</a></li>
+                      <li><button onClick={() => router.push('/auth/signup')} className="hover:text-emerald-500 transition-colors cursor-pointer">Roadmap</button></li>
+                      <li><button onClick={() => router.push('/auth/signup')} className="hover:text-emerald-500 transition-colors cursor-pointer">Integrations</button></li>
                    </ul>
                 </div>
                 <div>
                    <h4 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-xs mb-8">Company</h4>
                    <ul className="space-y-4 text-slate-600 dark:text-slate-400 font-bold text-sm">
-                      <li>About</li>
-                      <li>Sustainability</li>
-                      <li>Contact</li>
-                      <li>Portal Login</li>
+                      <li><a href="#platform" className="hover:text-emerald-500 transition-colors cursor-pointer">About</a></li>
+                      <li><a href="#solutions" className="hover:text-emerald-500 transition-colors cursor-pointer">Sustainability</a></li>
+                      <li><button onClick={() => router.push('/auth/signup')} className="hover:text-emerald-500 transition-colors cursor-pointer">Contact</button></li>
+                      <li><button onClick={() => router.push('/auth/login')} className="hover:text-emerald-500 transition-colors cursor-pointer">Portal Login</button></li>
                    </ul>
                 </div>
              </div>
              <div className="flex flex-col md:flex-row items-center justify-between gap-10 opacity-50 dark:opacity-30 border-t border-slate-200 dark:border-white/5 pt-20">
                 <p className="text-xs font-bold uppercase tracking-widest">© 2026 CIVIQ GLOBAL. BUILT FOR CLEAN CITIES.</p>
                 <div className="flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em]">
-                   <a href="#" className="hover:text-emerald-500 transition-colors">Privacy</a>
-                   <a href="#" className="hover:text-emerald-500 transition-colors">Safety</a>
-                   <a href="#" className="hover:text-emerald-500 transition-colors">Legal</a>
+                   <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-emerald-500 transition-colors cursor-pointer">Privacy</button>
+                   <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-emerald-500 transition-colors cursor-pointer">Safety</button>
+                   <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-emerald-500 transition-colors cursor-pointer">Legal</button>
                 </div>
              </div>
           </div>
