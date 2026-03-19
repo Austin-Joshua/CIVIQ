@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
+import { getApiBaseUrl } from '@/lib/api/baseUrl';
+
+const API_URL = getApiBaseUrl();
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -35,11 +38,30 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Mock signup for UI demonstration
-      setAuth({ id: '1', name: name, email: email, role: 'ADMIN' }, 'mock-token');
+      const response = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload?.message || 'Signup failed');
+      }
+
+      setAuth(
+        {
+          id: String(payload.user.id),
+          name: payload.user.name,
+          email: payload.user.email,
+          role: payload.user.role,
+        },
+        payload.token
+      );
       router.push('/dashboard');
     } catch (error) {
-      toast.error('Deployment request failed. Network latency detected.');
+      toast.error(error instanceof Error ? error.message : 'Deployment request failed. Network latency detected.');
     } finally {
       setLoading(false);
     }
@@ -65,7 +87,7 @@ export default function SignupPage() {
                   <div className="absolute -inset-4 bg-emerald-500/30 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative w-36 h-36 rounded-[2.5rem] bg-slate-950/40 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center shadow-[0_0_80px_rgba(16,185,129,0.2)] group-hover:border-emerald-500/50 transition-all duration-300 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-                    <img src="/logo.png" className="w-24 h-24 object-cover relative z-10 drop-shadow-2xl" alt="CIVIQ" />
+                    <img src="/globe.svg" className="w-24 h-24 object-contain relative z-10 drop-shadow-2xl" alt="CIVIQ" />
                   </div>
                 </div>
                 <h2 className="text-6xl font-black tracking-tighter leading-tight text-white">
@@ -94,7 +116,7 @@ export default function SignupPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden mb-10 flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-slate-950/40 backdrop-blur-3xl border border-white/10 flex items-center justify-center shadow-xl">
-                <img src="/logo.png" className="w-8 h-8 object-cover" alt="CIVIQ" />
+                <img src="/globe.svg" className="w-8 h-8 object-contain" alt="CIVIQ" />
               </div>
               <div>
                 <span className="text-foreground font-black text-xl tracking-tighter block">CIVIQ</span>
@@ -110,8 +132,9 @@ export default function SignupPage() {
             <div className="max-w-md w-full mx-auto">
               <form onSubmit={handleSignup} className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Full Name</label>
+                  <label htmlFor="signup-name" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Full Name</label>
                   <input
+                    id="signup-name"
                     type="text"
                     placeholder="Operator Name"
                     value={name}
@@ -121,8 +144,9 @@ export default function SignupPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Address</label>
+                  <label htmlFor="signup-email" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Address</label>
                   <input
+                    id="signup-email"
                     type="email"
                     placeholder="admin@civiq.city"
                     value={email}
@@ -132,8 +156,9 @@ export default function SignupPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Password</label>
+                  <label htmlFor="signup-password" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Password</label>
                   <input
+                    id="signup-password"
                     type="password"
                     placeholder="••••••••"
                     value={password}

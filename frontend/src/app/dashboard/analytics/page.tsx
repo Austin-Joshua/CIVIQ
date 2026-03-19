@@ -32,6 +32,8 @@ import { cn } from '@/lib/utils';
 import { SectionHeader, StatCard } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
 import { useUIStore } from '@/store/uiStore';
+import { downloadCsvFile } from '@/lib/download';
+import { toast } from 'sonner';
 
 const MONTHLY_RECOVERY = [
   { month: 'Jan', value: 820 },
@@ -52,6 +54,20 @@ const TABLE_DATA = [
 export default function AnalyticsPage() {
   const { openReport } = useUIStore();
 
+  const handleExportData = () => {
+    downloadCsvFile(
+      [
+        ['zone', 'generation', 'diversion', 'growth', 'status'],
+        ...TABLE_DATA.map((row) => [row.zone, row.generation, row.diversion, row.growth, row.status]),
+        [],
+        ['month', 'recovery_value_tons'],
+        ...MONTHLY_RECOVERY.map((item) => [item.month, item.value]),
+      ],
+      `analytics-export-${Date.now()}.csv`
+    );
+    toast.success('Analytics export downloaded.');
+  };
+
 
   return (
     <div className="space-y-6 lg:space-y-8 font-outfit">
@@ -68,7 +84,7 @@ export default function AnalyticsPage() {
           <button className="flex items-center gap-2 px-3 py-1.5 liquid-glass rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-all uppercase tracking-widest border border-border/50">
             <Calendar className="w-3.5 h-3.5" /> Date Range
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+          <button onClick={handleExportData} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg shadow-emerald-500/20">
             <Download className="w-3.5 h-3.5" /> Export Data
           </button>
         </div>

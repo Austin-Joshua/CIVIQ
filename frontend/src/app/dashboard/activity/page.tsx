@@ -5,6 +5,7 @@ import { Activity, Terminal, Shield, User, Globe, FileCode2, Clock, CheckCircle2
 import { SectionHeader } from '@/components/ui/Cards';
 import { useToast } from '@/components/providers/ToastProvider';
 import { cn } from '@/lib/utils';
+import { downloadCsvFile } from '@/lib/download';
 
 const TIMELINE_EVENTS = [
   { id: 'EVT-01', title: 'Route Optimization Triggered', type: 'system', time: '10:42 AM', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
@@ -33,9 +34,17 @@ export default function ActivityLogsPage() {
   const { toast } = useToast();
 
   const handleExport = () => {
+    downloadCsvFile(
+      [
+        ['event_id', 'title', 'type', 'time'],
+        ...TIMELINE_EVENTS.map((evt) => [evt.id, evt.title, evt.type, evt.time]),
+      ],
+      `operations-timeline-${Date.now()}.csv`
+    );
+
     toast({
-      title: 'Audit Export Started',
-      description: 'The secure CSV log is being prepared for download.',
+      title: 'Audit Export Complete',
+      description: 'The secure CSV log has been downloaded.',
       type: 'success'
     });
   };

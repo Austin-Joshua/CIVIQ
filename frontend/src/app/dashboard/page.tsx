@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { 
   Map as MapIcon, 
   Route, 
@@ -33,8 +34,13 @@ import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
 import { cn } from '@/lib/utils';
 import { useIsMounted } from '@/hooks/useIsMounted';
-import { InsightEngine } from '@/components/dashboard/InsightEngine';
 import { toast } from 'sonner';
+import { downloadTextFile } from '@/lib/download';
+
+const InsightEngine = dynamic(
+  () => import('@/components/dashboard/InsightEngine').then((mod) => mod.InsightEngine),
+  { ssr: false }
+);
 
 const MOCK_CHART_DATA = [
   { name: '06:00', waste: 400 },
@@ -57,6 +63,28 @@ export default function DashboardPage() {
   const { openReport } = useUIStore();
   const isMounted = useIsMounted();
 
+  const handleGenerateReport = () => {
+    const operator = user?.name || 'Operator';
+    const generatedAt = new Date().toISOString();
+    const content = [
+      'CIVIQ - Urban Intelligence Report',
+      `Generated At: ${generatedAt}`,
+      `Operator: ${operator}`,
+      '',
+      'Executive Summary',
+      '- City status: Stable',
+      '- Cleanliness score: 82.4',
+      '- Waste forecast: 14.2 Tons',
+      '- Active alerts: 12',
+      '',
+      'Zone Overview',
+      ...MOCK_ZONE_DATA.map((zone) => `- ${zone.name}: ${zone.score}% (${zone.status})`),
+    ].join('\n');
+
+    downloadTextFile(content, `civiq-ai-report-${Date.now()}.txt`);
+    toast.success('AI report generated and downloaded successfully.');
+  };
+
 
   return (
     <div className="space-y-8">
@@ -64,7 +92,7 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-foreground mb-1">
-            Welcome, {isMounted ? (user?.name?.split(' ')[0] || 'Operator') : 'Operator'}
+            Welcome, {isMounted ? (user?.name || 'Operator') : 'Operator'}
           </h1>
           <p className="text-muted-foreground font-medium">
             City status: <span className="text-emerald-500 font-bold">Stable</span>. Cleanliness score 82.4.
@@ -75,7 +103,7 @@ export default function DashboardPage() {
             <Filter className="w-3.5 h-3.5" /> Filter
           </button>
           <button 
-            onClick={() => toast.success('Intelligent Report Generation comprehensive analysis compiling. Output will be saved to your Drive.')}
+            onClick={handleGenerateReport}
             className="flex items-center gap-2 px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-primary/20"
           >
             Generate AI Report

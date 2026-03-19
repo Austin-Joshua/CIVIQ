@@ -2,28 +2,35 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useAuthStore } from '@/store/authStore';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopHeader, MobileBottomNav } from '@/components/layout/Header';
-import { GlobalReportView } from '@/components/layout/GlobalReportView';
-import { useIsMounted } from '@/hooks/useIsMounted';
-import { AICopilot } from '@/components/ui/AICopilot';
+
+const GlobalReportView = dynamic(
+  () => import('@/components/layout/GlobalReportView').then((mod) => mod.GlobalReportView),
+  { ssr: false }
+);
+
+const AICopilot = dynamic(
+  () => import('@/components/ui/AICopilot').then((mod) => mod.AICopilot),
+  { ssr: false }
+);
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
   const router = useRouter();
-  const isMounted = useIsMounted();
 
   useEffect(() => {
     if (!token) {
       router.replace('/auth/login');
+      return;
     }
+    // Keep middleware-visible cookie in sync for server-side route protection.
+    document.cookie = `civiq_auth=${encodeURIComponent(token)}; Path=/; Max-Age=86400; SameSite=Lax`;
   }, [token, router]);
 
-  // We only redirect if we are sure there is no token.
-  // We don't return null for isMounted to prevent "waiting page" flashes of empty content.
-  // Instead, we let the shell render.
-  if (!token && isMounted) return null;
+  if (!token) return null;
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">

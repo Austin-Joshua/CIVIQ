@@ -1,7 +1,9 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { config } from '../lib/config.js';
+import { HttpError } from './error.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
+const JWT_SECRET = config.jwtSecret;
 
 export interface AuthRequest extends Request {
   user?: {
@@ -27,12 +29,12 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Authentication token required' });
+    return next(new HttpError(401, 'Authentication token required'));
   }
 
   jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
     if (err) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
+      return next(new HttpError(403, 'Invalid or expired token'));
     }
     req.user = user;
     next();
@@ -42,7 +44,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 export const authorizeRoles = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Insufficient permissions' });
+      return next(new HttpError(403, 'Insufficient permissions'));
     }
     next();
   };

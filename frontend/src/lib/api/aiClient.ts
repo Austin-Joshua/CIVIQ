@@ -1,4 +1,6 @@
-const AI_SERVICE_URL = process.env.NEXT_PUBLIC_AI_API_URL || 'http://localhost:8000';
+import { getAiBaseUrl } from './baseUrl';
+
+const AI_SERVICE_URL = getAiBaseUrl();
 
 /**
  * Waste Generation Forecast Service

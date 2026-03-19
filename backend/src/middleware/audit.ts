@@ -1,6 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
-import { prisma } from '../lib/prisma';
-import { AuthRequest } from './auth';
+import prisma from '../lib/prisma.js';
+import { AuthRequest } from './auth.js';
 
 /**
  * Middleware to log actions to the AuditLog table.
@@ -16,13 +16,22 @@ export const auditLog = (action: string, entityType: string) => {
     // or capture original res.send to log outcome. For simplicity, we log upon request.
     
     // We only log if user is authenticated and we have details
+    const redactedBody = req.method !== 'GET' ? { ...req.body } : undefined;
+    if (redactedBody) {
+      for (const key of ['password', 'passwordHash', 'token', 'accessToken', 'authorization']) {
+        if (key in redactedBody) {
+          redactedBody[key] = '[REDACTED]';
+        }
+      }
+    }
+
     if (req.user) {
       const { id: userId, organizationId } = req.user;
       
       const metadata = {
         method: req.method,
         url: req.originalUrl,
-        body: req.method !== 'GET' ? req.body : undefined,
+        body: redactedBody,
         query: req.query,
         ip: req.ip
       };
@@ -32,7 +41,7 @@ export const auditLog = (action: string, entityType: string) => {
           data: {
             action,
             entityType,
-            entityId: req.params.id || null, // Best effort to extract entityId from URL params
+            entityId: req.params.id ? String(req.params.id) : null, // Best effort to extract entityId from URL params
             metadata: JSON.stringify(metadata),
             userId,
             organizationId

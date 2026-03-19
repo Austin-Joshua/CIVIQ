@@ -28,6 +28,12 @@ const MOCK_ASSETS = [
   { id: 'truck-2', type: 'truck', name: 'Truck V-12', lat: 40.7050, lng: -74.0120, capacity: 20, status: 'Active' },
 ];
 
+const FILTER_ACTIVE_CLASS: Record<string, string> = {
+  bin: 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-900/20',
+  truck: 'bg-teal-500/20 border-teal-500/50 text-teal-400 shadow-lg shadow-teal-900/20',
+  depot: 'bg-blue-500/20 border-blue-500/50 text-blue-400 shadow-lg shadow-blue-900/20',
+};
+
 export default function CommandMapPage() {
   const { openReport } = useUIStore();
   const [isDemoMode, setIsDemoMode] = useState(!GOOGLE_MAPS_API_KEY);
@@ -201,7 +207,7 @@ export default function CommandMapPage() {
                      className={cn(
                        "px-3 py-1.5 border rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all",
                        activeFilter === f.id 
-                         ? `bg-${f.color}-500/20 border-${f.color}-500/50 text-${f.color}-400 shadow-lg shadow-${f.color}-900/20` 
+                         ? FILTER_ACTIVE_CLASS[f.id] 
                          : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
                      )}
                    >

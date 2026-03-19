@@ -1,7 +1,14 @@
 import prisma from './lib/prisma.js';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 async function seed() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Seeding is disabled in production.');
+  }
+
   console.log('🌱 Starting city data seed...');
 
   // Create demo organization
@@ -19,11 +26,12 @@ async function seed() {
   }
 
   // Create demo admin
-  const adminEmail = 'admin@civiq.city';
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@civiq.city';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'change-me-please';
   const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
   
   if (!existingAdmin) {
-    const passwordHash = await bcrypt.hash('civiq2026', 10);
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
     await prisma.user.create({
       data: {
         email: adminEmail,
@@ -33,7 +41,7 @@ async function seed() {
         organizationId: org.id
       },
     });
-    console.log('✅ Admin user created (admin@civiq.city / civiq2026)');
+    console.log(`✅ Admin user created for ${adminEmail}`);
   }
 
   // Create Zones

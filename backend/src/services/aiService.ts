@@ -20,7 +20,7 @@ export const aiService = {
    * Simulates a time-series waste generation forecast
    */
   async getWasteForecast(zoneId: string, organizationId: string): Promise<PredictionResult> {
-    const zone = await prisma.zone.findUnique({ 
+    const zone = await prisma.zone.findFirst({ 
       where: { 
         id: zoneId,
         organizationId
@@ -69,7 +69,7 @@ export const aiService = {
    * Simulates a Sustainability Risk Score
    */
   async getRiskAssessment(zoneId: string, organizationId: string) {
-    const zone = await prisma.zone.findUnique({
+    const zone = await prisma.zone.findFirst({
       where: { id: zoneId, organizationId }
     });
     if (!zone) throw new Error('Zone not found');

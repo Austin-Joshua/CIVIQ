@@ -1,7 +1,10 @@
+'use client';
+
 import { ShieldCheck, FileDown, Activity, AlertCircle, Leaf, CalendarClock } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/Cards';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { downloadTextFile } from '@/lib/download';
 
 const METRICS = [
   { label: 'CO2 Diversion Rate', value: '42.8%', target: '45.0%', status: 'warning' },
@@ -12,7 +15,17 @@ const METRICS = [
 
 export default function CompliancePage() {
   const handleExport = (reportType: string) => {
-    toast.success(`Government-certified export initiated for: ${reportType}. The file will be available in your downloads shortly.`);
+    const content = [
+      'CIVIQ Compliance Export',
+      `Report: ${reportType}`,
+      `Generated: ${new Date().toISOString()}`,
+      '',
+      'Regulatory Metrics',
+      ...METRICS.map((m) => `- ${m.label}: ${m.value} (target ${m.target})`),
+    ].join('\n');
+
+    downloadTextFile(content, `${reportType.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}.txt`);
+    toast.success(`${reportType} generated and downloaded.`);
   };
 
   return (

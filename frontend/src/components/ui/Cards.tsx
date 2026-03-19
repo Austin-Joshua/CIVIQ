@@ -87,13 +87,17 @@ interface SectionHeaderProps {
   title: string;
   subtitle?: string;
   action?: React.ReactNode;
+  icon?: LucideIcon;
 }
 
-export function SectionHeader({ title, subtitle, action }: SectionHeaderProps) {
+export function SectionHeader({ title, subtitle, action, icon: Icon }: SectionHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4 mb-4">
       <div>
-        <h2 className="text-xl font-black tracking-tighter text-foreground">{title}</h2>
+        <h2 className="text-xl font-black tracking-tighter text-foreground flex items-center gap-2">
+          {Icon && <Icon className="w-4 h-4 text-primary" />}
+          {title}
+        </h2>
         {subtitle && <p className="text-muted-foreground text-xs font-medium mt-1">{subtitle}</p>}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}

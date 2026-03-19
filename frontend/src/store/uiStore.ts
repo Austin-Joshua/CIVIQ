@@ -7,9 +7,21 @@ interface UIState {
   openMobileSidebar: () => void;
   
   // Report State
-  activeReport: { type: string; data: any } | null;
-  openReport: (type: string, data: any) => void;
+  activeReport: { type: string; data: ReportData } | null;
+  openReport: (type: string, data: ReportData) => void;
   closeReport: () => void;
+}
+
+export interface ReportData {
+  label?: string;
+  value?: string | number;
+  unit?: string;
+  change?: { value: string; positive: boolean };
+  type?: string;
+  severity?: string;
+  message?: string;
+  time?: string;
+  [key: string]: unknown;
 }
 
 export const useUIStore = create<UIState>((set) => ({

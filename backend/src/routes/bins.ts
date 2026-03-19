@@ -2,14 +2,14 @@ import { Router } from 'express';
 import prisma from '../lib/prisma.js';
 import { authenticateToken, AuthRequest, authorizeRoles, ROLES } from '../middleware/auth.js';
 import { auditLog } from '../middleware/audit.js';
+import { HttpError } from '../middleware/error.js';
 
 const router = Router();
 
 router.use(authenticateToken);
 
 // Get all bins (with optional zone filtering and mandatory organization filtering)
-// Get all bins (with optional zone filtering and mandatory organization filtering)
-router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.ANALYST, ROLES.AUDITOR, ROLES.FIELD_SUPERVISOR, ROLES.VIEWER), auditLog('VIEW_BINS', 'Bin'), async (req: AuthRequest, res) => {
+router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.ANALYST, ROLES.AUDITOR, ROLES.FIELD_SUPERVISOR, ROLES.VIEWER), auditLog('VIEW_BINS', 'Bin'), async (req: AuthRequest, res, next) => {
   try {
     const { zoneId } = req.query;
     const bins = await prisma.bin.findMany({
@@ -22,34 +22,38 @@ router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MAN
       include: { zone: { select: { name: true } } }
     });
     res.json(bins);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    next(error);
   }
 });
 
 // Update bin fill level (simulating sensor data update)
-// Update bin fill level (simulating sensor data update)
-router.patch('/:id/fill', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.FIELD_SUPERVISOR, ROLES.FIELD_OPERATOR), auditLog('UPDATE_BIN_FILL', 'Bin'), async (req: AuthRequest, res) => {
+router.patch('/:id/fill', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.FIELD_SUPERVISOR, ROLES.FIELD_OPERATOR), auditLog('UPDATE_BIN_FILL', 'Bin'), async (req: AuthRequest, res, next) => {
   try {
+    const binId = String(req.params.id);
     const { fillLevel } = req.body;
+    const numericFill = Number(fillLevel);
+    if (!Number.isFinite(numericFill) || numericFill < 0 || numericFill > 100) {
+      return next(new HttpError(400, 'Fill level must be a number between 0 and 100.'));
+    }
     
     // First verify the bin belongs to a zone in the user's organization
     const existingBin = await prisma.bin.findUnique({
-      where: { id: req.params.id },
+      where: { id: binId },
       include: { zone: true }
     });
 
     if (!existingBin || existingBin.zone.organizationId !== req.user?.organizationId) {
-       return res.status(404).json({ message: 'Bin not found' });
+      return next(new HttpError(404, 'Bin not found.'));
     }
 
     const bin = await prisma.bin.update({
-      where: { id: req.params.id },
-      data: { currentFillLevel: fillLevel }
+      where: { id: binId },
+      data: { currentFillLevel: numericFill }
     });
     res.json(bin);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    next(error);
   }
 });
 

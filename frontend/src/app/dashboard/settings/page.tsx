@@ -11,6 +11,14 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from 'next-themes';
 import { Toaster, toast } from 'sonner';
+import { downloadCsvFile } from '@/lib/download';
+
+const AUDIT_LOGS = [
+  { time: '2026-03-19 14:32:01', user: 'Dr. Sarah Chen', action: 'UPDATE_ROLE', details: 'Changed Marcus Johnson to OPS_MANAGER' },
+  { time: '2026-03-19 12:15:44', user: 'System', action: 'CREATE_ZONE', details: 'Automated zone generation for Downtown area' },
+  { time: '2026-03-18 09:05:12', user: 'Elena Rodriguez', action: 'EXPORT_DATA', details: 'Downloaded last 30 days waste forecasting data' },
+  { time: '2026-03-17 18:44:20', user: 'Marcus Johnson', action: 'UPDATE_ROUTE', details: 'Manually overrode route optimization #773' },
+];
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
@@ -51,6 +59,17 @@ export default function SettingsPage() {
     toast.success('Settings saved successfully', {
       description: 'Your changes have been applied to the system.'
     });
+  };
+
+  const handleAuditExport = () => {
+    downloadCsvFile(
+      [
+        ['timestamp', 'user', 'action', 'details'],
+        ...AUDIT_LOGS.map((log) => [log.time, log.user, log.action, log.details]),
+      ],
+      `audit-logs-${Date.now()}.csv`
+    );
+    toast.success('Audit log CSV downloaded.');
   };
 
   const tabs = [
@@ -337,7 +356,7 @@ export default function SettingsPage() {
                       <Activity className="w-4 h-4 text-emerald-500" />
                       <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Audit Logs</h3>
                     </div>
-                    <button className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-xs font-bold rounded-xl transition-all">
+                    <button onClick={handleAuditExport} className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-xs font-bold rounded-xl transition-all">
                       Export CSV
                     </button>
                   </div>
@@ -351,12 +370,7 @@ export default function SettingsPage() {
                     </div>
                     
                     <div className="divide-y divide-border/50 bg-background/50 backdrop-blur-md">
-                      {[
-                         { time: '2026-03-19 14:32:01', user: 'Dr. Sarah Chen', action: 'UPDATE_ROLE', details: 'Changed Marcus Johnson to OPS_MANAGER' },
-                         { time: '2026-03-19 12:15:44', user: 'System', action: 'CREATE_ZONE', details: 'Automated zone generation for Downtown area' },
-                         { time: '2026-03-18 09:05:12', user: 'Elena Rodriguez', action: 'EXPORT_DATA', details: 'Downloaded last 30 days waste forecasting data' },
-                         { time: '2026-03-17 18:44:20', user: 'Marcus Johnson', action: 'UPDATE_ROUTE', details: 'Manually overrode route optimization #773' },
-                      ].map((log, i) => (
+                      {AUDIT_LOGS.map((log, i) => (
                         <div key={i} className="grid grid-cols-12 items-center px-6 py-4 hover:bg-muted/30 transition-colors gap-4">
                            <div className="col-span-3 text-[11px] font-mono text-muted-foreground">
                              {log.time}
@@ -482,7 +496,7 @@ export default function SettingsPage() {
                     <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-muted/20 border border-border rounded-2xl">
                       <div className="relative group">
                         <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-4xl font-bold shadow-2xl shadow-emerald-500/30 group-hover:scale-[1.05] transition-transform duration-500">
-                           <img src="/logo.png" className="w-full h-full object-cover rounded-3xl opacity-20 absolute" alt="" />
+                           <img src="/globe.svg" className="w-full h-full object-contain rounded-3xl opacity-20 absolute p-3" alt="" />
                            <span className="relative z-10">{profileSettings.name[0]}</span>
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-3xl cursor-pointer">

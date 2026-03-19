@@ -2,32 +2,57 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
+import { config } from '../lib/config.js';
+import { HttpError } from '../middleware/error.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
+const JWT_SECRET = config.jwtSecret;
+const ALLOWED_SIGNUP_ROLES = new Set(['OPS_MANAGER', 'ANALYST', 'VIEWER']);
+
+function ensureValidEmail(email: unknown) {
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new HttpError(400, 'Please provide a valid email address.');
+  }
+}
+
+function ensureValidPassword(password: unknown) {
+  if (typeof password !== 'string' || password.length < 8) {
+    throw new HttpError(400, 'Password must be at least 8 characters long.');
+  }
+}
+
+function ensureValidName(name: unknown) {
+  if (typeof name !== 'string' || name.trim().length < 2) {
+    throw new HttpError(400, 'Please provide your full name.');
+  }
+}
 
 // Signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req, res, next) => {
   try {
     const { email, password, name, role, organizationName } = req.body;
+    ensureValidEmail(email);
+    ensureValidPassword(password);
+    ensureValidName(name);
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      throw new HttpError(409, 'An account with this email already exists.');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    
-    // For SaaS, usually they either join an org or create one.
-    // If organizationName is provided, create a new one, else create a default 'CIVIQ Demo' org.
-    let orgName = organizationName || `${name}'s Organization`;
+    const safeRole = ALLOWED_SIGNUP_ROLES.has(role) ? role : 'OPS_MANAGER';
+    const orgName =
+      typeof organizationName === 'string' && organizationName.trim().length > 2
+        ? organizationName.trim()
+        : `${name.trim()}'s Organization`;
 
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
-        name,
-        role: role || 'OPS_MANAGER',
+        name: name.trim(),
+        role: safeRole,
         organization: {
           create: {
             name: orgName,
@@ -44,24 +69,25 @@ router.post('/signup', async (req, res) => {
       user: { id: user.id, email: user.email, name: user.name, role: user.role, organizationId: user.organizationId },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    ensureValidEmail(email);
+    ensureValidPassword(password);
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      throw new HttpError(401, 'Invalid email or password.');
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      throw new HttpError(401, 'Invalid email or password.');
     }
 
     const token = jwt.sign({ id: user.id, role: user.role, organizationId: user.organizationId }, JWT_SECRET, { expiresIn: '24h' });
@@ -71,8 +97,7 @@ router.post('/login', async (req, res) => {
       user: { id: user.id, email: user.email, name: user.name, role: user.role, organizationId: user.organizationId },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 });
 

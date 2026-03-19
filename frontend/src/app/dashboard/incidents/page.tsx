@@ -1,3 +1,5 @@
+'use client';
+
 import { AlertCircle, Clock, UserPlus, CheckCircle, Search, Filter, MoreHorizontal, MapPin } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/Cards';
 import { cn } from '@/lib/utils';

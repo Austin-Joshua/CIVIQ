@@ -25,6 +25,10 @@ const ToastContext = React.createContext<ToastContextType | undefined>(undefined
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
+  const dismiss = React.useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
   const toast = React.useCallback(
     ({ title, description, type = 'info', duration = 5000 }: Omit<ToastProps, 'id'>) => {
       const id = Math.random().toString(36).substring(2, 9);
@@ -38,12 +42,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         }, duration);
       }
     },
-    []
+    [dismiss]
   );
-
-  const dismiss = React.useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
 
   return (
     <ToastContext.Provider value={{ toasts, toast, dismiss }}>
@@ -66,12 +66,6 @@ export function useToast() {
 }
 
 function ToastItem({ title, description, type = 'info', onDismiss }: ToastProps & { onDismiss: () => void }) {
-  const [isLeaving, setIsLeaving] = React.useState(false);
-
-  React.useEffect(() => {
-    // Add cleanup animation logic if needed
-  }, []);
-
   const Icon = {
     success: CheckCircle2,
     error: XCircle,
@@ -96,7 +90,6 @@ function ToastItem({ title, description, type = 'info', onDismiss }: ToastProps 
       </div>
       <button 
         onClick={() => {
-          setIsLeaving(true);
           setTimeout(onDismiss, 200);
         }}
         className="text-current opacity-50 hover:opacity-100 transition-opacity"

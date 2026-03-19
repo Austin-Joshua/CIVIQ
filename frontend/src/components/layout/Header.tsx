@@ -111,6 +111,7 @@ export function TopHeader() {
       {/* Mobile Menu Toggle */}
       <button 
         onClick={openMobileSidebar}
+        aria-label="Open sidebar menu"
         className="lg:hidden p-2 -ml-2 rounded-xl text-muted-foreground hover:text-emerald-500 transition-all interactive-scale"
       >
         <Menu className="w-5 h-5" />
@@ -143,6 +144,7 @@ export function TopHeader() {
         {/* Mobile Search Toggle */}
         <button 
           onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+          aria-label={isSearchExpanded ? 'Close search' : 'Open search'}
           className="lg:hidden p-2 rounded-xl text-muted-foreground hover:text-emerald-500"
         >
           {isSearchExpanded ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
@@ -185,6 +187,7 @@ export function TopHeader() {
         {/* Theme toggle */}
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          aria-label="Toggle theme"
           className="p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale glow-accent"
         >
           {isMounted && theme === 'dark' ? <Sun className="w-4 h-4 relative z-10" /> : <Moon className="w-4 h-4 relative z-10" />}
@@ -194,6 +197,7 @@ export function TopHeader() {
         <div ref={notifRef} className="relative">
           <button
             onClick={() => { setShowNotifs(!showNotifs); setShowUserMenu(false); }}
+            aria-label="Open notifications"
             className="relative p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale glow-accent"
           >
             <Bell className="w-4 h-4 relative z-10" />
@@ -270,6 +274,7 @@ export function TopHeader() {
         <div ref={userRef} className="relative">
           <button
             onClick={() => { setShowUserMenu(!showUserMenu); setShowNotifs(false); }}
+            aria-label="Open user menu"
             className="flex items-center pl-2 border-l border-border ml-1 hover:opacity-80 transition-opacity"
           >
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white text-xs font-bold border border-emerald-400/30">
