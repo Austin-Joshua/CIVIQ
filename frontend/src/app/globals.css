@@ -8,12 +8,13 @@
   --color-background-secondary: hsl(var(--background-secondary));
   --color-foreground: hsl(var(--foreground));
 
-  --color-login-from: hsl(var(--login-bg-from));
-  --color-login-to: hsl(var(--login-bg-to));
+  --color-page-from: hsl(var(--page-bg-from));
+  --color-page-to: hsl(var(--page-bg-to));
   --color-panel-bg: hsl(var(--panel-bg));
   --color-visual-from: hsl(var(--visual-side-bg-from));
   --color-visual-to: hsl(var(--visual-side-bg-to));
   --color-input-bg: hsl(var(--input-bg));
+  --color-nav-bg: hsl(var(--nav-bg));
 
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
@@ -73,13 +74,14 @@
     --input: 220 15% 92%;
     --ring: 161 72% 39%;
 
-    /* Enhanced Theme Variables */
-    --login-bg-from: 210 40% 98%;
-    --login-bg-to: 161 72% 95%;
+    /* Universal Theme Variables */
+    --page-bg-from: 210 40% 98%;
+    --page-bg-to: 161 72% 95%;
     --panel-bg: 0 0% 100%;
     --visual-side-bg-from: 161 72% 39%;
     --visual-side-bg-to: 161 72% 20%;
     --input-bg: 220 15% 96%;
+    --nav-bg: 0 0% 100% / 0.7;
 
     --chart-grid: 220 10% 10% / 0.05;
     --chart-axis: 220 10% 45%;
@@ -115,13 +117,14 @@
     --input: 217 33% 12%;
     --ring: 161 72% 45%;
 
-    /* Original Dark Palette Restoration */
-    --login-bg-from: 222 47% 2%;
-    --login-bg-to: 222 47% 4%;
+    /* Universal Dark Palette Registry */
+    --page-bg-from: 222 47% 2%;
+    --page-bg-to: 222 47% 4%;
     --panel-bg: 222 47% 6%;
     --visual-side-bg-from: 161 72% 15%;
     --visual-side-bg-to: 161 94% 8%;
     --input-bg: 222 47% 8%;
+    --nav-bg: 222 47% 2% / 0.4;
 
     --chart-grid: 210 40% 98% / 0.05;
     --chart-axis: 215 20% 65%;

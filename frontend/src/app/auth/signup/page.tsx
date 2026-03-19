@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { 
   ArrowLeft, 
   ArrowRight, 
+  Sun,
+  Moon,
   Shield, 
   Globe, 
   Zap, 
@@ -33,6 +36,12 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,18 +77,26 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-page-from to-page-to flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden text-foreground transition-colors duration-300">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl bg-slate-900 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+      <div className="relative z-10 w-full max-w-7xl bg-panel-bg border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+        <button
+          type="button"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="absolute top-6 right-6 z-20 h-10 w-10 rounded-xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors"
+          aria-label="Toggle theme"
+        >
+          {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
         <div className="grid grid-cols-1 lg:grid-cols-2">
-         {/* Visual Side */}
-         <div className="hidden lg:block relative bg-[#022c22] overflow-hidden border-r border-white/5">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#064e3b] to-[#022c22] z-10" />
+          {/* Visual Side */}
+          <div className="hidden lg:block relative bg-visual-to overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-visual-from to-visual-to z-10" />
             
             <div className="absolute inset-0 flex flex-col justify-center p-20 z-20">
               <div className="space-y-6">
@@ -104,7 +121,7 @@ export default function SignupPage() {
           </div>
 
           {/* Form Side */}
-          <div className="p-8 lg:p-20 flex flex-col justify-center bg-slate-900 text-slate-200">
+          <div className="p-8 lg:p-20 flex flex-col justify-center bg-panel-bg text-foreground">
             <button 
               onClick={() => router.push('/')}
               className="flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-colors mb-8 lg:mb-12 group w-fit p-1 -ml-1"
@@ -125,8 +142,8 @@ export default function SignupPage() {
             </div>
 
             <div className="mb-10">
-              <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-white mb-4">Sign Up</h1>
-              <p className="text-slate-400 font-medium">Create your account.</p>
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-foreground mb-4">Sign Up</h1>
+              <p className="text-muted-foreground font-medium">Create your account.</p>
             </div>
 
             <div className="max-w-md w-full mx-auto">
@@ -139,7 +156,7 @@ export default function SignupPage() {
                     placeholder="Your full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
+                    className="w-full px-5 py-3 bg-input-bg border-border border rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground"
                     required
                   />
                 </div>
@@ -151,7 +168,7 @@ export default function SignupPage() {
                     placeholder="admin@civiq.city"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
+                    className="w-full px-5 py-3 bg-input-bg border-border border rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground"
                     required
                   />
                 </div>
@@ -163,7 +180,7 @@ export default function SignupPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
+                    className="w-full px-5 py-3 bg-input-bg border-border border rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground"
                     required
                   />
                 </div>

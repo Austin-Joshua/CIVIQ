@@ -32,7 +32,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-emerald-50 dark:from-[#020617] dark:to-[#020617] text-slate-900 dark:text-white selection:bg-emerald-500/30 overflow-x-hidden font-outfit">
+    <div className="min-h-screen bg-gradient-to-b from-page-from to-page-to text-foreground selection:bg-emerald-500/30 overflow-x-hidden font-outfit transition-colors duration-300">
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/15 blur-[150px] rounded-full animate-pulse-slow" />
@@ -40,13 +40,13 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-slate-950/40 backdrop-blur-2xl border-b border-slate-200 dark:border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-nav-bg backdrop-blur-2xl border-b border-slate-200 dark:border-white/5 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-300 dark:border-white/10 p-1 bg-slate-900">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-300 dark:border-white/10 p-1 bg-slate-900 flex items-center justify-center">
                <img src="/logo.png" className="w-full h-full object-cover" alt="Logo" />
             </div>
-            <span className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase">CIVIQ</span>
+            <span className="text-3xl font-black tracking-tighter text-foreground uppercase">CIVIQ</span>
           </div>
           <div className="hidden lg:flex items-center gap-10">
             {['Platform', 'Solutions', 'Vision', 'Network'].map((item) => (
@@ -59,7 +59,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="h-10 w-10 rounded-xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors"
+              className="h-10 w-10 rounded-xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-all hover:scale-105"
               aria-label="Toggle theme"
             >
               {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -139,7 +139,7 @@ export default function LandingPage() {
            </div>
            <div className="relative group">
               <div className="absolute inset-0 bg-emerald-500/20 blur-[120px] rounded-full opacity-30 transition-opacity group-hover:opacity-50" />
-              <div className="relative bg-white dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-[3rem] p-4 shadow-3xl overflow-hidden backdrop-blur-xl transition-transform duration-1000 group-hover:scale-[1.02]">
+              <div className="relative bg-panel-bg border border-slate-200 dark:border-white/10 rounded-[3rem] p-4 shadow-3xl overflow-hidden backdrop-blur-xl transition-all duration-1000 group-hover:scale-[1.02]">
                   <img 
                     src="/window.svg" 
                    className="w-full rounded-[2.5rem] shadow-2xl brightness-90 grayscale-[0.2] group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000" 

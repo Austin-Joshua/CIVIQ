@@ -107,7 +107,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-login-from to-login-to flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden text-foreground transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-page-from to-page-to flex items-center justify-center p-4 lg:p-10 font-outfit overflow-hidden text-foreground transition-colors duration-300">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/10 blur-[150px] rounded-full animate-pulse-slow" />
