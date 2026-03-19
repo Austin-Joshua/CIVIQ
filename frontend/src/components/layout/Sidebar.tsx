@@ -3,54 +3,57 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, Map, Route, TrendingUp, Recycle,
-  Layers, AlertTriangle, Sliders, Settings,
-  Leaf, ChevronRight, Activity, Database, FileText, X, ShieldCheck,
-  Building2, Users, Share2, CreditCard, ChevronLeft, PanelLeftClose, PanelLeftOpen,
-  Monitor, Zap, BarChart3, ClipboardList
+  LayoutDashboard, Route, TrendingUp, Recycle,
+  Layers, AlertTriangle, Settings, Database, ShieldCheck,
+  Users, Monitor, Zap, BarChart3, ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
 
+const ALL_ROLES = ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER', 'ANALYST', 'FIELD_SUPERVISOR', 'FIELD_OPERATOR', 'AUDITOR', 'VIEWER'];
+const ADMIN_OPS = ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER'];
+const ANALYSIS_ROLES = ['SUPER_ADMIN', 'GOV_ADMIN', 'ANALYST', 'AUDITOR'];
+const FIELD_ROLES = ['SUPER_ADMIN', 'OPS_MANAGER', 'FIELD_SUPERVISOR', 'FIELD_OPERATOR'];
+
 export const NAV_CATEGORIES = [
   {
     label: 'Overview',
     items: [
-      { href: '/dashboard', icon: LayoutDashboard, label: 'Executive Dashboard' },
-      { href: '/dashboard/incidents', icon: AlertTriangle, label: 'Command Center' },
-      { href: '/dashboard/notifications', icon: Zap, label: 'Alerts' },
+      { href: '/dashboard', icon: LayoutDashboard, label: 'Executive Dashboard', roles: ALL_ROLES },
+      { href: '/dashboard/incidents', icon: AlertTriangle, label: 'Command Center', roles: [...ADMIN_OPS, 'FIELD_SUPERVISOR'] },
+      { href: '/dashboard/notifications', icon: Zap, label: 'Alerts', roles: ALL_ROLES },
     ]
   },
   {
     label: 'Operations',
     items: [
-      { href: '/dashboard/map', icon: Monitor, label: 'Asset Monitor' },
-      { href: '/dashboard/routes', icon: Route, label: 'Route Intelligence' },
+      { href: '/dashboard/map', icon: Monitor, label: 'Asset Monitor', roles: [...ADMIN_OPS, ...FIELD_ROLES] },
+      { href: '/dashboard/routes', icon: Route, label: 'Route Intelligence', roles: [...ADMIN_OPS, 'FIELD_SUPERVISOR', 'FIELD_OPERATOR'] },
     ]
   },
   {
     label: 'Planning',
     items: [
-      { href: '/dashboard/forecast', icon: TrendingUp, label: 'Forecasting' },
-      { href: '/dashboard/recycling', icon: Recycle, label: 'Recycling Planner' },
-      { href: '/dashboard/landfill', icon: Layers, label: 'Landfill Intelligence' },
+      { href: '/dashboard/forecast', icon: TrendingUp, label: 'Forecasting', roles: ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER', 'ANALYST'] },
+      { href: '/dashboard/recycling', icon: Recycle, label: 'Recycling Planner', roles: ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER', 'ANALYST'] },
+      { href: '/dashboard/landfill', icon: Layers, label: 'Landfill Intelligence', roles: ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER'] },
     ]
   },
   {
     label: 'Analysis',
     items: [
-      { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics Center' },
-      { href: '/dashboard/compliance', icon: ShieldCheck, label: 'Sustainability Metrics' },
-      { href: '/dashboard/activity', icon: ClipboardList, label: 'Reports' },
+      { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics Center', roles: ANALYSIS_ROLES },
+      { href: '/dashboard/compliance', icon: ShieldCheck, label: 'Sustainability Metrics', roles: ['SUPER_ADMIN', 'GOV_ADMIN', 'AUDITOR'] },
+      { href: '/dashboard/activity', icon: ClipboardList, label: 'Reports', roles: ANALYSIS_ROLES },
     ]
   },
   {
     label: 'Administration',
     items: [
-      { href: '/dashboard/users', icon: Users, label: 'Users & Roles' },
-      { href: '/dashboard/data', icon: Database, label: 'Data Manager' },
-      { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
+      { href: '/dashboard/users', icon: Users, label: 'Users & Roles', roles: ['SUPER_ADMIN', 'GOV_ADMIN'] },
+      { href: '/dashboard/data', icon: Database, label: 'Data Manager', roles: ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER'] },
+      { href: '/dashboard/settings', icon: Settings, label: 'Settings', roles: ['SUPER_ADMIN'] },
     ]
   }
 ];
@@ -112,11 +115,9 @@ export function Sidebar() {
           isSidebarCollapsed && "px-2"
         )}>
           {NAV_CATEGORIES.map((category) => {
-            // RBAC Filter
-            if (category.label === 'Administration' && 
-                !['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER'].includes(user?.role || '')) {
-              return null;
-            }
+            const userRole = user?.role || '';
+            const visibleItems = category.items.filter(item => item.roles.includes(userRole));
+            if (visibleItems.length === 0) return null;
 
             return (
               <div key={category.label} className="space-y-1">
@@ -129,7 +130,7 @@ export function Sidebar() {
                 )}
 
                 <div className="space-y-1">
-                  {category.items.map(({ href, icon: Icon, label }) => {
+                  {visibleItems.map(({ href, icon: Icon, label }) => {
                     const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
                     return (
                       <Link

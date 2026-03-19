@@ -92,9 +92,8 @@ async function ensureDefaultLoginUser() {
     return;
   }
 
-  const defaultEmail = process.env.SEED_ADMIN_EMAIL || 'admin@civiq.city';
-  const defaultPassword = process.env.SEED_ADMIN_PASSWORD || 'civiq2026';
   const orgName = process.env.SEED_ORGANIZATION_NAME || 'CIVIQ Demo City';
+  const defaultPassword = process.env.SEED_ADMIN_PASSWORD || 'civiq2026';
 
   let org = await prisma.organization.findFirst({ where: { name: orgName } });
   if (!org) {
@@ -107,22 +106,27 @@ async function ensureDefaultLoginUser() {
   }
 
   const passwordHash = await bcrypt.hash(defaultPassword, 10);
-  await prisma.user.upsert({
-    where: { email: defaultEmail },
-    update: {
-      passwordHash,
-      name: 'CIVIQ Administrator',
-      role: 'SUPER_ADMIN',
-      organizationId: org.id,
-    },
-    create: {
-      email: defaultEmail,
-      passwordHash,
-      name: 'CIVIQ Administrator',
-      role: 'SUPER_ADMIN',
-      organizationId: org.id,
-    },
-  });
+
+  const seedUsers = [
+    { email: 'admin@civiq.city',      name: 'CIVIQ Administrator',  role: 'SUPER_ADMIN' },
+    { email: 'gov@civiq.city',        name: 'Sarah Chen',           role: 'GOV_ADMIN' },
+    { email: 'ops@civiq.city',        name: 'Raj Patel',            role: 'OPS_MANAGER' },
+    { email: 'analyst@civiq.city',    name: 'Maya Torres',          role: 'ANALYST' },
+    { email: 'supervisor@civiq.city', name: 'David Kim',            role: 'FIELD_SUPERVISOR' },
+    { email: 'operator@civiq.city',   name: 'Alex Johnson',         role: 'FIELD_OPERATOR' },
+    { email: 'auditor@civiq.city',    name: 'Priya Sharma',         role: 'AUDITOR' },
+    { email: 'viewer@civiq.city',     name: 'Jordan Lee',           role: 'VIEWER' },
+  ];
+
+  for (const u of seedUsers) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: { passwordHash, name: u.name, role: u.role, organizationId: org.id },
+      create: { email: u.email, passwordHash, name: u.name, role: u.role, organizationId: org.id },
+    });
+  }
+
+  console.log(`Seeded ${seedUsers.length} users for organization "${orgName}"`);
 }
 
 import { initWebSocketGateway } from './modules/realtime/websocket.gateway.js';
