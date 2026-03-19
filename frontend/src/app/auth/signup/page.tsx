@@ -95,10 +95,17 @@ export default function SignupPage() {
         </button>
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Visual Side */}
-          <div className="hidden lg:block relative bg-visual-to overflow-hidden">
+          <div className="hidden lg:block relative bg-visual-to overflow-hidden auth-panel-slide-right">
             <div className="absolute inset-0 bg-gradient-to-br from-visual-from to-visual-to z-10" />
             
             <div className="absolute inset-0 flex flex-col justify-center p-20 z-20">
+              <button 
+                onClick={() => router.push('/')}
+                className="absolute top-12 left-12 flex items-center gap-2 text-white/70 hover:text-white transition-colors group w-fit p-1"
+              >
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" /> 
+                <span className="text-xs font-black uppercase tracking-widest">Back to Vision</span>
+              </button>
               <div className="space-y-6">
                 <div className="relative group">
                   <div className="absolute -inset-4 bg-emerald-500/30 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -121,15 +128,7 @@ export default function SignupPage() {
           </div>
 
           {/* Form Side */}
-          <div className="p-8 lg:p-20 flex flex-col justify-center bg-panel-bg text-foreground">
-            <button 
-              onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-colors mb-8 lg:mb-12 group w-fit p-1 -ml-1"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
-              <span className="text-[10px] lg:text-xs font-black uppercase tracking-widest">Back to Vision</span>
-            </button>
-
+          <div className="p-8 lg:p-20 flex flex-col justify-center bg-panel-bg text-foreground auth-panel-slide-left">
             {/* Mobile Logo */}
             <div className="lg:hidden mb-10 flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-slate-950/40 backdrop-blur-3xl border border-white/10 flex items-center justify-center shadow-xl">

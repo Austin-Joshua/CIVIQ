@@ -66,7 +66,7 @@ export default function LandingPage() {
             </button>
             <button 
               onClick={() => router.push('/auth/login')}
-              className="text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors px-4"
+              className="text-sm font-black text-foreground hover:text-emerald-500 transition-colors px-4 uppercase tracking-[0.2em]"
             >
               Login
             </button>
