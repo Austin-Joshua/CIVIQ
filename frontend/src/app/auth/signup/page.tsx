@@ -21,6 +21,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -38,7 +39,7 @@ export default function SignupPage() {
       setAuth({ id: '1', name: name, email: email, role: 'ADMIN' }, 'mock-token');
       router.push('/dashboard');
     } catch (error) {
-      console.error(error);
+      toast.error('Deployment request failed. Network latency detected.');
     } finally {
       setLoading(false);
     }

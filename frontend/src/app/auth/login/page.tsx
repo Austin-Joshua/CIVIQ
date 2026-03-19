@@ -21,6 +21,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -37,7 +38,7 @@ export default function LoginPage() {
       setAuth({ id: '1', name: 'Admin User', email: email, role: 'ADMIN' }, 'mock-token');
       router.push('/dashboard');
     } catch (error) {
-      console.error(error);
+      toast.error('Authentication node offline. Please verify credentials or try again later.');
     } finally {
       setLoading(false);
     }

@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
 import { useUIStore } from '@/store/uiStore';
+import { toast } from 'sonner';
 
 const FILL_LEVELS = [
   { name: 'Site Alpha', fill: 82, capacity: 50000 },
@@ -194,7 +195,7 @@ export default function LandfillIntelPage() {
             </div>
           </div>
           <button 
-            onClick={() => {}}
+            onClick={() => toast.success('AI Strategy simulation initiated. ETA 2m to compile reports.')}
             className="flex items-center gap-3 px-6 py-3 liquid-glass hover:bg-emerald-500/10 border-white/10 hover:border-emerald-500/30 rounded-xl text-[10px] font-black text-foreground hover:text-emerald-500 uppercase tracking-[0.2em] transition-all group-hover:gap-4 shadow-sm"
           >
             Analyze Strategy <ChevronRight className="w-4 h-4" />

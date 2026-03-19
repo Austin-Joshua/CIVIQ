@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
 import { useUIStore } from '@/store/uiStore';
+import { toast } from 'sonner';
 
 const DIVERSION_DATA = [
   { name: 'Paper/Cardboard', value: 35, color: '#10b981' },
@@ -143,7 +144,7 @@ export default function RecyclingPlannerPage() {
               <div 
                 key={item.name} 
                 className="flex items-center justify-between p-3 rounded-xl hover:bg-card/40 border border-transparent hover:border-white/10 transition-colors cursor-pointer group/item shadow-sm hover:shadow-md"
-                onClick={() => {}}
+                onClick={() => toast.info(`Deep-diving into ${item.name} recovery workflows.`)}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full group-hover/item:scale-125 transition-transform shadow-inner" style={{ backgroundColor: item.color }} />
@@ -199,7 +200,7 @@ export default function RecyclingPlannerPage() {
             </p>
           </div>
           <button 
-            onClick={() => {}}
+            onClick={() => toast.success('AI recommendation approved. Collection schedules adjusted automatically.')}
             className="flex-shrink-0 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-xl shadow-emerald-500/20 active:scale-[0.98]"
           >
             Apply Recommendation

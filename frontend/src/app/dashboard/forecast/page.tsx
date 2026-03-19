@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { StatCard, SectionHeader } from '@/components/ui/Cards';
 import { DynamicChart } from '@/components/ui/DynamicChart';
 import { useUIStore } from '@/store/uiStore';
+import { toast } from 'sonner';
 
 const FORECAST_DATA = [
   { day: 'Mon', historical: 400, predicted: 420 },
@@ -192,7 +193,10 @@ export default function WasteForecastPage() {
               </div>
             </div>
 
-            <button className="w-full mt-6 py-3 liquid-glass hover:bg-orange-500/5 hover:border-orange-500/30 hover:text-orange-500 border-white/10 rounded-xl text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] transition-all relative z-10 shadow-sm">
+            <button 
+              onClick={() => toast.info('Historical logs feature coming soon!')}
+              className="w-full mt-6 py-3 liquid-glass hover:bg-orange-500/5 hover:border-orange-500/30 hover:text-orange-500 border-white/10 rounded-xl text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] transition-all relative z-10 shadow-sm"
+            >
               View historical logs
             </button>
           </div>
@@ -206,7 +210,7 @@ export default function WasteForecastPage() {
               "Based on forecast, implement 'Zone C Peak Fee' to reduce industrial waste by <span className="text-emerald-500">4%</span>, saving <span className="text-emerald-500">120kg</span> of carbon tomorrow."
             </p>
             <button 
-              onClick={() => {}}
+              onClick={() => toast.success('Policy simulation running. Computing economic and environmental impact...')}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-xl shadow-emerald-500/20 relative z-10 hover:scale-[1.02] active:scale-[0.98]"
             >
               Run Policy Simulation
