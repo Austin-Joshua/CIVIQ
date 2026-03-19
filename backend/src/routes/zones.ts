@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma.js';
-import { authenticateToken, AuthRequest } from '../middleware/auth.js';
+import { authenticateToken, AuthRequest, authorizeRoles, ROLES } from '../middleware/auth.js';
+import { auditLog } from '../middleware/audit.js';
 
 const router = Router();
 
 router.use(authenticateToken);
 
 // Get all zones with their cleanliness summary
-router.get('/', async (req: AuthRequest, res) => {
+// Get all zones with their cleanliness summary (Accessible by Ops Managers and above, or Auditors)
+router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.ANALYST, ROLES.AUDITOR, ROLES.VIEWER), auditLog('VIEW_ZONES', 'Zone'), async (req: AuthRequest, res) => {
   try {
     const zones = await prisma.zone.findMany({
       where: { organizationId: req.user?.organizationId },
@@ -24,7 +26,8 @@ router.get('/', async (req: AuthRequest, res) => {
 });
 
 // Get zone by ID with bins
-router.get('/:id', async (req: AuthRequest, res) => {
+// Get zone by ID with bins
+router.get('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.ANALYST, ROLES.AUDITOR, ROLES.VIEWER), auditLog('VIEW_ZONE_DETAIL', 'Zone'), async (req: AuthRequest, res) => {
   try {
     const zone = await prisma.zone.findUnique({
       where: { 

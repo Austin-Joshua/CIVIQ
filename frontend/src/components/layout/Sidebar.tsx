@@ -15,6 +15,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/map', icon: Map, label: 'Geospatial Map' },
   { href: '/dashboard/routes', icon: Route, label: 'Route Intel' },
   { href: '/dashboard/forecast', icon: TrendingUp, label: 'Predictive Ops' },
+  { href: '/dashboard/compliance', icon: ShieldCheck, label: 'Gov. Compliance' },
   { href: '/dashboard/recycling', icon: Recycle, label: 'Sustainability' },
   { href: '/dashboard/landfill', icon: Layers, label: 'Waste Management' },
   { href: '/dashboard/risk', icon: AlertTriangle, label: 'Risk Evaluation' },

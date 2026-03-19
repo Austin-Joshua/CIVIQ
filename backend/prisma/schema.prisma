@@ -10,14 +10,20 @@ datasource db {
 model Organization {
   id               String   @id @default(uuid())
   name             String
-  subscriptionPlan String   @default("ENTERPRISE") // FREE, PRO, ENTERPRISE
+  type             String   @default("MUNICIPALITY") // NATIONAL, STATE, MUNICIPALITY, PRIVATE_CONTRACTOR
+  parentId         String?  // Self-relation for hierarchy (e.g., State -> National)
+  subscriptionPlan String   @default("ENTERPRISE")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  users    User[]
-  zones    Zone[]
-  vehicles Vehicle[]
-  alerts   Alert[]
+  parent   Organization?  @relation("OrgHierarchy", fields: [parentId], references: [id])
+  children Organization[] @relation("OrgHierarchy")
+
+  users     User[]
+  zones     Zone[]
+  vehicles  Vehicle[]
+  alerts    Alert[]
+  auditLogs AuditLog[]
 }
 
 model User {
@@ -25,12 +31,28 @@ model User {
   email          String   @unique
   passwordHash   String
   name           String
-  role           String   @default("VIEWER") // SUPER_ADMIN, CITY_ADMIN, OPS_MANAGER, ANALYST, FIELD_OPERATOR, VIEWER
+  role           String   @default("VIEWER") // SUPER_ADMIN, GOV_ADMIN, OPS_MANAGER, ANALYST, FIELD_SUPERVISOR, FIELD_OPERATOR, AUDITOR, VIEWER
   organizationId String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  action         String   // e.g., "USER_LOGIN", "ROUTE_MODIFIED", "POLICY_UPDATED"
+  entityType     String   // e.g., "Vehicle", "Alert", "User"
+  entityId       String?
+  metadata       String?  // JSON string containing previous/new values
+  timestamp      DateTime @default(now())
+  
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model Zone {

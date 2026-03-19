@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma.js';
-import { authenticateToken, AuthRequest } from '../middleware/auth.js';
+import { authenticateToken, AuthRequest, authorizeRoles, ROLES } from '../middleware/auth.js';
+import { auditLog } from '../middleware/audit.js';
 
 const router = Router();
 
 router.use(authenticateToken);
 
 // Get all bins (with optional zone filtering and mandatory organization filtering)
-router.get('/', async (req: AuthRequest, res) => {
+// Get all bins (with optional zone filtering and mandatory organization filtering)
+router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.ANALYST, ROLES.AUDITOR, ROLES.FIELD_SUPERVISOR, ROLES.VIEWER), auditLog('VIEW_BINS', 'Bin'), async (req: AuthRequest, res) => {
   try {
     const { zoneId } = req.query;
     const bins = await prisma.bin.findMany({
@@ -26,7 +28,8 @@ router.get('/', async (req: AuthRequest, res) => {
 });
 
 // Update bin fill level (simulating sensor data update)
-router.patch('/:id/fill', async (req: AuthRequest, res) => {
+// Update bin fill level (simulating sensor data update)
+router.patch('/:id/fill', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN, ROLES.OPS_MANAGER, ROLES.FIELD_SUPERVISOR, ROLES.FIELD_OPERATOR), auditLog('UPDATE_BIN_FILL', 'Bin'), async (req: AuthRequest, res) => {
   try {
     const { fillLevel } = req.body;
     

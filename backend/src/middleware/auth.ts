@@ -11,6 +11,17 @@ export interface AuthRequest extends Request {
   };
 }
 
+export const ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  GOV_ADMIN: 'GOV_ADMIN',
+  OPS_MANAGER: 'OPS_MANAGER',
+  ANALYST: 'ANALYST',
+  FIELD_SUPERVISOR: 'FIELD_SUPERVISOR',
+  FIELD_OPERATOR: 'FIELD_OPERATOR',
+  AUDITOR: 'AUDITOR',
+  VIEWER: 'VIEWER'
+};
+
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
