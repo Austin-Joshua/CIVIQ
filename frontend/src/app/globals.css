@@ -5,6 +5,7 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-background: hsl(var(--background));
+  --color-background-secondary: hsl(var(--background-secondary));
   --color-foreground: hsl(var(--foreground));
 
   --color-primary: hsl(var(--primary));
@@ -36,6 +37,7 @@
 @layer base {
   :root {
     --background: 180 20% 98%; 
+    --background-secondary: 161 72% 95%;
     --foreground: 220 40% 10%;
     
     --card: 0 0% 100%;
@@ -72,6 +74,7 @@
   
   .dark {
     --background: 222 47% 2%;
+    --background-secondary: 222 47% 4%;
     --foreground: 210 40% 98%;
     
     --card: 222 47% 4%;

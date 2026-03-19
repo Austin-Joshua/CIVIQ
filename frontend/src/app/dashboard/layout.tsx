@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!token) return null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative flex">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background-secondary text-foreground relative flex">
       <Sidebar />
       <div className={cn(
         "flex-1 flex flex-col min-h-screen relative z-10 transition-all duration-300 ease-in-out w-full",
