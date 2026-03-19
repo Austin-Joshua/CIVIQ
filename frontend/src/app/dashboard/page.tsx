@@ -33,6 +33,8 @@ import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
 import { cn } from '@/lib/utils';
 import { useIsMounted } from '@/hooks/useIsMounted';
+import { InsightEngine } from '@/components/dashboard/InsightEngine';
+import { toast } from 'sonner';
 
 const MOCK_CHART_DATA = [
   { name: '06:00', waste: 400 },
@@ -72,8 +74,11 @@ export default function DashboardPage() {
           <button className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted transition-all">
             <Filter className="w-3.5 h-3.5" /> Filter
           </button>
-          <button className="flex items-center gap-2 px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold rounded-lg transition-all shadow-lg shadow-primary/20">
-            Generate Report
+          <button 
+            onClick={() => toast.success('Intelligent Report Generation comprehensive analysis compiling. Output will be saved to your Drive.')}
+            className="flex items-center gap-2 px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-primary/20"
+          >
+            Generate AI Report
           </button>
         </div>
       </div>
@@ -192,53 +197,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Alerts & Risk Sidebar */}
+        {/* Autonomous Insight Engine Sidebar */}
         <div className="space-y-6">
-          <div className="bg-card/50 border border-border rounded-2xl p-6">
-            <SectionHeader 
-              title="Alerts" 
-              subtitle="Infrastructure updates"
-            />
-            <div className="space-y-3 mt-4">
-              <AlertCard 
-                type="Overflow Outbreak" 
-                severity="CRITICAL" 
-                message="Bin B12 in Zone C is at 98% capacity with blockage." 
-                time="2 mins ago" 
-                onClick={() => openReport('alert', { type: 'Overflow Outbreak', severity: 'CRITICAL', message: 'Bin B12 in Zone C is at 98% capacity with blockage.', time: '2 mins ago' })}
-              />
-              <AlertCard 
-                type="Service Gap" 
-                severity="MEDIUM" 
-                message="Vehicle V04 scheduled maintenance delayed." 
-                time="14 mins ago" 
-                onClick={() => openReport('alert', { type: 'Service Gap', severity: 'MEDIUM', message: 'Vehicle V04 scheduled maintenance delayed.', time: '14 mins ago' })}
-              />
-              <AlertCard 
-                type="Infrastructure Risk" 
-                severity="HIGH" 
-                message="Sensor network in Industrial Zone reporting high noise." 
-                time="22 mins ago" 
-                onClick={() => openReport('alert', { type: 'Infrastructure Risk', severity: 'HIGH', message: 'Sensor network in Industrial Zone reporting high noise.', time: '22 mins ago' })}
-              />
-            </div>
-            <button className="w-full mt-4 py-2 border border-border hover:bg-muted/50 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground transition-all flex items-center justify-center gap-2">
-              View All Alerts <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
-              <Zap className="w-12 h-12 text-primary" />
-            </div>
-            <h3 className="text-sm font-black text-foreground mb-2">Optimization Tip</h3>
-            <p className="text-primary/70 text-xs font-medium leading-relaxed mb-4">
-              "Predicted overflows in Zone C can be mitigated by rerouting vehicle V09, saving 14% fuel."
-            </p>
-            <button className="text-primary text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 hover:gap-2.5 transition-all">
-              Apply <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <InsightEngine />
         </div>
       </div>
 
