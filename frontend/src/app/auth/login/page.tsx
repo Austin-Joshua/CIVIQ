@@ -112,10 +112,10 @@ export default function LoginPage() {
       <button
         type="button"
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        className="fixed top-8 right-8 z-50 h-12 w-12 rounded-2xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur shadow-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-all active:scale-95"
+        className="fixed top-8 right-8 z-50 h-10 w-10 rounded-xl border border-slate-300 dark:border-white/10 bg-white/80 dark:bg-slate-950/60 backdrop-blur shadow-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-all active:scale-95"
         aria-label="Toggle theme"
       >
-        {mounted && theme === 'dark' ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
 
       {/* Dynamic Background Elements */}
@@ -140,8 +140,8 @@ export default function LoginPage() {
               <div className="space-y-6">
                 <div className="relative group">
                   <div className="absolute -inset-4 bg-emerald-500/30 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative w-32 h-32 rounded-[2rem] bg-slate-950/40 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center shadow-[0_0_80px_rgba(16,185,129,0.2)] group-hover:border-emerald-500/50 transition-all duration-300 overflow-hidden">
-                    <img src="/logo.png" className="w-20 h-20 object-cover relative z-10 drop-shadow-2xl" alt="CIVIQ" />
+                  <div className="relative w-36 h-36 rounded-[2.5rem] bg-slate-950/40 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center shadow-[0_0_80px_rgba(16,185,129,0.2)] group-hover:border-emerald-500/50 transition-all duration-300 overflow-hidden">
+                    <img src="/logo.png" className="w-full h-full object-contain p-4 relative z-10 drop-shadow-2xl" alt="CIVIQ" />
                   </div>
                 </div>
                 <h2 className="text-5xl font-black tracking-tighter leading-tight text-white">
