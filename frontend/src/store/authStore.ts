@@ -21,7 +21,8 @@ const AUTH_COOKIE = 'civiq_auth';
 
 function setAuthCookie(token: string) {
   if (typeof document === 'undefined') return;
-  document.cookie = `${AUTH_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=86400; SameSite=Lax`;
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${AUTH_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=86400; SameSite=Lax${secure}`;
 }
 
 function clearAuthCookie() {

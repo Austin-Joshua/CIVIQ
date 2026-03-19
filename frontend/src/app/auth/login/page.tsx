@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ArrowLeft, 
@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +59,14 @@ export default function LoginPage() {
         },
         payload.token
       );
-      router.push('/dashboard');
+      const target = searchParams.get('next') || '/dashboard';
+      router.replace(target);
+      // Fallback navigation for hosted environments where edge middleware sees cookie with slight delay.
+      setTimeout(() => {
+        if (window.location.pathname !== target) {
+          window.location.assign(target);
+        }
+      }, 150);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Authentication node offline. Please verify credentials or try again later.');
     } finally {
