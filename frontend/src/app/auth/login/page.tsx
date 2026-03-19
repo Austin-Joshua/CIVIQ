@@ -124,24 +124,24 @@ export default function LoginPage() {
         <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/10 blur-[150px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl bg-panel-bg border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
+      <div className="relative z-10 w-full max-w-5xl lg:h-[640px] bg-panel-bg border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Visual Side (Fixed on Left) */}
           <div className="hidden lg:block relative bg-visual-to overflow-hidden auth-panel-slide-right">
             <div className="absolute inset-0 bg-gradient-to-br from-visual-from to-visual-to z-10" />
-            <button 
-              onClick={() => router.push('/')}
+            <Link
+              href="/"
               className="absolute top-10 left-10 z-20 flex items-center gap-2 text-white/70 hover:text-white transition-colors group w-fit p-1"
             >
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" /> 
               <span className="text-xs font-black uppercase tracking-widest">Back to Vision</span>
-            </button>
+            </Link>
             <div className="absolute inset-0 flex flex-col justify-center p-14 z-20">
               <div className="space-y-6">
                 <div className="relative group">
                   <div className="absolute -inset-4 bg-emerald-500/30 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative w-36 h-36 rounded-[2.5rem] bg-slate-950/40 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center shadow-[0_0_80px_rgba(16,185,129,0.2)] group-hover:border-emerald-500/50 transition-all duration-300 overflow-hidden">
-                    <img src="/logo.png" className="w-full h-full object-contain p-4 relative z-10 drop-shadow-2xl" alt="CIVIQ" />
+                    <img src="/logo.png" className="w-full h-full object-cover relative z-10" alt="CIVIQ" />
                   </div>
                 </div>
                 <h2 className="text-5xl font-black tracking-tighter leading-tight text-white">
