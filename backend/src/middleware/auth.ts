@@ -37,7 +37,18 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
       return next(new HttpError(403, 'Invalid or expired token'));
     }
     req.user = user;
-    next();
+    
+    // Explicit tenant override header for super admins (if required)
+    let tenantId = user.organizationId;
+    if (user.role === ROLES.SUPER_ADMIN && req.headers['x-tenant-id']) {
+      tenantId = req.headers['x-tenant-id'] as string;
+    }
+
+    import('../lib/tenantContext.js').then(({ tenantContext }) => {
+      tenantContext.run(tenantId, () => {
+        next();
+      });
+    }).catch(next);
   });
 };
 

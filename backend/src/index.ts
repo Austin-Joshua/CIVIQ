@@ -56,7 +56,12 @@ app.use((req, res, next) => {
 });
 
 // Routes
+import usersRoutes from './routes/users.js';
+import incidentRoutes from './routes/incidents.js';
+
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/incidents', incidentRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/zones', zoneRoutes);
 app.use('/api/bins', binRoutes);
@@ -120,15 +125,21 @@ async function ensureDefaultLoginUser() {
   });
 }
 
+import { initWebSocketGateway } from './modules/realtime/websocket.gateway.js';
+import { analyticsWorker } from './workers/analytics.worker.js';
+
 async function startServer() {
   await ensureDefaultLoginUser();
   server = app.listen(config.port, () => {
     console.log(`CIVIQ Backend listening on http://localhost:${config.port}`);
   });
+  initWebSocketGateway(server);
+  analyticsWorker.start();
 }
 
 const gracefulShutdown = async (signal: string) => {
   console.log(`Received ${signal}. Shutting down gracefully...`);
+  analyticsWorker.stop();
   if (server) {
     server.close(async () => {
       await prisma.$disconnect();

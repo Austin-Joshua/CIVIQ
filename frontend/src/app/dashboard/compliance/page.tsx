@@ -1,10 +1,11 @@
 'use client';
 
-import { ShieldCheck, FileDown, Activity, AlertCircle, Leaf, CalendarClock } from 'lucide-react';
+import { ShieldCheck, Activity, AlertCircle, Leaf, CalendarClock, Target, BarChart } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/Cards';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { downloadTextFile } from '@/lib/download';
+import { ExportButton } from '@/components/reports/ExportButton';
+import { useIsMounted } from '@/hooks/useIsMounted';
 
 const METRICS = [
   { label: 'CO2 Diversion Rate', value: '42.8%', target: '45.0%', status: 'warning' },
@@ -14,19 +15,9 @@ const METRICS = [
 ];
 
 export default function CompliancePage() {
-  const handleExport = (reportType: string) => {
-    const content = [
-      'CIVIQ Compliance Export',
-      `Report: ${reportType}`,
-      `Generated: ${new Date().toISOString()}`,
-      '',
-      'Regulatory Metrics',
-      ...METRICS.map((m) => `- ${m.label}: ${m.value} (target ${m.target})`),
-    ].join('\n');
+  const isMounted = useIsMounted();
 
-    downloadTextFile(content, `${reportType.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}.txt`);
-    toast.success(`${reportType} generated and downloaded.`);
-  };
+  if (!isMounted) return null;
 
   return (
     <div className="space-y-8 fade-in">
@@ -37,12 +28,7 @@ export default function CompliancePage() {
             National Environmental Regulatory Adherence Overview
           </p>
         </div>
-        <button 
-          onClick={() => handleExport('Monthly Master Audit')}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:border-primary/40 text-sm font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-primary/5"
-        >
-          <FileDown className="w-4 h-4" /> Export Master Audit
-        </button>
+        <ExportButton data={METRICS} filename="civiq_compliance_report" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -81,7 +67,7 @@ export default function CompliancePage() {
             <SectionHeader 
               title="Official Protocol Generation" 
               subtitle="Certified Exports for Government Procurement"
-              icon={FileDown}
+              icon={Activity}
             />
             <div className="space-y-3 mt-6">
                {[
@@ -99,12 +85,9 @@ export default function CompliancePage() {
                         <p className="text-[10px] text-muted-foreground mt-0.5">{doc.d}</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => handleExport(doc.t)}
-                      className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:text-primary bg-muted rounded-lg hover:bg-primary/10 transition-colors shrink-0"
-                    >
-                      Generate Form
-                    </button>
+                    <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground bg-muted rounded-lg shrink-0">
+                      Standardized Form
+                    </div>
                  </div>
                ))}
             </div>

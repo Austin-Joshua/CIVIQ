@@ -38,6 +38,7 @@ model User {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   auditLogs    AuditLog[]
+  alertsAssigned Alert[] @relation("AlertAssignments")
 }
 
 model AuditLog {
@@ -103,14 +104,19 @@ model Route {
 }
 
 model Alert {
-  id             String   @id @default(uuid())
-  type           String   // OVERFLOW_RISK, SERVICE_GAP, INCIDENT
-  severity       String   // LOW, MEDIUM, HIGH, CRITICAL
-  message        String
-  timestamp      DateTime @default(now())
-  resolved       Boolean  @default(false)
-  organizationId String
+  id               String   @id @default(uuid())
+  type             String   // OVERFLOW_RISK, SERVICE_GAP, INCIDENT
+  severity         String   // LOW, MEDIUM, HIGH, CRITICAL
+  status           String   @default("DETECTED") // DETECTED, ASSIGNED, RESPONDING, RESOLVED
+  message          String
+  timestamp        DateTime @default(now())
+  resolved         Boolean  @default(false)
+  resolutionNotes  String?
+  
+  assignedToId     String?
+  assignedTo       User?    @relation("AlertAssignments", fields: [assignedToId], references: [id], onDelete: SetNull)
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 

@@ -60,13 +60,14 @@ router.post('/signup', async (req, res, next) => {
           }
         }
       },
+      include: { organization: true }
     });
 
     const token = jwt.sign({ id: user.id, role: user.role, organizationId: user.organizationId }, JWT_SECRET, { expiresIn: '24h' });
 
     res.status(201).json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role, organizationId: user.organizationId },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, organizationId: user.organizationId, organizationName: user.organization?.name || orgName },
     });
   } catch (error) {
     next(error);
@@ -80,7 +81,10 @@ router.post('/login', async (req, res, next) => {
     ensureValidEmail(email);
     ensureValidPassword(password);
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ 
+      where: { email },
+      include: { organization: true } 
+    });
     if (!user) {
       throw new HttpError(401, 'Invalid email or password.');
     }
@@ -94,7 +98,7 @@ router.post('/login', async (req, res, next) => {
 
     res.json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role, organizationId: user.organizationId },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, organizationId: user.organizationId, organizationName: user.organization?.name || 'Unknown Organization' },
     });
   } catch (error) {
     next(error);
@@ -108,9 +112,11 @@ router.post('/guest-login', async (_req, res, next) => {
       (await prisma.user.findFirst({
         where: { role: 'SUPER_ADMIN' },
         orderBy: { id: 'asc' },
+        include: { organization: true }
       })) ||
       (await prisma.user.findFirst({
         orderBy: { id: 'asc' },
+        include: { organization: true }
       }));
 
     if (!user) {
@@ -131,6 +137,7 @@ router.post('/guest-login', async (_req, res, next) => {
         name: user.name,
         role: user.role,
         organizationId: user.organizationId,
+        organizationName: user.organization?.name || 'Guest Organization'
       },
     });
   } catch (error) {

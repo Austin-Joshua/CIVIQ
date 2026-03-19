@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { ToastProvider } from '@/components/providers/ToastProvider';
+import { WebSocketProvider } from '@/providers/WebSocketProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -31,7 +32,9 @@ export default function RootLayout({
           enableSystem
         >
           <ToastProvider>
-            {children}
+            <WebSocketProvider>
+              {children}
+            </WebSocketProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

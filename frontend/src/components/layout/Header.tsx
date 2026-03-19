@@ -1,10 +1,9 @@
 'use client';
 
-import { Bell, Search, Sun, Moon, Leaf, User, LogOut, Settings, Check, CheckCheck, ArrowRight, Menu, X } from 'lucide-react';
+import { Bell, Search, Sun, Moon, Leaf, User, LogOut, Settings, Check, CheckCheck, ArrowRight, Menu, X, ChevronDown } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuthStore } from '@/store/authStore';
 import { useState, useRef, useEffect } from 'react';
-import { NAV_ITEMS } from './Sidebar';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -49,7 +48,8 @@ export function TopHeader() {
   const [showNotifs, setShowNotifs] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const { openMobileSidebar } = useUIStore();
+  const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false);
+  const { openMobileSidebar, selectedWorkspace, setSelectedWorkspace } = useUIStore();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [notifs, setNotifs] = useState(MOCK_NOTIFS);
   const isMounted = useIsMounted();
@@ -57,6 +57,7 @@ export function TopHeader() {
   const notifRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const workspaceRef = useRef<HTMLDivElement>(null);
 
   const filteredResults = search.trim() 
     ? SEARCHABLE_ITEMS.filter(item => 
@@ -70,6 +71,7 @@ export function TopHeader() {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifs(false);
       if (userRef.current && !userRef.current.contains(e.target as Node)) setShowUserMenu(false);
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowSearchResults(false);
+      if (workspaceRef.current && !workspaceRef.current.contains(e.target as Node)) setShowWorkspaceMenu(false);
     }
     
     function handleKeyDown(e: KeyboardEvent) {
@@ -108,14 +110,76 @@ export function TopHeader() {
   return (
     <>
     <header className="sticky top-0 z-20 h-14 flex items-center px-4 lg:px-6 liquid-glass border-b border-border gap-2 font-outfit">
-      {/* Mobile Menu Toggle */}
-      <button 
-        onClick={openMobileSidebar}
-        aria-label="Open sidebar menu"
-        className="lg:hidden p-2 -ml-2 rounded-xl text-muted-foreground hover:text-emerald-500 transition-all interactive-scale"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
+      <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0">
+        {/* Mobile Menu Toggle */}
+        <button 
+          onClick={openMobileSidebar}
+          aria-label="Open sidebar menu"
+          className="lg:hidden p-2 -ml-2 rounded-xl text-muted-foreground hover:text-emerald-500 transition-all interactive-scale"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        {/* Logo and Title */}
+        <Link href="/dashboard" className="flex items-center gap-2 lg:gap-3 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0">
+          <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg overflow-hidden flex-shrink-0 shadow-lg shadow-emerald-500/10 border border-white/5 glow-accent">
+            <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="text-foreground font-black text-lg lg:text-xl tracking-tighter">CIVIQ</span>
+            <span className="text-[8px] text-primary font-black uppercase tracking-widest hidden xs:block">Command Nexus</span>
+          </div>
+        </Link>
+      </div>
+
+      {/* Workspace Selector */}
+      <div ref={workspaceRef} className="hidden md:block ml-2 lg:ml-4 border-l border-border/50 pl-2 lg:pl-4 relative z-[70]">
+        <button 
+          onClick={() => setShowWorkspaceMenu(!showWorkspaceMenu)}
+          className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors group"
+        >
+          <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+            {isMounted ? (user?.organizationName?.[0]?.toUpperCase() || 'C') : 'C'}
+          </div>
+          <div className="flex flex-col text-left">
+             <span className="text-xs font-bold text-foreground max-w-[120px] truncate">{isMounted ? (user?.organizationName || 'CIVIQ Workspace') : 'CIVIQ Workspace'}</span>
+             <span className="text-[9px] uppercase tracking-wider text-muted-foreground">{isMounted ? (user?.role || 'Enterprise') : 'Enterprise'}</span>
+          </div>
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1 group-hover:text-foreground transition-colors" />
+        </button>
+
+        {showWorkspaceMenu && (
+          <div className="absolute left-4 top-full mt-2 w-56 liquid-glass-panel border border-border rounded-xl overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2 duration-100">
+            <div className="px-3 py-2 border-b border-border/50 bg-background/50">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Switch Workspace</span>
+            </div>
+            <div className="p-1">
+              <button 
+                onClick={() => { setSelectedWorkspace(user?.organizationId || 'default'); setShowWorkspaceMenu(false); }}
+                className={cn("w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-left transition-colors", selectedWorkspace === (user?.organizationId || 'default') ? "bg-emerald-500/10 text-emerald-500" : "hover:bg-muted/50")}
+              >
+                <div className="w-6 h-6 rounded bg-emerald-500/20 flex items-center justify-center font-bold text-xs uppercase shrink-0 text-emerald-500">
+                  {isMounted ? (user?.organizationName?.[0]?.toUpperCase() || 'C') : 'C'}
+                </div>
+                <span className="truncate">{isMounted ? (user?.organizationName || 'Primary Workspace') : 'Primary Workspace'}</span>
+              </button>
+              
+              {isMounted && user?.role === 'SUPER_ADMIN' && (
+                <button 
+                  onClick={() => { setSelectedWorkspace('sandbox-env'); setShowWorkspaceMenu(false); }}
+                  className={cn("w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-left transition-colors", selectedWorkspace === 'sandbox-env' ? "bg-emerald-500/10 text-emerald-500" : "hover:bg-muted/50")}
+                >
+                  <div className="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center font-bold text-xs uppercase shrink-0 text-purple-500">SB</div>
+                  Sandbox Env
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Spacer for desktop search alignment */}
+      <div className="hidden lg:block flex-1 max-w-[20px]" />
 
       {/* Search */}
       <div ref={searchRef} className={cn(
@@ -145,9 +209,12 @@ export function TopHeader() {
         <button 
           onClick={() => setIsSearchExpanded(!isSearchExpanded)}
           aria-label={isSearchExpanded ? 'Close search' : 'Open search'}
-          className="lg:hidden p-2 rounded-xl text-muted-foreground hover:text-emerald-500"
+          className={cn(
+            "lg:hidden p-2 rounded-xl text-muted-foreground hover:text-emerald-500 transition-all",
+            isSearchExpanded ? "bg-emerald-500/10 text-emerald-500" : ""
+          )}
         >
-          {isSearchExpanded ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+          {isSearchExpanded ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
         </button>
 
         {showSearchResults && filteredResults.length > 0 && (
@@ -200,7 +267,7 @@ export function TopHeader() {
             aria-label="Open notifications"
             className="relative p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all interactive-scale glow-accent"
           >
-            <Bell className="w-4 h-4 relative z-10" />
+            <Bell className="w-5 h-5 relative z-10 lg:w-4 lg:h-4" />
             {unreadCount > 0 && (
               <span className="absolute top-1 right-1 min-w-[14px] h-[14px] rounded-full bg-emerald-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg shadow-emerald-500/20 z-20">
                 {unreadCount}
