@@ -28,21 +28,24 @@ async function seed() {
   // Create demo admin
   const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@civiq.city';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'change-me-please';
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
-  
-  if (!existingAdmin) {
-    const passwordHash = await bcrypt.hash(adminPassword, 10);
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        passwordHash,
-        name: 'CIVIQ Administrator',
-        role: 'SUPER_ADMIN',
-        organizationId: org.id
-      },
-    });
-    console.log(`✅ Admin user created for ${adminEmail}`);
-  }
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      passwordHash,
+      name: 'CIVIQ Administrator',
+      role: 'SUPER_ADMIN',
+      organizationId: org.id,
+    },
+    create: {
+      email: adminEmail,
+      passwordHash,
+      name: 'CIVIQ Administrator',
+      role: 'SUPER_ADMIN',
+      organizationId: org.id,
+    },
+  });
+  console.log(`✅ Admin user synced for ${adminEmail}`);
 
   // Create Zones
   const zones = ['Zone A - Central', 'Zone B - Port Side', 'Zone C - Industrial', 'Zone D - Residential North'];
