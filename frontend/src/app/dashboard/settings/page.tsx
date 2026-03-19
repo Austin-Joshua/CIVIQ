@@ -496,7 +496,7 @@ export default function SettingsPage() {
                     <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-muted/20 border border-border rounded-2xl">
                       <div className="relative group">
                         <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-4xl font-bold shadow-2xl shadow-emerald-500/30 group-hover:scale-[1.05] transition-transform duration-500">
-                           <img src="/globe.svg" className="w-full h-full object-contain rounded-3xl opacity-20 absolute p-3" alt="" />
+                           <img src="/logo.png" className="w-full h-full object-cover rounded-3xl opacity-20 absolute" alt="" />
                            <span className="relative z-10">{profileSettings.name[0]}</span>
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-3xl cursor-pointer">

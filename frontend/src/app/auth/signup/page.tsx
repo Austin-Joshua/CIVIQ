@@ -87,7 +87,7 @@ export default function SignupPage() {
                   <div className="absolute -inset-4 bg-emerald-500/30 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative w-36 h-36 rounded-[2.5rem] bg-slate-950/40 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center shadow-[0_0_80px_rgba(16,185,129,0.2)] group-hover:border-emerald-500/50 transition-all duration-300 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-                    <img src="/globe.svg" className="w-24 h-24 object-contain relative z-10 drop-shadow-2xl" alt="CIVIQ" />
+                    <img src="/logo.png" className="w-24 h-24 object-cover relative z-10 drop-shadow-2xl" alt="CIVIQ" />
                   </div>
                 </div>
                 <h2 className="text-6xl font-black tracking-tighter leading-tight text-white">
@@ -116,11 +116,11 @@ export default function SignupPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden mb-10 flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-slate-950/40 backdrop-blur-3xl border border-white/10 flex items-center justify-center shadow-xl">
-                <img src="/globe.svg" className="w-8 h-8 object-contain" alt="CIVIQ" />
+                <img src="/logo.png" className="w-8 h-8 object-cover" alt="CIVIQ" />
               </div>
               <div>
                 <span className="text-foreground font-black text-xl tracking-tighter block">CIVIQ</span>
-                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Urban OS</span>
+                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">CIVIQ</span>
               </div>
             </div>
 

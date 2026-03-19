@@ -48,11 +48,11 @@ export function Sidebar() {
         <div className="flex items-center justify-between pt-8 pb-4 px-6 mb-2">
           <Link href="/" className="flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity">
             <div className="w-16 h-16 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-2xl shadow-emerald-500/20 border border-white/10 glow-accent">
-              <img src="/globe.svg" alt="CIVIQ Logo" className="w-full h-full object-contain p-2 bg-white/5 relative z-10" />
+              <img src="/logo.png" alt="CIVIQ Logo" className="w-full h-full object-cover relative z-10" />
             </div>
             <div>
               <span className="text-foreground font-black text-4xl tracking-tighter block leading-none">CIVIQ</span>
-              <p className="text-[10px] text-primary font-black uppercase tracking-[0.4em] mt-1.5 opacity-80">Urban OS</p>
+              <p className="text-[10px] text-primary font-black uppercase tracking-[0.4em] mt-1.5 opacity-80">CIVIQ</p>
             </div>
           </Link>
           

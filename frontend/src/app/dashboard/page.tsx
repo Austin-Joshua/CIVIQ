@@ -67,7 +67,7 @@ export default function DashboardPage() {
     const operator = user?.name || 'Operator';
     const generatedAt = new Date().toISOString();
     const content = [
-      'CIVIQ - Urban Intelligence Report',
+      'CIVIQ Report',
       `Generated At: ${generatedAt}`,
       `Operator: ${operator}`,
       '',

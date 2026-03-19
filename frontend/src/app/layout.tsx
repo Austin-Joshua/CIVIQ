@@ -7,9 +7,14 @@ import { ToastProvider } from '@/components/providers/ToastProvider';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'CIVIQ — Urban Intelligence OS',
+  title: 'CIVIQ',
   description: 'The Brain Behind Clean Cities — Predict. Optimize. Sustain.',
   keywords: ['smart city', 'waste management', 'urban intelligence', 'sustainability'],
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({

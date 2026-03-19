@@ -43,7 +43,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 p-1 bg-slate-900">
-               <img src="/globe.svg" className="w-full h-full object-contain p-2" alt="Logo" />
+               <img src="/logo.png" className="w-full h-full object-cover" alt="Logo" />
             </div>
             <span className="text-3xl font-black tracking-tighter text-white uppercase">CIVIQ</span>
           </div>
@@ -215,7 +215,7 @@ export default function LandingPage() {
              <div className="grid grid-cols-1 md:grid-cols-4 gap-20 mb-20 text-center md:text-left">
                 <div className="md:col-span-2">
                    <div className="flex items-center gap-3 mb-8 justify-center md:justify-start">
-                     <img src="/globe.svg" className="w-10 h-10 object-contain rounded-xl p-1" alt="CIVIQ" />
+                     <img src="/logo.png" className="w-10 h-10 object-cover rounded-xl" alt="CIVIQ" />
                      <span className="text-3xl font-black tracking-tighter">CIVIQ</span>
                    </div>
                    <p className="text-slate-500 max-w-sm font-medium leading-relaxed mx-auto md:mx-0">
