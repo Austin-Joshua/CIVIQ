@@ -12,13 +12,13 @@ import { useUIStore } from '@/store/uiStore';
 
 export const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Command Nexus' },
+  { href: '/dashboard/incidents', icon: AlertTriangle, label: 'Incident Command' },
   { href: '/dashboard/map', icon: Map, label: 'Geospatial Map' },
   { href: '/dashboard/routes', icon: Route, label: 'Route Intel' },
   { href: '/dashboard/forecast', icon: TrendingUp, label: 'Predictive Ops' },
   { href: '/dashboard/compliance', icon: ShieldCheck, label: 'Gov. Compliance' },
   { href: '/dashboard/recycling', icon: Recycle, label: 'Sustainability' },
   { href: '/dashboard/landfill', icon: Layers, label: 'Waste Management' },
-  { href: '/dashboard/risk', icon: AlertTriangle, label: 'Risk Evaluation' },
   { href: '/dashboard/simulator', icon: Sliders, label: 'Sim Engine' },
   { href: '/dashboard/analytics', icon: Activity, label: 'Urban Intel' },
   { href: '/dashboard/data', icon: Database, label: 'Identity Sync' },
