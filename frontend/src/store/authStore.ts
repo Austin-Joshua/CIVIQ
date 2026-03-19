@@ -13,8 +13,10 @@ interface User {
 interface AuthState {
   user: User | null;
   token: string | null;
+  hasHydrated: boolean;
   setAuth: (user: User, token: string) => void;
   logout: () => void;
+  setHasHydrated: (value: boolean) => void;
 }
 
 const AUTH_COOKIE = 'civiq_auth';
@@ -35,6 +37,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
+      hasHydrated: false,
       setAuth: (user, token) => {
         setAuthCookie(token);
         set({ user, token });
@@ -43,9 +46,13 @@ export const useAuthStore = create<AuthState>()(
         clearAuthCookie();
         set({ user: null, token: null });
       },
+      setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {
       name: 'civiq-auth',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

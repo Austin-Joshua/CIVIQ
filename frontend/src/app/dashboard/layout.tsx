@@ -18,17 +18,26 @@ const AICopilot = dynamic(
 );
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { token } = useAuthStore();
+  const { token, hasHydrated } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (!token) {
       router.replace('/auth/login');
       return;
     }
     // Keep middleware-visible cookie in sync for server-side route protection.
     document.cookie = `civiq_auth=${encodeURIComponent(token)}; Path=/; Max-Age=86400; SameSite=Lax`;
-  }, [token, router]);
+  }, [hasHydrated, token, router]);
+
+  if (!hasHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground text-sm">
+        Loading dashboard...
+      </div>
+    );
+  }
 
   if (!token) return null;
 

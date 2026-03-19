@@ -61,7 +61,7 @@ export default function SignupPage() {
       );
       router.push('/dashboard');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Deployment request failed. Network latency detected.');
+      toast.error(error instanceof Error ? error.message : 'Sign up failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -91,11 +91,11 @@ export default function SignupPage() {
                   </div>
                 </div>
                 <h2 className="text-6xl font-black tracking-tighter leading-tight text-white">
-                  Built for <br /> <span className="text-emerald-500">Scale.</span>
+                  Create your account <br /> <span className="text-emerald-500">and get started.</span>
                 </h2>
                 <div className="h-1.5 w-24 bg-emerald-500 rounded-full" />
                 <p className="text-slate-300 font-medium text-lg leading-relaxed max-w-sm">
-                  Initialize your district node and start transforming waste into actionable intelligence.
+                  Set up your profile and start using CIVIQ in minutes.
                 </p>
               </div>
             </div>
@@ -126,7 +126,7 @@ export default function SignupPage() {
 
             <div className="mb-10">
               <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-white mb-4">Sign Up</h1>
-              <p className="text-slate-400 font-medium">Create your administrative node credentials.</p>
+              <p className="text-slate-400 font-medium">Create your account.</p>
             </div>
 
             <div className="max-w-md w-full mx-auto">
@@ -136,7 +136,7 @@ export default function SignupPage() {
                   <input
                     id="signup-name"
                     type="text"
-                    placeholder="Operator Name"
+                    placeholder="Your full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
@@ -173,16 +173,16 @@ export default function SignupPage() {
                   disabled={loading}
                   className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black rounded-xl transition-all shadow-xl shadow-emerald-900/40 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest text-xs mt-4"
                 >
-                  {loading ? 'Processing...' : 'Deploy Node'} 
+                  {loading ? 'Creating account...' : 'Sign Up'} 
                   {!loading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </form>
             </div>
 
             <p className="mt-10 text-center text-sm text-muted-foreground font-medium">
-              Already have a node?{' '}
+              Already have an account?{' '}
               <Link href="/auth/login" className="text-emerald-500 font-black hover:underline underline-offset-4 decoration-2">
-                Authorized Login
+                Sign in
               </Link>
             </p>
           </div>

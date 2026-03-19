@@ -8,8 +8,10 @@ export function getApiBaseUrl() {
     return normalizeUrl(configured);
   }
 
+  // Keep builds and prerendering stable even when env vars are missing.
+  // In production, default to same-origin API routes/proxy.
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('Missing NEXT_PUBLIC_API_URL in production environment.');
+    return '/api';
   }
 
   return 'http://localhost:5000/api';
@@ -21,8 +23,10 @@ export function getAiBaseUrl() {
     return normalizeUrl(configured);
   }
 
+  // Avoid hard build failures when AI URL is not configured yet.
+  // In production, default to same-origin AI proxy path.
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('Missing NEXT_PUBLIC_AI_API_URL in production environment.');
+    return '/ai';
   }
 
   return 'http://localhost:8000';

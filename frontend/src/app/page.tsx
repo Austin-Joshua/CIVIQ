@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowRight, 
@@ -18,17 +17,9 @@ import {
   Fingerprint,
   Bot
 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
 
 export default function LandingPage() {
-  const { token } = useAuthStore();
   const router = useRouter();
-
-  useEffect(() => {
-    if (token) {
-      router.replace('/dashboard');
-    }
-  }, [token, router]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-white selection:bg-emerald-500/30 overflow-x-hidden font-outfit">

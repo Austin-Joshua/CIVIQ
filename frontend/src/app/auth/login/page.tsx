@@ -107,7 +107,7 @@ export default function LoginPage() {
 
             <div className="mb-10">
               <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-white mb-4">Login</h1>
-              <p className="text-slate-400 font-medium">Access your city management node.</p>
+              <p className="text-slate-400 font-medium">Sign in to your account.</p>
             </div>
 
             <div className="max-w-md w-full mx-auto">
@@ -142,16 +142,16 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black rounded-xl transition-all shadow-xl shadow-emerald-900/40 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest text-xs mt-4"
                 >
-                  {loading ? 'Authorizing...' : 'Authorize Access'} 
+                  {loading ? 'Signing in...' : 'Sign In'} 
                   {!loading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </form>
             </div>
 
             <p className="mt-10 text-center text-sm text-muted-foreground font-medium">
-              New operator?{' '}
+              New user?{' '}
               <Link href="/auth/signup" className="text-emerald-500 font-black hover:underline underline-offset-4 decoration-2">
-                Request Deployment
+                Create account
               </Link>
             </p>
           </div>
@@ -169,11 +169,11 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <h2 className="text-6xl font-black tracking-tighter leading-tight text-white">
-                  The OS for <br /> <span className="text-emerald-500">Future Cities.</span>
+                  Manage your city <br /> <span className="text-emerald-500">in one place.</span>
                 </h2>
                 <div className="h-1.5 w-24 bg-emerald-500 rounded-full" />
                 <p className="text-slate-300 font-medium text-lg leading-relaxed max-w-sm">
-                  Join 22 districts worldwide in the transition to predictive, zero-waste urban governance.
+                  Track operations, incidents, and reports from a single dashboard.
                 </p>
               </div>
             </div>
