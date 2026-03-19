@@ -24,9 +24,12 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!token) {
       if (socket) {
-        socket.disconnect();
-        setSocket(null);
-        setIsConnected(false);
+        const timer = setTimeout(() => {
+          socket.disconnect();
+          setSocket(null);
+          setIsConnected(false);
+        }, 0);
+        return () => clearTimeout(timer);
       }
       return;
     }
@@ -50,12 +53,15 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       setIsConnected(false);
     });
 
-    setSocket(newSocket);
+    const timer = setTimeout(() => {
+      setSocket(newSocket);
+    }, 0);
 
     return () => {
+      clearTimeout(timer);
       newSocket.disconnect();
     };
-  }, [token]);
+  }, [token, socket]);
 
   return (
     <WebSocketContext.Provider value={{ socket, isConnected }}>

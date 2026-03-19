@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from 'next-themes';
+import { useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
 import { downloadCsvFile } from '@/lib/download';
 
@@ -21,7 +22,9 @@ const AUDIT_LOGS = [
 ];
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState('general');
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'general';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const { user, token, updateUser } = useAuthStore();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -67,6 +70,12 @@ export default function SettingsPage() {
     }
   }, [user]);
 
+  // Sync active tab with query param
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
+
   if (!mounted) return null;
 
   const handleSave = async () => {
@@ -90,8 +99,9 @@ export default function SettingsPage() {
       const updated = await res.json();
       updateUser({ name: updated.name, email: updated.email });
       toast.success('Profile updated!', { description: 'Your name and email have been saved.' });
-    } catch (error: any) {
-      toast.error(error.message || 'Could not save profile');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Could not save profile';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -123,8 +133,9 @@ export default function SettingsPage() {
       }
       toast.success('Password updated!', { description: 'Your credentials have been changed.' });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error: any) {
-      toast.error(error.message || 'Could not update password');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Could not update password';
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

@@ -198,7 +198,7 @@ export default function RiskMonitorPage() {
               </div>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground leading-relaxed md:pl-20 max-w-xl">
-              Potential for <span className="text-foreground font-black">Zone C overflow risk</span> has reached 84%. AI recommends enabling "Overflow Buffer B4" immediately to prevent street-level contamination leaks.
+              Potential for <span className="text-foreground font-black">Zone C overflow risk</span> has reached 84%. AI recommends enabling &quot;Overflow Buffer B4&quot; immediately to prevent street-level contamination leaks.
             </p>
           </div>
           <button 

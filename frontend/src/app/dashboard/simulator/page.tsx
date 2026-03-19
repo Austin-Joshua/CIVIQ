@@ -87,7 +87,7 @@ export default function SimulatorPage() {
             <Activity className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" /> Decision Simulator
           </h1>
           <p className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest pl-11">
-            Predictive "What-If" sandbox for strategic urban planning.
+            Predictive &quot;What-If&quot; sandbox for strategic urban planning.
           </p>
         </div>
         <div className="flex items-center gap-2">

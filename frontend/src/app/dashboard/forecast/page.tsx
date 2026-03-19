@@ -207,7 +207,7 @@ export default function WasteForecastPage() {
             <Zap className="w-10 h-10 text-emerald-500 mb-4 relative z-10 group-hover:scale-110 transition-transform" />
             <h3 className="text-lg font-black tracking-tight text-foreground mb-2 relative z-10">Policy Recommender</h3>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-loose mb-6 relative z-10">
-              "Based on forecast, implement 'Zone C Peak Fee' to reduce industrial waste by <span className="text-emerald-500">4%</span>, saving <span className="text-emerald-500">120kg</span> of carbon tomorrow."
+              &quot;Based on forecast, implement &apos;Zone C Peak Fee&apos; to reduce industrial waste by <span className="text-emerald-500">4%</span>, saving <span className="text-emerald-500">120kg</span> of carbon tomorrow.&quot;
             </p>
             <button 
               onClick={() => toast.success('Policy simulation running. Computing economic and environmental impact...')}

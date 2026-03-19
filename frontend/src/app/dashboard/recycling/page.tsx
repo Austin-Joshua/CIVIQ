@@ -196,7 +196,7 @@ export default function RecyclingPlannerPage() {
               AI Diversion Strategy Recommended
             </h3>
             <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground leading-relaxed pl-0 md:pl-16">
-              Based on waste stream analysis in the Residential North district, increasing the collection frequency of "Organics" by <span className="text-foreground">20%</span> would potentially divert an additional <span className="text-foreground">1.4 tons</span> of waste per month with minimal operational cost increase.
+              Based on waste stream analysis in the Residential North district, increasing the collection frequency of &quot;Organics&quot; by <span className="text-foreground">20%</span> would potentially divert an additional <span className="text-foreground">1.4 tons</span> of waste per month with minimal operational cost increase.
             </p>
           </div>
           <button 

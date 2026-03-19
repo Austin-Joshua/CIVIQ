@@ -20,7 +20,8 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -201,7 +202,7 @@ export default function LandingPage() {
                      <span className="text-3xl font-black tracking-tighter">CIVIQ</span>
                    </div>
                    <p className="text-slate-600 dark:text-slate-500 max-w-sm font-medium leading-relaxed mx-auto md:mx-0">
-                     The world's leading urban OS for smart, sustainable waste infrastructure. 
+                     The world&apos;s leading urban OS for smart, sustainable waste infrastructure. 
                      Predicting the future of city life, today.
                    </p>
                 </div>

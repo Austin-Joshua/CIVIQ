@@ -1,9 +1,10 @@
 'use client';
 
-import { FileDown, Table, FileSpreadsheet } from 'lucide-react';
+import { FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ExportButtonProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   filename: string;
   className?: string;
@@ -48,6 +49,7 @@ export function ExportButton({ data, filename, className }: ExportButtonProps) {
       
       toast.success('Report exported successfully');
     } catch (error) {
+      console.error('Export failed:', error);
       toast.error('Export failed');
     }
   };

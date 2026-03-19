@@ -58,7 +58,7 @@ export default function UsersPage() {
     if (token) {
       fetchUsers();
     }
-  }, [token]);
+  }, [token, fetchUsers]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,8 +84,9 @@ export default function UsersPage() {
       setInviteRole('VIEWER');
       setIsInviteModalOpen(false);
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Could not invite user';
+      toast.error(message);
     }
   };
 
@@ -105,8 +106,9 @@ export default function UsersPage() {
       
       toast.success('User removed');
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Could not remove user';
+      toast.error(message);
     }
   };
 
@@ -130,8 +132,9 @@ export default function UsersPage() {
       toast.success('Role updated');
       setEditingUserId(null);
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Could not update role';
+      toast.error(message);
     }
   };
 

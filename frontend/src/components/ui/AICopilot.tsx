@@ -12,7 +12,13 @@ interface Message {
   timestamp: Date;
 }
 
-const INTENTS = [
+interface Intent {
+  name: string;
+  keywords: string[];
+  response: string | React.ReactNode;
+}
+
+const INTENTS: Intent[] = [
   {
     name: 'overflow',
     keywords: ['overflow', 'full', 'capacity', 'tomorrow', 'bins', 'fill'],
@@ -114,22 +120,21 @@ export function AICopilot() {
       const query = (userMsg.content || '').toString().toLowerCase();
       
       // Intent Scoring
-      let bestIntent = null;
+      let bestIntentFound: Intent | null = null;
       let highestScore = 0;
-
       INTENTS.forEach(intent => {
         const score = intent.keywords.reduce((acc, kw) => acc + (query.includes(kw) ? 1 : 0), 0);
         if (score > highestScore) {
           highestScore = score;
-          bestIntent = intent;
+          bestIntentFound = intent;
         }
       });
 
-      const responseContent = bestIntent 
-        ? (bestIntent as any).response 
+      const responseContent = bestIntentFound 
+        ? (bestIntentFound as Intent).response 
         : (
           <p className="text-sm text-foreground/90 leading-relaxed italic opacity-90">
-            "I'm keeping a close eye on **Forecasting**, **Fleet Safety**, and **Operational Costs**. Which area would you like to analyze together?"
+            &quot;I&apos;m keeping a close eye on **Forecasting**, **Fleet Safety**, and **Operational Costs**. Which area would you like to analyze together?&quot;
           </p>
         );
 

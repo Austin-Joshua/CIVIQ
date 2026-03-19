@@ -57,7 +57,7 @@ const MOCK_ROUTES = [
   }
 ];
 
-function Directions({ activeRoute }: { activeRoute: any }) {
+function Directions({ activeRoute }: { activeRoute: typeof MOCK_ROUTES[0] }) {
   const map = useMap();
   const routesLibrary = useMapsLibrary('routes');
   const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
@@ -65,8 +65,11 @@ function Directions({ activeRoute }: { activeRoute: any }) {
 
   useEffect(() => {
     if (!routesLibrary || !map) return;
-    setDirectionsService(new routesLibrary.DirectionsService());
-    setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
+    const timer = setTimeout(() => {
+      setDirectionsService(new routesLibrary.DirectionsService());
+      setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
+    }, 0);
+    return () => clearTimeout(timer);
   }, [routesLibrary, map]);
 
   useEffect(() => {
@@ -273,7 +276,7 @@ export default function RouteIntelligencePage() {
                   <div className="bg-emerald-600/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
                     <p className="text-[11px] text-emerald-700 dark:text-emerald-200/60 leading-relaxed italic">
-                      "Optimizer rerouted current vehicle to avoid congestion in North district, saving 12 minutes."
+                      &quot;Optimizer rerouted current vehicle to avoid congestion in North district, saving 12 minutes.&quot;
                     </p>
                   </div>
                 </div>
