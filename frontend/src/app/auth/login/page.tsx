@@ -11,30 +11,31 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
-import { getApiBaseUrl } from '@/lib/api/baseUrl';
 
-const API_URL = getApiBaseUrl();
-const LOGIN_TIMEOUT_MS = 20000;
-
-function toDisplayName(email: string) {
-  const local = email.split('@')[0] || 'user';
+function toDisplayName(identifier: string) {
+  const local = identifier.split('@')[0] || 'user';
   return local
     .replace(/[._-]+/g, ' ')
     .replace(/\b\w/g, (ch) => ch.toUpperCase())
     .trim();
 }
 
-function normalizeIdentifier(input: string) {
+function normalizeUsername(input: string) {
   const value = input.trim().toLowerCase();
-  if (!value) return 'guest@civiq.city';
-  if (value.includes('@')) return value;
-  const safe = value.replace(/[^a-z0-9._-]/g, '');
-  return `${safe || 'guest'}@civiq.city`;
+  if (!value) return 'guest_user';
+  if (value.includes('@')) {
+    return value.split('@')[0] || 'guest_user';
+  }
+  return value.replace(/[^a-z0-9._-]/g, '') || 'guest_user';
 }
 
-function normalizePassword(input: string) {
-  if (input.length >= 8) return input;
-  return `${input}#CIVIQ2026`.slice(0, 8);
+function normalizeEmailFromUsername(username: string) {
+  return `${username}@civiq.city`;
+}
+
+function buildLocalToken(username: string) {
+  const nonce = Math.random().toString(36).slice(2);
+  return `local-${username}-${Date.now()}-${nonce}`;
 }
 
 export default function LoginPage() {
@@ -62,152 +63,38 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const normalizedEmail = normalizeIdentifier(email);
-      const normalizedPassword = normalizePassword(password);
-      const payloadBody = JSON.stringify({ email: normalizedEmail, password: normalizedPassword });
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS);
-      let response: Response;
-      let payload: any;
-
-      try {
-        response = await fetch(`${API_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payloadBody,
-          signal: controller.signal,
-        });
-
-        try {
-          payload = await response.json();
-        } catch {
-          payload = null;
-        }
-      } finally {
-        window.clearTimeout(timeoutId);
-      }
-
-      if (!response.ok) {
-        // If user does not exist yet, create account automatically and continue.
-        if (response.status === 401 || response.status === 404) {
-          const signupResponse = await fetch(`${API_URL}/auth/signup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: toDisplayName(normalizedEmail),
-              email: normalizedEmail,
-              password: normalizedPassword,
-            }),
-          });
-
-          let signupPayload: any = null;
-          try {
-            signupPayload = await signupResponse.json();
-          } catch {
-            signupPayload = null;
-          }
-
-          if (!signupResponse.ok) {
-            throw new Error(signupPayload?.message || payload?.message || 'Could not sign in. Please try again.');
-          }
-
-          finishLogin(
-            {
-              id: String(signupPayload.user.id),
-              name: signupPayload.user.name,
-              email: signupPayload.user.email,
-              role: signupPayload.user.role,
-            },
-            signupPayload.token
-          );
-          toast.success('Account created and signed in.');
-          return;
-        }
-
-        throw new Error(payload?.message || 'Invalid credentials');
-      }
+      const username = normalizeUsername(email);
+      const displayName = toDisplayName(username);
+      const accountEmail = normalizeEmailFromUsername(username);
 
       finishLogin(
         {
-          id: String(payload.user.id),
-          name: payload.user.name,
-          email: payload.user.email,
-          role: payload.user.role,
+          id: `local-${username}`,
+          name: displayName,
+          email: accountEmail,
+          role: 'OPS_MANAGER',
         },
-        payload.token
+        buildLocalToken(username)
       );
+      toast.success(`Welcome, ${displayName}`);
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        toast.error('Login is taking too long. The server may be waking up, please try again in a few seconds.');
-      } else {
-        toast.error(error instanceof Error ? error.message : 'Sign in failed. Please try again.');
-      }
+      toast.error(error instanceof Error ? error.message : 'Sign in failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleGuestAccess = async () => {
-    setLoading(true);
-    try {
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS);
-      let response: Response;
-      let payload: any;
-
-      try {
-        response = await fetch(`${API_URL}/auth/guest-login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-        });
-        try {
-          payload = await response.json();
-        } catch {
-          payload = null;
-        }
-      } finally {
-        window.clearTimeout(timeoutId);
-      }
-
-      if (response.ok && payload?.token && payload?.user) {
-        finishLogin(
-          {
-            id: String(payload.user.id),
-            name: payload.user.name,
-            email: payload.user.email,
-            role: payload.user.role,
-          },
-          payload.token
-        );
-        return;
-      }
-
-      // Offline fallback so users can still enter dashboard UI.
-      finishLogin(
-        {
-          id: 'demo-user',
-          name: 'Demo User',
-          email: 'demo@civiq.city',
-          role: 'VIEWER',
-        },
-        'demo-access-token'
-      );
-      toast.success('Signed in with demo access.');
-    } catch {
-      finishLogin(
-        {
-          id: 'demo-user',
-          name: 'Demo User',
-          email: 'demo@civiq.city',
-          role: 'VIEWER',
-        },
-        'demo-access-token'
-      );
-      toast.success('Signed in with demo access.');
-    } finally {
-      setLoading(false);
-    }
+    finishLogin(
+      {
+        id: 'demo-user',
+        name: 'Demo User',
+        email: 'demo@civiq.city',
+        role: 'VIEWER',
+      },
+      'demo-access-token'
+    );
+    toast.success('Signed in with demo access.');
   };
 
   return (
@@ -253,7 +140,7 @@ export default function LoginPage() {
                   <input
                     id="login-email"
                     type="text"
-                    placeholder="admin@civiq.city or admin"
+                    placeholder="Enter your username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-5 py-3 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
@@ -266,7 +153,7 @@ export default function LoginPage() {
                     <input
                       id="login-password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
+                      placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-5 py-3 pr-12 bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all text-sm font-medium text-white placeholder:text-slate-500"
@@ -281,7 +168,7 @@ export default function LoginPage() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  <p className="text-[11px] text-slate-500">Any password works. If your account does not exist yet, it will be created automatically.</p>
+                  <p className="text-[11px] text-slate-500">Any username and password will sign in.</p>
                 </div>
 
                 <button
