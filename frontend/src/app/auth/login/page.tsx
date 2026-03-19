@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 import { getApiBaseUrl } from '@/lib/api/baseUrl';
 
 const API_URL = getApiBaseUrl();
+const LOGIN_TIMEOUT_MS = 20000;
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -38,13 +39,28 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const payloadBody = JSON.stringify({ email, password });
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), LOGIN_TIMEOUT_MS);
+      let response: Response;
+      let payload: any;
 
-      const payload = await response.json();
+      try {
+        response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payloadBody,
+          signal: controller.signal,
+        });
+
+        try {
+          payload = await response.json();
+        } catch {
+          payload = null;
+        }
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
 
       if (!response.ok) {
         throw new Error(payload?.message || 'Invalid credentials');
@@ -68,7 +84,11 @@ export default function LoginPage() {
         }
       }, 150);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Authentication node offline. Please verify credentials or try again later.');
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast.error('Login is taking too long. The server may be waking up, please try again in a few seconds.');
+      } else {
+        toast.error(error instanceof Error ? error.message : 'Sign in failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

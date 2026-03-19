@@ -3,18 +3,8 @@ function normalizeUrl(url: string) {
 }
 
 export function getApiBaseUrl() {
-  const configured = process.env.NEXT_PUBLIC_API_URL;
-  if (configured && configured.trim().length > 0) {
-    return normalizeUrl(configured);
-  }
-
-  // Keep builds and prerendering stable even when env vars are missing.
-  // In production, default to same-origin API routes/proxy.
-  if (process.env.NODE_ENV === 'production') {
-    return '/api';
-  }
-
-  return 'http://localhost:5000/api';
+  // Always use same-origin Next.js API proxy to avoid CORS/config drift.
+  return '/api';
 }
 
 export function getAiBaseUrl() {
