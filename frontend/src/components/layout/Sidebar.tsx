@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Map, Route, TrendingUp, Recycle,
   Layers, AlertTriangle, Sliders, Settings,
-  Leaf, ChevronRight, Activity, Database, FileText, X
+  Leaf, ChevronRight, Activity, Database, FileText, X, ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/uiStore';
