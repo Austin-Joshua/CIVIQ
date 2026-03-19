@@ -9,7 +9,55 @@ const router = Router();
 
 router.use(authenticateToken);
 
-// Only SUPER_ADMIN and GOV_ADMIN can manage users
+// ─── Self-service routes (any authenticated user) ───────────────────────────
+
+// Get current user profile
+router.get('/me', async (req: AuthRequest, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+      select: { id: true, email: true, name: true, role: true, organizationId: true }
+    });
+    if (!user) throw new HttpError(404, 'User not found');
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Update own profile (name, email, password)
+router.patch('/me', auditLog('UPDATE_PROFILE', 'User'), async (req: AuthRequest, res, next) => {
+  try {
+    const { name, email, currentPassword, newPassword } = req.body;
+
+    const existing = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!existing) throw new HttpError(404, 'User not found');
+
+    const updateData: Record<string, any> = {};
+    if (name?.trim()) updateData.name = name.trim();
+    if (email?.trim()) updateData.email = email.trim().toLowerCase();
+
+    // Password change — only if both current and new are provided
+    if (currentPassword && newPassword) {
+      const isValid = await bcrypt.compare(currentPassword, existing.passwordHash);
+      if (!isValid) throw new HttpError(401, 'Current password is incorrect');
+      if (newPassword.length < 6) throw new HttpError(400, 'New password must be at least 6 characters');
+      updateData.passwordHash = await bcrypt.hash(newPassword, 10);
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: req.user!.id },
+      data: updateData,
+      select: { id: true, email: true, name: true, role: true, organizationId: true }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ─── Admin-only routes (SUPER_ADMIN, GOV_ADMIN) ─────────────────────────────
 router.use(authorizeRoles(ROLES.SUPER_ADMIN, ROLES.GOV_ADMIN));
 
 // Get all users in the organization

@@ -17,6 +17,7 @@ interface AuthState {
   token: string | null;
   hasHydrated: boolean;
   setAuth: (user: User, token: string) => void;
+  updateUser: (updates: Partial<User>) => void;
   logout: () => void;
   setHasHydrated: (value: boolean) => void;
 }
@@ -65,6 +66,9 @@ export const useAuthStore = create<AuthState>()(
           setAuthCookie(token);
           set({ user, token });
           resetTimeout();
+        },
+        updateUser: (updates) => {
+          set((state) => ({ user: state.user ? { ...state.user, ...updates } : null }));
         },
         logout: () => {
           clearAuthCookie();

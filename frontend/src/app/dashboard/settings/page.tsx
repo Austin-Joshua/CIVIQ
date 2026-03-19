@@ -22,7 +22,7 @@ const AUDIT_LOGS = [
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
-  const { user } = useAuthStore();
+  const { user, token, updateUser } = useAuthStore();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showSetupWizard, setShowSetupWizard] = useState(false);
@@ -48,17 +48,86 @@ export default function SettingsPage() {
     criticalOnly: false
   });
 
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     setEnvKeyDetected(!!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
     setMounted(true);
   }, []);
 
+  // Sync profile fields from store whenever user changes
+  useEffect(() => {
+    if (user) {
+      setProfileSettings({ name: user.name, email: user.email, role: user.role });
+    }
+  }, [user]);
+
   if (!mounted) return null;
 
-  const handleSave = () => {
-    toast.success('Settings saved successfully', {
-      description: 'Your changes have been applied to the system.'
-    });
+  const handleSave = async () => {
+    if (activeTab !== 'profile') {
+      toast.success('Settings saved successfully', { description: 'Your changes have been applied.' });
+      return;
+    }
+    // Profile tab — persist to backend
+    setIsSaving(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${baseUrl}/users/me`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: profileSettings.name, email: profileSettings.email })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to save profile');
+      }
+      const updated = await res.json();
+      updateUser({ name: updated.name, email: updated.email });
+      toast.success('Profile updated!', { description: 'Your name and email have been saved.' });
+    } catch (error: any) {
+      toast.error(error.message || 'Could not save profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePasswordSave = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${baseUrl}/users/me`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to update password');
+      }
+      toast.success('Password updated!', { description: 'Your credentials have been changed.' });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      toast.error(error.message || 'Could not update password');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAuditExport = () => {
@@ -598,15 +667,42 @@ export default function SettingsPage() {
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                          <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Operational Password</label>
-                            <input type="password" placeholder="••••••••" className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-red-500/40 focus:ring-4 focus:ring-red-500/5 outline-none transition-all" />
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Current Password</label>
+                            <input 
+                              type="password" 
+                              placeholder="••••••••" 
+                              value={passwordForm.currentPassword}
+                              onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-red-500/40 focus:ring-4 focus:ring-red-500/5 outline-none transition-all" 
+                            />
                          </div>
                          <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">New Command Credential</label>
-                            <input type="password" placeholder="••••••••" className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" />
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">New Password</label>
+                            <input 
+                              type="password" 
+                              placeholder="••••••••" 
+                              value={passwordForm.newPassword}
+                              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" 
+                            />
+                         </div>
+                         <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Confirm New Password</label>
+                            <input 
+                              type="password" 
+                              placeholder="••••••••" 
+                              value={passwordForm.confirmPassword}
+                              onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" 
+                            />
                          </div>
                       </div>
-                      <button className="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] font-bold rounded-xl transition-all uppercase tracking-[0.2em] border border-red-500/20 shadow-lg shadow-red-500/10">Authorize Update</button>
+                      <button 
+                        onClick={handlePasswordSave}
+                        disabled={isSaving}
+                        className="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 disabled:opacity-50 text-red-500 text-[10px] font-bold rounded-xl transition-all uppercase tracking-[0.2em] border border-red-500/20 shadow-lg shadow-red-500/10">
+                        {isSaving ? 'Updating...' : 'Authorize Update'}
+                      </button>
                     </div>
 
                     <div className="mt-12 pt-10 border-t border-border/50">
@@ -684,12 +780,13 @@ export default function SettingsPage() {
             </div>
 
             <div className="pt-10 mt-10 border-t border-border/40 flex justify-end">
-              <button 
+              <button
                 onClick={handleSave}
+                disabled={isSaving}
                 className="group relative px-10 py-4 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-[0.2em] rounded-[1.25rem] transition-all shadow-2xl shadow-emerald-900/40 hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                Apply Parameters
+                Apply Parameters {isSaving && '...'}
               </button>
             </div>
           </div>
