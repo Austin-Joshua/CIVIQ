@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/uiStore';
+import { useAuthStore } from '@/store/authStore';
 
 export const NAV_CATEGORIES = [
   {
@@ -26,7 +27,6 @@ export const NAV_CATEGORIES = [
     items: [
       { href: '/dashboard/map', icon: Monitor, label: 'Asset Monitor' },
       { href: '/dashboard/routes', icon: Route, label: 'Route Intelligence' },
-      { href: '/dashboard/field', icon: Activity, label: 'Field Operations' },
     ]
   },
   {
@@ -48,11 +48,8 @@ export const NAV_CATEGORIES = [
   {
     label: 'Administration',
     items: [
-      { href: '/dashboard/organization', icon: Building2, label: 'Organization' },
       { href: '/dashboard/users', icon: Users, label: 'Users & Roles' },
       { href: '/dashboard/data', icon: Database, label: 'Data Manager' },
-      { href: '/dashboard/integrations', icon: Share2, label: 'Integrations' },
-      { href: '/dashboard/billing', icon: CreditCard, label: 'Billing' },
       { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
     ]
   }
@@ -60,6 +57,7 @@ export const NAV_CATEGORIES = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuthStore();
   const { 
     isMobileSidebarOpen, 
     closeMobileSidebar, 
@@ -105,22 +103,7 @@ export function Sidebar() {
             )}
           </Link>
           
-          {/* Mobile Close Button / Desktop Collapse Toggle */}
-          <div className="flex items-center">
-            <button 
-              onClick={closeMobileSidebar}
-              className="lg:hidden p-2 rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={toggleSidebarCollapse}
-              className="hidden lg:flex p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/5 transition-all"
-              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-            </button>
-          </div>
+          {/* Mobile Close Button / Desktop Collapse Toggle removed in favor of external header toggle */}
         </div>
 
         {/* Navigation */}
@@ -128,57 +111,65 @@ export function Sidebar() {
           "flex-1 px-3 py-4 space-y-6 overflow-y-auto no-scrollbar transition-all",
           isSidebarCollapsed && "px-2"
         )}>
-          {NAV_CATEGORIES.map((category) => (
-            <div key={category.label} className="space-y-1">
-              {!isSidebarCollapsed ? (
-                <h3 className="px-4 text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-2 animate-in fade-in duration-500">
-                  {category.label}
-                </h3>
-              ) : (
-                <div className="h-px bg-border/50 mx-2 mb-4" />
-              )}
-              
-              <div className="space-y-1">
-                {category.items.map(({ href, icon: Icon, label }) => {
-                  const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
-                  return (
-                    <Link 
-                      key={href} 
-                      href={href}
-                      onClick={() => {
-                        if (window.innerWidth < 1024) closeMobileSidebar();
-                      }}
-                      title={isSidebarCollapsed ? label : undefined}
-                      className={cn(
-                        'flex items-center rounded-xl text-sm font-bold transition-all duration-150 group relative overflow-hidden',
-                        isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-4 py-2.5",
-                        isActive
-                          ? 'bg-emerald-500/10 text-emerald-500 shadow-[inset_0_0_12px_rgba(16,185,129,0.05)]'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03]'
-                      )}>
-                      {isActive && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-r-full shadow-[0_0_8px_#10b981]" />
-                      )}
-                      
-                      <Icon className={cn(
-                        'flex-shrink-0 transition-all duration-200',
-                        isSidebarCollapsed ? "w-5 h-5" : "w-4 h-4",
-                        isActive ? 'text-emerald-500 scale-110' : 'text-muted-foreground group-hover:text-emerald-500 group-hover:scale-110'
-                      )} />
-                      
-                      {!isSidebarCollapsed && (
-                        <span className="tracking-tight transition-all duration-200 truncate">{label}</span>
-                      )}
-                      
-                      {isActive && !isSidebarCollapsed && (
-                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
-                      )}
-                    </Link>
-                  );
-                })}
+          {NAV_CATEGORIES.map((category) => {
+            // RBAC Filter
+            if (category.label === 'Administration' && 
+                !['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER'].includes(user?.role || '')) {
+              return null;
+            }
+
+            return (
+              <div key={category.label} className="space-y-1">
+                {!isSidebarCollapsed ? (
+                  <h3 className="px-4 text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-2 animate-in fade-in duration-500">
+                    {category.label}
+                  </h3>
+                ) : (
+                  <div className="h-px bg-border/50 mx-2 mb-4" />
+                )}
+
+                <div className="space-y-1">
+                  {category.items.map(({ href, icon: Icon, label }) => {
+                    const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => {
+                          if (window.innerWidth < 1024) closeMobileSidebar();
+                        }}
+                        title={isSidebarCollapsed ? label : undefined}
+                        className={cn(
+                          'flex items-center rounded-xl text-sm font-bold transition-all duration-150 group relative overflow-hidden',
+                          isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-4 py-2.5",
+                          isActive
+                            ? 'bg-emerald-500/10 text-emerald-500 shadow-[inset_0_0_12px_rgba(16,185,129,0.05)]'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03]'
+                        )}>
+                        {isActive && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-r-full shadow-[0_0_8px_#10b981]" />
+                        )}
+                        
+                        <Icon className={cn(
+                          'flex-shrink-0 transition-all duration-200',
+                          isSidebarCollapsed ? "w-5 h-5" : "w-4 h-4",
+                          isActive ? 'text-emerald-500 scale-110' : 'text-muted-foreground group-hover:text-emerald-500 group-hover:scale-110'
+                        )} />
+                        
+                        {!isSidebarCollapsed && (
+                          <span className="tracking-tight transition-all duration-200 truncate">{label}</span>
+                        )}
+                        
+                        {isActive && !isSidebarCollapsed && (
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </nav>
 
         {/* Bottom Status (Optional) */}

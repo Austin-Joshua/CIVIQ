@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from './Skeletons';
-import { cn } from '@/lib/utils';
 
 // This wrapper ensures that any chart is only rendered on the client side
 // and allows for a smooth loading state while the heavy Recharts library is initialized.

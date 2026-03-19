@@ -112,7 +112,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Primary Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           label="Cleanliness"
           value="82.4"
@@ -237,7 +237,7 @@ export default function DashboardPage() {
           title="Zone Rankings" 
           subtitle="Top performing districts"
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {MOCK_ZONE_DATA.map((zone) => (
             <div key={zone.name} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all hover:bg-card/80">
               <div className={cn(

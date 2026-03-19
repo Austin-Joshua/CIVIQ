@@ -35,8 +35,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-b from-page-from to-page-to text-foreground selection:bg-emerald-500/30 overflow-x-hidden font-outfit transition-colors duration-300">
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/20 dark:bg-emerald-500/15 blur-[150px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/10 blur-[200px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-0 -left-1/4 w-[1000px] h-[1000px] bg-emerald-500/10 dark:bg-emerald-500/15 blur-[150px] rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/10 dark:bg-teal-500/10 blur-[200px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Navigation */}
@@ -93,7 +93,7 @@ export default function LandingPage() {
               Sustain.
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-slate-400 mb-16 max-w-3xl mx-auto font-medium leading-relaxed animate-in slide-in-from-bottom-6 duration-1000">
+          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-16 max-w-3xl mx-auto font-medium leading-relaxed animate-in slide-in-from-bottom-6 duration-1000">
             CIVIQ is the first mission-critical operating system for modern city infrastructure, designed for resilient and clean urban growth.
           </p>
           
@@ -118,12 +118,12 @@ export default function LandingPage() {
                 { icon: Fingerprint, title: "Secure Governance", desc: "Blockchain-backed data integrity for municipal records and audits." },
                 { icon: Globe, title: "Zero-Waste Vision", desc: "Fully automated routing and sorting strategies for clean districts." }
               ].map((item, i) => (
-                <div key={i} className="p-10 bg-white/70 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 rounded-[2.5rem] hover:border-emerald-500/30 transition-all hover:-translate-y-2 group">
+                <div key={i} className="p-10 bg-white dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 rounded-[2.5rem] hover:border-emerald-500/30 transition-all hover:-translate-y-2 group shadow-xl hover:shadow-2xl">
                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-8 font-black group-hover:bg-emerald-500 group-hover:text-white transition-all">
                       <item.icon className="w-7 h-7" />
                    </div>
-                   <h3 className="text-2xl font-black mb-4 tracking-tight">{item.title}</h3>
-                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{item.desc}</p>
+                   <h3 className="text-2xl font-black mb-4 tracking-tight text-slate-900 dark:text-white">{item.title}</h3>
+                   <p className="text-slate-700 dark:text-slate-400 leading-relaxed font-medium">{item.desc}</p>
                 </div>
               ))}
            </div>
@@ -169,13 +169,13 @@ export default function LandingPage() {
                            <div className="w-1.5 h-16 bg-emerald-500/20 rounded-full group-hover:bg-emerald-500 transition-colors" />
                            <div>
                               <h4 className="text-xl font-black mb-2 text-slate-900 dark:text-white">{item.title}</h4>
-                              <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium text-lg">{item.desc}</p>
+                              <p className="text-slate-700 dark:text-slate-400 leading-relaxed font-medium text-lg">{item.desc}</p>
                            </div>
                         </div>
                       ))}
                    </div>
                 </div>
-                <div className="bg-white/70 dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 rounded-[3rem] p-12 space-y-10 relative">
+                <div className="bg-white dark:bg-slate-900/30 border border-slate-200 dark:border-white/5 rounded-[3rem] p-12 space-y-10 relative shadow-xl">
                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full" />
                    <div className="space-y-6 relative">
                       {[

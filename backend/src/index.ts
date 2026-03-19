@@ -129,11 +129,22 @@ import { initWebSocketGateway } from './modules/realtime/websocket.gateway.js';
 import { analyticsWorker } from './workers/analytics.worker.js';
 
 async function startServer() {
-  await ensureDefaultLoginUser();
+  try {
+    console.log('Initializing database connectivity...');
+    await ensureDefaultLoginUser();
+    console.log('Database initialization complete.');
+  } catch (error) {
+    console.error('CRITICAL: Database initialization failed. Server starting in degraded mode.');
+    console.error(error);
+  }
+
   server = app.listen(config.port, () => {
     console.log(`CIVIQ Backend listening on http://localhost:${config.port}`);
   });
-  initWebSocketGateway(server);
+  
+  if (server) {
+    initWebSocketGateway(server);
+  }
   analyticsWorker.start();
 }
 

@@ -299,4 +299,10 @@
   .animate-float-slow {
     animation: float-slow 6s ease-in-out infinite;
   }
+
+  /* Remove persistent focus outline on charts */
+  .recharts-wrapper:focus,
+  .recharts-wrapper *:focus {
+    outline: none !important;
+  }
 }

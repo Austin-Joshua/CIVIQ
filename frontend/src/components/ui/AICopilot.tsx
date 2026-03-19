@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Sparkles, Activity, MapPin, ChevronRight, Zap } from 'lucide-react';
+import { Bot, X, Send, Sparkles, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUIStore } from '@/store/uiStore';
+
 
 interface Message {
   id: string;
@@ -12,62 +12,85 @@ interface Message {
   timestamp: Date;
 }
 
-const MOCK_RESPONSES: Record<string, React.ReactNode> = {
-  overflow: (
-    <div className="space-y-3 mt-2">
-      <p className="text-sm text-foreground/90">Based on current generation rates and historical weekend data, <strong className="text-red-500">Zone C (Industrial North)</strong> and <strong className="text-orange-500">Zone A (Downtown)</strong> are projected to reach overflow capacity by tomorrow at 14:00.</p>
-      <div className="p-3 liquid-glass border border-white/10 rounded-xl space-y-2">
-        <div className="flex justify-between items-center text-xs">
-          <span className="text-muted-foreground uppercase font-bold tracking-widest text-[9px]">Confidence Score</span>
-          <span className="text-emerald-500 font-black">94%</span>
+const INTENTS = [
+  {
+    name: 'overflow',
+    keywords: ['overflow', 'full', 'capacity', 'tomorrow', 'bins', 'fill'],
+    response: (
+      <div className="space-y-3 mt-2">
+        <p className="text-sm text-foreground/90 leading-relaxed">System analysis indicates <strong className="text-red-500">Zone C (Industrial)</strong> and <strong className="text-orange-500">Zone A (Central)</strong> are currently trending towards capacity breach.</p>
+        <div className="p-3 liquid-glass border border-white/10 rounded-xl space-y-2 bg-red-500/5">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-muted-foreground uppercase font-black tracking-widest text-[9px]">Critical Forecast</span>
+            <span className="text-red-500 font-black animate-pulse">ALARM</span>
+          </div>
+          <div className="text-[10px] space-y-1.5">
+            <p className="flex justify-between"><span className="text-muted-foreground">Zone C:</span> <span className="font-bold">88% (Est. 14:00 Overflow)</span></p>
+            <p className="flex justify-between"><span className="text-muted-foreground">Zone A:</span> <span className="font-bold">82% (Est. 16:30 Overflow)</span></p>
+          </div>
         </div>
-        <div className="flex items-center gap-2 cursor-pointer group">
-          <MapPin className="w-3 h-3 text-red-500" />
-          <span className="text-xs font-semibold group-hover:text-red-500 transition-colors">Zone C (84% full currently)</span>
-        </div>
-        <div className="flex items-center gap-2 cursor-pointer group">
-          <MapPin className="w-3 h-3 text-orange-500" />
-          <span className="text-xs font-semibold group-hover:text-orange-500 transition-colors">Zone A (78% full currently)</span>
+        <div className="flex gap-2">
+          <button className="flex-1 py-1.5 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all hover:bg-emerald-500">Dispatch Fleet</button>
+          <button className="flex-1 py-1.5 bg-white/5 border border-white/10 text-foreground rounded-lg text-[9px] font-black uppercase tracking-widest transition-all hover:bg-white/10">Ignore</button>
         </div>
       </div>
-      <button className="w-full py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-500 border border-emerald-500/30 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-        <Zap className="w-3 h-3" /> Auto-reroute Fleet
-      </button>
-    </div>
-  ),
-  cost: (
-    <div className="space-y-3 mt-2">
-      <p className="text-sm text-foreground/90">To reduce costs this month, I recommend <strong className="text-emerald-500">consolidating evening routes in Zone D</strong> and delaying non-critical landfill transport until off-peak hours.</p>
-      <div className="p-3 bg-card border border-border rounded-xl">
-        <div className="flex justify-between items-center text-xs mb-2">
-          <span className="text-muted-foreground uppercase font-bold tracking-widest text-[9px]">Projected Savings</span>
-          <span className="text-foreground font-black">$4,250</span>
+    )
+  },
+  {
+    name: 'cost',
+    keywords: ['cost', 'reduce', 'budget', 'money', 'save', 'efficient', 'opex'],
+    response: (
+      <div className="space-y-3 mt-2">
+        <p className="text-sm text-foreground/90">Urban OPEX can be reduced by <strong className="text-emerald-500">12.4%</strong> this cycle through dynamic route clustering.</p>
+        <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+          <p className="text-xs font-bold text-foreground">Optimization Strategy:</p>
+          <ul className="mt-2 space-y-1">
+            <li className="text-[10px] text-muted-foreground flex items-center gap-2">
+              <div className="w-1 h-1 rounded-full bg-emerald-500" /> Consolidate Zone D evening collections
+            </li>
+            <li className="text-[10px] text-muted-foreground flex items-center gap-2">
+              <div className="w-1 h-1 rounded-full bg-emerald-500" /> Shift landfill transport to 23:00-04:00
+            </li>
+          </ul>
         </div>
-        <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-          <div className="bg-emerald-500 w-[15%] h-full rounded-full" />
-        </div>
-        <p className="text-[9px] text-muted-foreground mt-2 uppercase tracking-widest">Represents a 15% reduction in fuel OPEX.</p>
       </div>
-    </div>
-  ),
-  default: (
-    <p className="text-sm text-foreground/90">I am analyzing the global city matrix. Could you specify if you are looking for zone forecasts, routing optimizations, or budget analysis?</p>
-  )
-};
+    )
+  },
+  {
+    name: 'risk',
+    keywords: ['risk', 'safety', 'danger', 'problem', 'incident', 'issue', 'fleet'],
+    response: (
+      <div className="space-y-3 mt-2">
+        <p className="text-sm text-foreground/90">Fleet Risk Multiplier is currently <strong className="text-emerald-500">Low (0.24)</strong>. No critical safety incidents reported in the last 12 hours.</p>
+        <div className="p-3 liquid-glass border border-white/10 rounded-xl">
+          <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Operational Safety</span>
+              <Activity className="w-3 h-3 text-emerald-500" />
+          </div>
+          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 w-[92%]" />
+          </div>
+          <p className="text-[9px] text-muted-foreground mt-2 italic">Next maintenance cycle for Vehicle #402 starts in 48h.</p>
+        </div>
+      </div>
+    )
+  }
+];
 
 export function AICopilot() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'ai',
-      content: "Hello. I am the CIVIQ Autonomous Insight Engine. How can I assist with your urban operations today?",
+      content: "Hello. I am the CIVIQ Autonomous Insight Engine. I am monitoring waste logistics, fleet risk, and city-wide cleanliness metrics in real-time. How can I assist your operations?",
       timestamp: new Date()
     }
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { openReport } = useUIStore();
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -75,26 +98,40 @@ export function AICopilot() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isTyping]);
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
 
     const userMsg: Message = { id: Date.now().toString(), role: 'user', content: input, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+    setIsTyping(true);
 
-    // Simulate AI response
+    // Contextual Processing Logic
     setTimeout(() => {
-      const query = typeof userMsg.content === 'string' ? userMsg.content.toLowerCase() : '';
-      let responseContent = MOCK_RESPONSES.default;
+      const query = (userMsg.content || '').toString().toLowerCase();
       
-      if (query.includes('overflow') || query.includes('tomorrow')) {
-        responseContent = MOCK_RESPONSES.overflow;
-      } else if (query.includes('cost') || query.includes('reduce')) {
-        responseContent = MOCK_RESPONSES.cost;
-      }
+      // Intent Scoring
+      let bestIntent = null;
+      let highestScore = 0;
+
+      INTENTS.forEach(intent => {
+        const score = intent.keywords.reduce((acc, kw) => acc + (query.includes(kw) ? 1 : 0), 0);
+        if (score > highestScore) {
+          highestScore = score;
+          bestIntent = intent;
+        }
+      });
+
+      const responseContent = bestIntent 
+        ? (bestIntent as any).response 
+        : (
+          <p className="text-sm text-foreground/90 leading-relaxed italic opacity-90">
+            "I'm keeping a close eye on **Forecasting**, **Fleet Safety**, and **Operational Costs**. Which area would you like to analyze together?"
+          </p>
+        );
 
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
@@ -102,7 +139,8 @@ export function AICopilot() {
         content: responseContent,
         timestamp: new Date()
       }]);
-    }, 1200);
+      setIsTyping(false);
+    }, 1500);
   };
 
   return (
@@ -111,26 +149,18 @@ export function AICopilot() {
       <button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-6 right-6 lg:bottom-10 lg:right-10 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)] flex items-center justify-center transition-all z-40 group hover:scale-110 active:scale-95",
+          "fixed bottom-24 right-6 lg:bottom-10 lg:right-10 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)] flex items-center justify-center transition-all z-40 group hover:scale-110 active:scale-95",
           isOpen && "scale-0 opacity-0"
         )}
       >
         <Sparkles className="w-6 h-6 group-hover:animate-pulse" />
       </button>
 
-      {/* Backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Copilot Drawer */}
+      {/* Copilot Floating Panel */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-full sm:w-[420px] bg-card border-l border-border/50 shadow-2xl z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col",
-          isOpen ? "translate-x-0" : "translate-x-full"
+          "fixed bottom-24 right-6 lg:bottom-10 lg:right-10 h-[500px] lg:h-[600px] w-[calc(100vw-48px)] sm:w-[380px] lg:w-[420px] liquid-glass backdrop-blur-2xl bg-card/80 border border-white/10 shadow-2xl rounded-[2.5rem] z-50 transform transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden",
+          isOpen ? "translate-y-0 opacity-100 scale-100" : "translate-y-10 opacity-0 scale-95 pointer-events-none"
         )}
       >
         {/* Header */}
@@ -167,15 +197,15 @@ export function AICopilot() {
               )}
             >
               {msg.role === 'ai' && (
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 flex items-center justify-center mt-1">
-                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0 flex items-center justify-center mt-1 text-emerald-500">
+                  <Bot className="w-4 h-4" />
                 </div>
               )}
               <div 
                 className={cn(
-                  "p-3 rounded-2xl text-sm",
+                  "p-3 rounded-2xl text-sm leading-relaxed",
                   msg.role === 'user' 
-                    ? "bg-emerald-600 text-white rounded-tr-sm" 
+                    ? "bg-emerald-600 text-white rounded-tr-sm shadow-lg shadow-emerald-500/20" 
                     : "liquid-glass-panel border-white/5 rounded-tl-sm text-foreground"
                 )}
               >
@@ -209,8 +239,8 @@ export function AICopilot() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask CIVIQ Intelligence..."
-              className="w-full bg-card/50 border border-border/50 rounded-xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/30 transition-all font-medium placeholder:text-muted-foreground/50"
+              placeholder="Message CIVIQ..."
+              className="w-full bg-card/50 border border-border/50 rounded-xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/30 transition-all font-medium placeholder:text-muted-foreground/30"
             />
             <button 
               type="submit"
@@ -220,10 +250,6 @@ export function AICopilot() {
               <Send className="w-4 h-4" />
             </button>
           </form>
-          <div className="mt-3 flex items-center justify-center gap-2 text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
-            <Activity className="w-3 h-3" />
-            <span>AI-Generated Output. Verify Real-World Feasibility.</span>
-          </div>
         </div>
       </div>
     </>

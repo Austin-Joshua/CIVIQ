@@ -110,7 +110,7 @@ export function TopHeader() {
   return (
     <>
     <header className="sticky top-0 z-20 h-14 flex items-center px-4 lg:px-6 liquid-glass border-b border-border gap-2 font-outfit">
-      <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0">
+      <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0 lg:hidden">
         {/* Mobile Menu Toggle */}
         <button 
           onClick={openMobileSidebar}
@@ -133,7 +133,7 @@ export function TopHeader() {
       </div>
 
       {/* Workspace Selector */}
-      <div ref={workspaceRef} className="hidden md:block ml-2 lg:ml-4 border-l border-border/50 pl-2 lg:pl-4 relative z-[70]">
+      <div ref={workspaceRef} className="hidden md:block lg:hidden ml-2 lg:ml-4 border-l border-border/50 pl-2 lg:pl-4 relative z-[70]">
         <button 
           onClick={() => setShowWorkspaceMenu(!showWorkspaceMenu)}
           className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors group"

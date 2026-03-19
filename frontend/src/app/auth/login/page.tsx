@@ -125,9 +125,9 @@ export default function LoginPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-5xl lg:h-[640px] bg-panel-bg border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-3xl auth-flip-enter">
-        <div className="grid grid-cols-1 lg:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
           {/* Visual Side (Fixed on Left) */}
-          <div className="hidden lg:block relative bg-visual-to overflow-hidden auth-panel-slide-right">
+          <div className="hidden lg:block relative bg-visual-to overflow-hidden auth-panel-slide-right h-full">
             <div className="absolute inset-0 bg-gradient-to-br from-visual-from to-visual-to z-10" />
             <Link
               href="/"

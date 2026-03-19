@@ -40,7 +40,8 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/users`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${baseUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch users');
@@ -62,7 +63,8 @@ export default function UsersPage() {
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/users/invite`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${baseUrl}/users/invite`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -90,7 +92,8 @@ export default function UsersPage() {
   const handleDelete = async (userId: string) => {
     if (!confirm('Are you sure you want to remove this user?')) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/users/${userId}`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${baseUrl}/users/${userId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -109,7 +112,8 @@ export default function UsersPage() {
 
   const handleRoleChange = async (userId: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/users/${userId}`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${baseUrl}/users/${userId}`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',
@@ -133,7 +137,7 @@ export default function UsersPage() {
 
   if (!isMounted) return null;
 
-  const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'GOV_ADMIN';
+  const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'GOV_ADMIN' || user?.role === 'OPS_MANAGER';
 
   if (!isAdmin) {
     return (
