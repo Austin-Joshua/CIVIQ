@@ -6,19 +6,20 @@ import (
 
 	"civiq/api/internal/middleware"
 	"civiq/api/internal/models"
+	"civiq/api/internal/security"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func zoneRoles() gin.HandlerFunc {
-	return middleware.RequireRoles("SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "ANALYST", "AUDITOR", "VIEWER")
+func zoneRoles(sec *security.Service) gin.HandlerFunc {
+	return middleware.RequireRoles(sec, "SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "ANALYST", "AUDITOR", "VIEWER")
 }
 
-func RegisterZones(r *gin.RouterGroup, db *mongo.Database) {
+func RegisterZones(r *gin.RouterGroup, db *mongo.Database, sec *security.Service) {
 	z := r.Group("/zones")
-	z.Use(zoneRoles())
+	z.Use(zoneRoles(sec))
 
 	z.GET("", func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
