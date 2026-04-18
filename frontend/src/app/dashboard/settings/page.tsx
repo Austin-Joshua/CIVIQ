@@ -13,6 +13,7 @@ import { useTheme } from 'next-themes';
 import { useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
 import { downloadCsvFile } from '@/lib/download';
+import { getApiBaseUrl } from '@/lib/api/baseUrl';
 
 const AUDIT_LOGS = [
   { time: '2026-03-19 14:32:01', user: 'Dr. Sarah Chen', action: 'UPDATE_ROLE', details: 'Changed Marcus Johnson to OPS_MANAGER' },
@@ -86,7 +87,7 @@ export default function SettingsPage() {
     // Profile tab — persist to backend
     setIsSaving(true);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users/me`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -118,7 +119,7 @@ export default function SettingsPage() {
     }
     setIsSaving(true);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users/me`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

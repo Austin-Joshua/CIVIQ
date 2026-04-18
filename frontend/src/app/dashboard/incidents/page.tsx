@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useWebSocket } from '@/providers/WebSocketProvider';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { ExportButton } from '@/components/reports/ExportButton';
+import { getApiBaseUrl } from '@/lib/api/baseUrl';
 
 interface Incident {
   id: string;
@@ -46,7 +47,7 @@ export default function IncidentCommandPage() {
 
   const fetchIncidents = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/incidents`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -60,7 +61,7 @@ export default function IncidentCommandPage() {
 
   const fetchUsers = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -103,7 +104,7 @@ export default function IncidentCommandPage() {
 
   const handleUpdate = async (id: string, updates: Partial<Incident>) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/incidents/${id}`, {
         method: 'PATCH',
         headers: {

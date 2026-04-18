@@ -7,6 +7,7 @@ import { ShieldCheck, UserPlus, Pencil, Trash2, Shield, MoreVertical } from 'luc
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { ExportButton } from '@/components/reports/ExportButton';
+import { getApiBaseUrl } from '@/lib/api/baseUrl';
 
 interface OrgUser {
   id: string;
@@ -40,7 +41,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -63,7 +64,7 @@ export default function UsersPage() {
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users/invite`, {
         method: 'POST',
         headers: { 
@@ -93,7 +94,7 @@ export default function UsersPage() {
   const handleDelete = async (userId: string) => {
     if (!confirm('Are you sure you want to remove this user?')) return;
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users/${userId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
@@ -114,7 +115,7 @@ export default function UsersPage() {
 
   const handleRoleChange = async (userId: string) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const baseUrl = getApiBaseUrl();
       const res = await fetch(`${baseUrl}/users/${userId}`, {
         method: 'PATCH',
         headers: { 

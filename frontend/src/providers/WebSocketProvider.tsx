@@ -34,10 +34,22 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
-    
+    // Go API does not expose Socket.IO by default; set NEXT_PUBLIC_ENABLE_WEBSOCKET=true when you add a WS server.
+    if (process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET !== 'true') {
+      setSocket(null);
+      setIsConnected(false);
+      return;
+    }
+
+    const API_URL =
+      process.env.NEXT_PUBLIC_SOCKET_URL ||
+      'http://localhost:5001';
+
     const newSocket = io(API_URL, {
       auth: {
+        token,
+      },
+      query: {
         token,
       },
       transports: ['websocket'],
@@ -61,7 +73,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timer);
       newSocket.disconnect();
     };
-  }, [token, socket]);
+  }, [token]);
 
   return (
     <WebSocketContext.Provider value={{ socket, isConnected }}>

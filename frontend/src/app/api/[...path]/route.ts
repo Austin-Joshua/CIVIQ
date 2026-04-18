@@ -1,21 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-function normalizeUrl(url: string) {
-  return url.replace(/\/+$/, '');
-}
+import { getBackendProxyTarget } from '@/lib/api/baseUrl';
 
 function resolveBackendBaseUrl() {
-  const configured =
-    process.env.API_PROXY_TARGET ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    process.env.BACKEND_URL;
-
-  if (configured && configured.trim().length > 0) {
-    const normalized = normalizeUrl(configured.trim());
-    return normalized.endsWith('/api') ? normalized : `${normalized}/api`;
-  }
-
-  return 'http://localhost:5000/api';
+  return getBackendProxyTarget();
 }
 
 function buildTargetUrl(request: NextRequest, path: string[]) {
@@ -58,7 +45,7 @@ async function proxy(request: NextRequest, path: string[]) {
     return NextResponse.json(
       {
         message:
-          'Backend service is unavailable. If this is Render, it may be waking up. Please try again in a few seconds.',
+          'Backend service is unavailable. The API host may be starting up or unreachable. Please try again in a few seconds.',
       },
       { status: 503 }
     );

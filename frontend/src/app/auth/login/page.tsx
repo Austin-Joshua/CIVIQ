@@ -13,15 +13,8 @@ import {
   Moon
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { getApiBaseUrl } from '@/lib/api/baseUrl';
 import { toast } from 'sonner';
-
-function toDisplayName(identifier: string) {
-  const local = identifier.split('@')[0] || 'user';
-  return local
-    .replace(/[._-]+/g, ' ')
-    .replace(/\b\w/g, (ch) => ch.toUpperCase())
-    .trim();
-}
 
 function normalizeUsername(input: string) {
   const value = input.trim().toLowerCase();
@@ -34,11 +27,6 @@ function normalizeUsername(input: string) {
 
 function normalizeEmailFromUsername(username: string) {
   return `${username}@civiq.city`;
-}
-
-function buildLocalToken(username: string) {
-  const nonce = Math.random().toString(36).slice(2);
-  return `local-${username}-${Date.now()}-${nonce}`;
 }
 
 export default function LoginPage() {
@@ -58,7 +46,17 @@ export default function LoginPage() {
     setMounted(true);
   }, []);
 
-  const finishLogin = (user: { id: string; name: string; email: string; role: string }, token: string) => {
+  const finishLogin = (
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      organizationId?: string;
+      organizationName?: string;
+    },
+    token: string
+  ) => {
     setAuth(user, token);
     router.replace(target);
     setTimeout(() => {
@@ -72,20 +70,40 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const username = normalizeUsername(email);
-      const displayName = toDisplayName(username);
-      const accountEmail = normalizeEmailFromUsername(username);
-
+      const raw = email.trim();
+      const loginEmail = raw.includes('@')
+        ? raw.toLowerCase()
+        : normalizeEmailFromUsername(normalizeUsername(raw));
+      const API = getApiBaseUrl();
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(typeof data.message === 'string' ? data.message : 'Sign in failed. Please try again.');
+      }
+      const u = data.user as {
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+        organizationId?: string;
+        organizationName?: string;
+      };
       finishLogin(
         {
-          id: `local-${username}`,
-          name: displayName,
-          email: accountEmail,
-          role: 'OPS_MANAGER',
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          organizationId: u.organizationId,
+          organizationName: u.organizationName,
         },
-        buildLocalToken(username)
+        data.token as string
       );
-      toast.success(`Welcome, ${displayName}`);
+      toast.success(`Welcome, ${u.name}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Sign in failed. Please try again.');
     } finally {
@@ -94,16 +112,41 @@ export default function LoginPage() {
   };
 
   const handleGuestAccess = async () => {
-    finishLogin(
-      {
-        id: 'demo-user',
-        name: 'Demo User',
-        email: 'demo@civiq.city',
-        role: 'VIEWER',
-      },
-      'demo-access-token'
-    );
-    toast.success('Signed in with demo access.');
+    setLoading(true);
+    try {
+      const API = getApiBaseUrl();
+      const res = await fetch(`${API}/auth/guest-login`, { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          typeof data.message === 'string' ? data.message : 'Guest access is unavailable.'
+        );
+      }
+      const u = data.user as {
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+        organizationId?: string;
+        organizationName?: string;
+      };
+      finishLogin(
+        {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          organizationId: u.organizationId,
+          organizationName: u.organizationName,
+        },
+        data.token as string
+      );
+      toast.success('Signed in with quick access.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Guest access failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -206,7 +249,9 @@ export default function LoginPage() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-500">Any username and password will sign in.</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-500">
+                    Use a seeded email and password, or Quick Access to sign in via the API.
+                  </p>
                 </div>
 
                 <button
