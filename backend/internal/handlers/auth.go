@@ -9,6 +9,7 @@ import (
 	"civiq/api/internal/auth"
 	"civiq/api/internal/config"
 	"civiq/api/internal/models"
+	"civiq/api/internal/security"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,7 +21,7 @@ import (
 
 var emailRe = regexp.MustCompile(`^[^\s@]+@[^\s@]+\.[^\s@]+$`)
 
-func RegisterAuth(r *gin.RouterGroup, db *mongo.Database, cfg *config.Config, secret []byte) {
+func RegisterAuth(r *gin.RouterGroup, db *mongo.Database, cfg *config.Config, secret []byte, sec *security.Service) {
 	r.POST("/auth/signup", func(c *gin.Context) {
 		var body struct {
 			Email             string `json:"email"`
@@ -90,6 +91,9 @@ func RegisterAuth(r *gin.RouterGroup, db *mongo.Database, cfg *config.Config, se
 			return
 		}
 		tok, _ := auth.Sign(secret, u.ID, u.Role, u.OrganizationID, 24)
+		if sec != nil {
+			sec.RecordSuccessfulLogin(ctx, u.ID, security.ClientIP(c))
+		}
 		c.JSON(http.StatusCreated, gin.H{
 			"token": tok,
 			"user": gin.H{
@@ -121,10 +125,16 @@ func RegisterAuth(r *gin.RouterGroup, db *mongo.Database, cfg *config.Config, se
 		var u models.User
 		err := db.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&u)
 		if err != nil {
+			if sec != nil {
+				sec.RecordFailedLogin(ctx, security.ClientIP(c), email)
+			}
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password."})
 			return
 		}
 		if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(body.Password)) != nil {
+			if sec != nil {
+				sec.RecordFailedLogin(ctx, security.ClientIP(c), email)
+			}
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password."})
 			return
 		}
@@ -135,6 +145,9 @@ func RegisterAuth(r *gin.RouterGroup, db *mongo.Database, cfg *config.Config, se
 			orgName = "Unknown Organization"
 		}
 		tok, _ := auth.Sign(secret, u.ID, u.Role, u.OrganizationID, 24)
+		if sec != nil {
+			sec.RecordSuccessfulLogin(ctx, u.ID, security.ClientIP(c))
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"token": tok,
 			"user": gin.H{
@@ -162,6 +175,9 @@ func RegisterAuth(r *gin.RouterGroup, db *mongo.Database, cfg *config.Config, se
 			orgName = "Guest Organization"
 		}
 		tok, _ := auth.Sign(secret, u.ID, u.Role, u.OrganizationID, 24)
+		if sec != nil {
+			sec.RecordSuccessfulLogin(ctx, u.ID, security.ClientIP(c))
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"token": tok,
 			"user": gin.H{

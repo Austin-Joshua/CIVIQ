@@ -6,15 +6,16 @@ import (
 
 	"civiq/api/internal/middleware"
 	"civiq/api/internal/models"
+	"civiq/api/internal/security"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterBins(r *gin.RouterGroup, db *mongo.Database) {
+func RegisterBins(r *gin.RouterGroup, db *mongo.Database, sec *security.Service) {
 	b := r.Group("/bins")
-	b.GET("", binListRoles(), func(c *gin.Context) {
+	b.GET("", binListRoles(sec), func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
 		zoneQ := c.Query("zoneId")
 		ctx := c.Request.Context()
@@ -66,7 +67,7 @@ func RegisterBins(r *gin.RouterGroup, db *mongo.Database) {
 		c.JSON(http.StatusOK, out)
 	})
 
-	b.PATCH("/:id/fill", binFillRoles(), func(c *gin.Context) {
+	b.PATCH("/:id/fill", binFillRoles(sec), func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
 		id := c.Param("id")
 		var body struct {
@@ -113,10 +114,10 @@ func RegisterBins(r *gin.RouterGroup, db *mongo.Database) {
 	})
 }
 
-func binListRoles() gin.HandlerFunc {
-	return middleware.RequireRoles("SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "ANALYST", "AUDITOR", "FIELD_SUPERVISOR", "VIEWER")
+func binListRoles(sec *security.Service) gin.HandlerFunc {
+	return middleware.RequireRoles(sec, "SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "ANALYST", "AUDITOR", "FIELD_SUPERVISOR", "VIEWER")
 }
 
-func binFillRoles() gin.HandlerFunc {
-	return middleware.RequireRoles("SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "FIELD_SUPERVISOR", "FIELD_OPERATOR")
+func binFillRoles(sec *security.Service) gin.HandlerFunc {
+	return middleware.RequireRoles(sec, "SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "FIELD_SUPERVISOR", "FIELD_OPERATOR")
 }
