@@ -141,4 +141,24 @@ func RegisterSecurity(r *gin.RouterGroup, sec *security.Service) {
 		}
 		c.JSON(http.StatusOK, gin.H{"ok": true, "stats": stats})
 	})
+
+	admin.POST("/attack-test", func(c *gin.Context) {
+		var body struct {
+			Command string `json:"command"`
+		}
+		if err := c.ShouldBindJSON(&body); err != nil || body.Command == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "command is required"})
+			return
+		}
+		result, err := sec.ExecuteAdminAttackCommand(c.Request.Context(), body.Command, "admin_api")
+		if err != nil {
+			if errors.Is(err, security.ErrUnsupportedAttackCommand) {
+				c.JSON(http.StatusBadRequest, gin.H{"message": result})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Attack simulation failed"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"ok": true, "message": result})
+	})
 }

@@ -99,6 +99,7 @@ export default function SecurityMonitorPage() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [savingTelegramSecurity, setSavingTelegramSecurity] = useState(false);
   const [runningRecovery, setRunningRecovery] = useState(false);
+  const [runningAttackCmd, setRunningAttackCmd] = useState<string | null>(null);
 
   const canView = user?.role && ADMIN_ROLES.has(user.role);
   const canUnblock = user?.role === 'SUPER_ADMIN';
@@ -290,6 +291,31 @@ export default function SecurityMonitorPage() {
     }
   };
 
+  const handleAttackTest = async (command: 'insert' | 'delete' | 'manipulate' | 'duplicate') => {
+    if (!canControl || !token) return;
+    setRunningAttackCmd(command);
+    try {
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/security/attack-test`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'failed');
+      toast.success(data.message || `Attack command ${command} executed`);
+      load();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : `Attack command ${command} failed`;
+      toast.error(msg);
+    } finally {
+      setRunningAttackCmd(null);
+    }
+  };
+
   if (!hasHydrated || !user) {
     return (
       <div className="text-sm text-muted-foreground p-6">Loading…</div>
@@ -447,6 +473,22 @@ export default function SecurityMonitorPage() {
               >
                 {runningRecovery ? 'Recovering…' : 'Run Backup Recovery'}
               </button>
+              <div className="w-full pt-2 border-t border-border/70 mt-1 flex flex-wrap gap-2">
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground w-full">
+                  Attack simulation (for OFF-mode testing)
+                </span>
+                {(['insert', 'delete', 'manipulate', 'duplicate'] as const).map((cmd) => (
+                  <button
+                    key={cmd}
+                    type="button"
+                    onClick={() => handleAttackTest(cmd)}
+                    disabled={runningAttackCmd !== null}
+                    className="px-3 py-1.5 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-xs font-semibold hover:bg-destructive/20 disabled:opacity-60"
+                  >
+                    {runningAttackCmd === cmd ? `Running ${cmd}…` : `Run ${cmd}`}
+                  </button>
+                ))}
+              </div>
             </form>
           )}
         </div>

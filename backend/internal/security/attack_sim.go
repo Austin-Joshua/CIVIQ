@@ -24,6 +24,9 @@ const (
 
 var errUnsupportedAttackCommand = errors.New("unsupported command")
 
+// ErrUnsupportedAttackCommand is returned for unknown simulation commands.
+var ErrUnsupportedAttackCommand = errUnsupportedAttackCommand
+
 // AttackLog stores executed attacks, blocked threats, and recovery/sync actions.
 type AttackLog struct {
 	ID           string         `bson:"_id" json:"id"`
@@ -327,6 +330,31 @@ func (s *Service) ExecuteTelegramAttackCommand(ctx context.Context, command stri
 		return s.attackDuplicate(ctx, telegramUser, chatID)
 	default:
 		return "Unknown command. Use /insert /delete /manipulate /duplicate", errUnsupportedAttackCommand
+	}
+}
+
+// ExecuteAdminAttackCommand allows privileged API-based attack simulation.
+// It still respects global security mode (monitoringOn), so tests can verify ON/OFF behavior.
+func (s *Service) ExecuteAdminAttackCommand(ctx context.Context, command, actor string) (string, error) {
+	cmd := strings.ToLower(strings.TrimSpace(command))
+	if !strings.HasPrefix(cmd, "/") {
+		cmd = "/" + cmd
+	}
+	if s.monitoringOn() {
+		s.logAttack(ctx, cmd, "blocked", "security mode is ON (admin test)", 0, actor, nil, nil)
+		return "Threat attack has been stopped by the security system.", nil
+	}
+	switch cmd {
+	case "/insert":
+		return s.attackInsert(ctx, 0, actor)
+	case "/delete":
+		return s.attackDelete(ctx, 0, actor)
+	case "/manipulate":
+		return s.attackManipulate(ctx, 0, actor)
+	case "/duplicate":
+		return s.attackDuplicate(ctx, 0, actor)
+	default:
+		return "Unknown command. Use insert/delete/manipulate/duplicate", errUnsupportedAttackCommand
 	}
 }
 
