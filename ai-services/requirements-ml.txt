@@ -1,2 +1,0 @@
-# Optional: hierarchical encoder + Phase B/C training (CPU wheels on Linux CI)
-torch==2.2.2

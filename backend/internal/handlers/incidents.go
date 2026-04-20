@@ -7,7 +7,6 @@ import (
 
 	"civiq/api/internal/middleware"
 	"civiq/api/internal/models"
-	"civiq/api/internal/security"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -18,7 +17,7 @@ import (
 
 type Broadcaster func(tenantID, event string, payload interface{})
 
-func RegisterIncidents(r *gin.RouterGroup, db *mongo.Database, bcast Broadcaster, sec *security.Service) {
+func RegisterIncidents(r *gin.RouterGroup, db *mongo.Database, bcast Broadcaster) {
 	r.GET("/incidents", func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
 		ctx := c.Request.Context()
@@ -37,7 +36,7 @@ func RegisterIncidents(r *gin.RouterGroup, db *mongo.Database, bcast Broadcaster
 		c.JSON(http.StatusOK, out)
 	})
 
-	r.POST("/incidents", middleware.RequireRoles(sec, "SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "FIELD_SUPERVISOR", "FIELD_OPERATOR"), func(c *gin.Context) {
+	r.POST("/incidents", middleware.RequireRoles("SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "FIELD_SUPERVISOR", "FIELD_OPERATOR"), func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
 		var body struct {
 			Type     string `json:"type"`
@@ -68,7 +67,7 @@ func RegisterIncidents(r *gin.RouterGroup, db *mongo.Database, bcast Broadcaster
 		c.JSON(http.StatusCreated, j)
 	})
 
-	r.PATCH("/incidents/:id", middleware.RequireRoles(sec, "SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "FIELD_SUPERVISOR", "FIELD_OPERATOR"), func(c *gin.Context) {
+	r.PATCH("/incidents/:id", middleware.RequireRoles("SUPER_ADMIN", "GOV_ADMIN", "OPS_MANAGER", "FIELD_SUPERVISOR", "FIELD_OPERATOR"), func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
 		id := c.Param("id")
 		var body map[string]interface{}

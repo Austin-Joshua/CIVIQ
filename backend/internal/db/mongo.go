@@ -19,42 +19,5 @@ func EnsureIndexes(ctx context.Context, db *mongo.Database) error {
 		Keys: map[string]int{"email": 1},
 		Options: options.Index().SetUnique(true),
 	})
-	if err != nil {
-		return err
-	}
-	_, err = db.Collection("security_events").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: map[string]int{"timestamp": -1},
-	})
-	if err != nil {
-		return err
-	}
-	_, err = db.Collection("security_events").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: map[string]int{"userId": 1, "timestamp": -1},
-	})
-	if err != nil {
-		return err
-	}
-	_, err = db.Collection("security_events").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: map[string]int{"ip": 1, "timestamp": -1},
-	})
-	if err != nil {
-		return err
-	}
-	_, err = db.Collection("security_blocks").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: map[string]int{"type": 1, "value": 1},
-	})
-	if err != nil {
-		return err
-	}
-	_, err = db.Collection("security_known_ips").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    map[string]int{"userId": 1, "ip": 1},
-		Options: options.Index().SetUnique(true),
-	})
-	if err != nil {
-		return err
-	}
-	_, err = db.Collection("security_ml_alerts").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: map[string]int{"timestamp": -1},
-	})
 	return err
 }

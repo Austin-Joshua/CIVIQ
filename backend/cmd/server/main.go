@@ -8,7 +8,6 @@ import (
 	"civiq/api/internal/config"
 	"civiq/api/internal/db"
 	"civiq/api/internal/handlers"
-	"civiq/api/internal/security"
 	"civiq/api/internal/seed"
 
 	"github.com/gin-gonic/gin"
@@ -42,18 +41,11 @@ func main() {
 		log.Println("seed warning:", err)
 	}
 
-	sec := security.NewService(mdb, cfg)
-	if err := sec.BootstrapSettings(ctx); err != nil {
-		log.Println("security settings warning:", err)
-	}
-	sec.StartBackground(context.Background())
-	defer sec.StopMLWorker()
-
 	r := gin.New()
 	r.Use(gin.Recovery())
 
 	secret := []byte(cfg.JWTSecret)
-	handlers.Mount(r, mdb, cfg, secret, nil, sec)
+	handlers.Mount(r, mdb, cfg, secret, nil)
 
 	addr := ":" + cfg.Port
 	log.Printf("CIVIQ API (Go + MongoDB) listening on %s", addr)

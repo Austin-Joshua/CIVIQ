@@ -6,7 +6,6 @@ import (
 
 	"civiq/api/internal/auth"
 	"civiq/api/internal/config"
-	"civiq/api/internal/security"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -79,7 +78,7 @@ func JWT(secret []byte) gin.HandlerFunc {
 	}
 }
 
-func RequireRoles(sec *security.Service, roles ...string) gin.HandlerFunc {
+func RequireRoles(roles ...string) gin.HandlerFunc {
 	roleSet := map[string]struct{}{}
 	for _, r := range roles {
 		roleSet[r] = struct{}{}
@@ -87,9 +86,6 @@ func RequireRoles(sec *security.Service, roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cl := c.MustGet(CtxClaims).(*auth.Claims)
 		if _, ok := roleSet[cl.Role]; !ok {
-			if sec != nil {
-				sec.RecordRoleViolation(c, cl, c.Request.URL.Path, roles)
-			}
 			c.JSON(http.StatusForbidden, gin.H{"message": "Insufficient permissions"})
 			c.Abort()
 			return

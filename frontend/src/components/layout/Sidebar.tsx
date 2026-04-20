@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Route, TrendingUp, Recycle,
-  Layers, AlertTriangle, Settings, Database,   ShieldCheck,
-  ShieldAlert,
+  Layers, AlertTriangle, Settings, Database, ShieldCheck,
   Users, Monitor, Zap, BarChart3, ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -53,7 +52,6 @@ export const NAV_CATEGORIES = [
     label: 'Administration',
     items: [
       { href: '/dashboard/users', icon: Users, label: 'Users & Roles', roles: ['SUPER_ADMIN', 'GOV_ADMIN'] },
-      { href: '/dashboard/security', icon: ShieldAlert, label: 'Security Monitor', roles: ['SUPER_ADMIN', 'GOV_ADMIN'] },
       { href: '/dashboard/data', icon: Database, label: 'Data Manager', roles: ['SUPER_ADMIN', 'GOV_ADMIN', 'OPS_MANAGER'] },
       { href: '/dashboard/settings', icon: Settings, label: 'Settings', roles: ['SUPER_ADMIN'] },
     ]

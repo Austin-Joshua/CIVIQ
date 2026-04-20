@@ -8,7 +8,6 @@ import (
 	"civiq/api/internal/auth"
 	"civiq/api/internal/middleware"
 	"civiq/api/internal/models"
-	"civiq/api/internal/security"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -18,7 +17,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUsers(r *gin.RouterGroup, db *mongo.Database, sec *security.Service) {
+func RegisterUsers(r *gin.RouterGroup, db *mongo.Database) {
 	r.GET("/users/me", func(c *gin.Context) {
 		cl := c.MustGet(middleware.CtxClaims).(*auth.Claims)
 		ctx := c.Request.Context()
@@ -72,7 +71,7 @@ func RegisterUsers(r *gin.RouterGroup, db *mongo.Database, sec *security.Service
 	})
 
 	admin := r.Group("/users")
-	admin.Use(middleware.RequireRoles(sec, "SUPER_ADMIN", "GOV_ADMIN"))
+	admin.Use(middleware.RequireRoles("SUPER_ADMIN", "GOV_ADMIN"))
 
 	admin.GET("", func(c *gin.Context) {
 		orgID := c.MustGet(middleware.CtxOrgID).(string)
