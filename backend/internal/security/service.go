@@ -37,10 +37,10 @@ const (
 	ActionUnauthorized = "unauthorized_route"
 	ActionNewIP        = "new_ip"
 
-	ruleFailedLoginFlood = "failed_login_flood"
-	ruleMutatingFlood    = "mutating_flood"
-	ruleNewIP            = "new_ip_access"
-	ruleUnauthorized     = "restricted_route_access"
+	ruleFailedLoginFlood  = "failed_login_flood"
+	ruleMutatingFlood     = "mutating_flood"
+	ruleNewIP             = "new_ip_access"
+	ruleUnauthorized      = "restricted_route_access"
 	ruleUnauthorizedFlood = "unauthorized_flood"
 
 	maxFailedLoginsPerMinute   = 5
@@ -63,6 +63,8 @@ type Service struct {
 	stopBG        context.CancelFunc
 	stopDetection context.CancelFunc
 	stopML        context.CancelFunc
+	stopBackup    context.CancelFunc
+	stopTelegram  context.CancelFunc
 	mlCh          chan TrafficMLSample
 
 	mlHitsMu sync.Mutex
@@ -111,6 +113,8 @@ func (s *Service) StartBackground(parent context.Context) {
 	}()
 
 	s.startMLWorker(parent)
+	s.startBackupSyncWorker(parent)
+	s.startTelegramCommandWorker(parent)
 }
 
 func (s *Service) detectionTickerInterval() time.Duration {
@@ -128,7 +132,6 @@ func (s *Service) pruneOldEvents(ctx context.Context) {
 		log.Println("security: prune events:", err)
 	}
 }
-
 
 func (s *Service) blockIPMinutes() int {
 	if s.cfg != nil && s.cfg.SecurityBlockIPMinutes > 0 {
@@ -195,8 +198,8 @@ func (s *Service) IPBlockMiddleware() gin.HandlerFunc {
 		ip := ClientIP(c)
 		if s.isIPBlocked(c.Request.Context(), ip) {
 			c.JSON(http.StatusForbidden, gin.H{
-				"message":   "Access temporarily blocked for this network address.",
-				"code":      "SECURITY_IP_BLOCKED",
+				"message":    "Access temporarily blocked for this network address.",
+				"code":       "SECURITY_IP_BLOCKED",
 				"retryAfter": s.blockIPMinutes() * 60,
 			})
 			c.Abort()
@@ -221,8 +224,8 @@ func (s *Service) UserBlockMiddleware() gin.HandlerFunc {
 		}
 		if s.isUserBlocked(c.Request.Context(), claims.ID) {
 			c.JSON(http.StatusForbidden, gin.H{
-				"message":   "Your account is temporarily locked due to security policy. Sign in again later.",
-				"code":      "SECURITY_USER_BLOCKED",
+				"message":    "Your account is temporarily locked due to security policy. Sign in again later.",
+				"code":       "SECURITY_USER_BLOCKED",
 				"retryAfter": s.blockUserMinutes() * 60,
 			})
 			c.Abort()

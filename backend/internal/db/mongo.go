@@ -16,7 +16,7 @@ func Connect(uri string) (*mongo.Client, error) {
 
 func EnsureIndexes(ctx context.Context, db *mongo.Database) error {
 	_, err := db.Collection("users").Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: map[string]int{"email": 1},
+		Keys:    map[string]int{"email": 1},
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
@@ -54,6 +54,12 @@ func EnsureIndexes(ctx context.Context, db *mongo.Database) error {
 		return err
 	}
 	_, err = db.Collection("security_ml_alerts").Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: map[string]int{"timestamp": -1},
+	})
+	if err != nil {
+		return err
+	}
+	_, err = db.Collection("security_attack_logs").Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: map[string]int{"timestamp": -1},
 	})
 	return err

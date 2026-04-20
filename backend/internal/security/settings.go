@@ -2,6 +2,7 @@ package security
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -55,6 +56,17 @@ func (s *Service) SetMonitoringEnabled(ctx context.Context, on bool) error {
 		return err
 	}
 	s.liveMonitoring.Store(on)
+	if on {
+		go func() {
+			// Recovery first, then refresh backup baseline.
+			if _, err := s.RecoverMainFromBackup(context.Background()); err != nil {
+				log.Println("security: recovery:", err)
+			}
+			if err := s.SyncBackupNow(context.Background()); err != nil {
+				log.Println("security: backup sync:", err)
+			}
+		}()
+	}
 	return nil
 }
 
@@ -70,12 +82,15 @@ func (s *Service) GetSettingsSnapshot() map[string]interface{} {
 		maxR = s.cfg.MaxRequestsPerIPPerMinute
 	}
 	return map[string]interface{}{
-		"monitoringEnabled":           s.liveMonitoring.Load(),
-		"envSecurityMonitorEnabled":   envOn,
-		"detectionIntervalSec":        sec,
-		"maxRequestsPerIPPerMinute":   maxR,
-		"maxFailedLoginsPerMinute":    maxFailedLoginsPerMinute,
-		"maxMutatingPerUserMinute":    maxMutatingPerUserMinute,
+		"monitoringEnabled":          s.liveMonitoring.Load(),
+		"envSecurityMonitorEnabled":  envOn,
+		"detectionIntervalSec":       sec,
+		"maxRequestsPerIPPerMinute":  maxR,
+		"maxFailedLoginsPerMinute":   maxFailedLoginsPerMinute,
+		"maxMutatingPerUserMinute":   maxMutatingPerUserMinute,
 		"maxUnauthorizedPerIPMinute": maxUnauthorizedPerIPMinute,
+		"backupDatabaseName":         s.backupDB().Name(),
+		"backupSyncIntervalSec":      s.backupSyncIntervalSec(),
+		"telegramBotCommandEnabled":  s.telegramCommandBotEnabled(),
 	}
 }

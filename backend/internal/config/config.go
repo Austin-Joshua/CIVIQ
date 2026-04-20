@@ -7,29 +7,34 @@ import (
 )
 
 type Config struct {
-	Port           string
-	MongoURI       string
-	DatabaseName   string
-	JWTSecret      string
-	CORSOrigins    []string
-	SocketEnabled  bool
-	SocketPort     string
-	Bootstrap      bool
-	SeedOrgName    string
-	SeedPassword   string
+	Port          string
+	MongoURI      string
+	DatabaseName  string
+	JWTSecret     string
+	CORSOrigins   []string
+	SocketEnabled bool
+	SocketPort    string
+	Bootstrap     bool
+	SeedOrgName   string
+	SeedPassword  string
 
-	SecurityMonitorEnabled   bool
-	TelegramBotToken         string
-	TelegramChatIDs          []string
-	SecurityBlockIPMinutes   int
-	SecurityBlockUserMinutes int
+	SecurityMonitorEnabled       bool
+	TelegramBotToken             string
+	TelegramChatIDs              []string
+	SecurityBlockIPMinutes       int
+	SecurityBlockUserMinutes     int
 	SecurityDetectionIntervalSec int // background detection sweep (default 10)
 	MaxRequestsPerIPPerMinute    int // excessive traffic threshold (default 100)
 
-	MLSecurityURL     string
-	MLBatchSize       int
-	MLBatchWaitMs     int
-	MLHTTPTimeoutMs   int
+	MLSecurityURL   string
+	MLBatchSize     int
+	MLBatchWaitMs   int
+	MLHTTPTimeoutMs int
+
+	SecurityBackupDatabaseName    string
+	SecurityBackupSyncIntervalSec int
+	TelegramAllowedUserIDs        []int64
+	TelegramPollIntervalSec       int
 }
 
 func Load() *Config {
@@ -92,6 +97,26 @@ func Load() *Config {
 	if v := get("SECURITY_ML_HTTP_TIMEOUT_MS", "1500"); v != "" {
 		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil && n >= 200 {
 			c.MLHTTPTimeoutMs = n
+		}
+	}
+	c.SecurityBackupDatabaseName = strings.TrimSpace(get("SECURITY_BACKUP_DATABASE_NAME", c.DatabaseName+"_backup"))
+	if v := get("SECURITY_BACKUP_SYNC_INTERVAL_SEC", "30"); v != "" {
+		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil && n >= 5 {
+			c.SecurityBackupSyncIntervalSec = n
+		}
+	}
+	for _, idRaw := range strings.Split(get("TELEGRAM_ALLOWED_USER_IDS", ""), ",") {
+		idRaw = strings.TrimSpace(idRaw)
+		if idRaw == "" {
+			continue
+		}
+		if n, err := strconv.ParseInt(idRaw, 10, 64); err == nil {
+			c.TelegramAllowedUserIDs = append(c.TelegramAllowedUserIDs, n)
+		}
+	}
+	if v := get("TELEGRAM_POLL_INTERVAL_SEC", "3"); v != "" {
+		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil && n >= 1 {
+			c.TelegramPollIntervalSec = n
 		}
 	}
 	return c

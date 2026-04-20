@@ -53,6 +53,16 @@ func RegisterSecurity(r *gin.RouterGroup, sec *security.Service) {
 		c.JSON(http.StatusOK, alerts)
 	})
 
+	g.GET("/attack-logs", func(c *gin.Context) {
+		limit, _ := strconv.ParseInt(c.Query("limit"), 10, 64)
+		rows, err := sec.ListAttackLogs(c.Request.Context(), limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not load attack logs"})
+			return
+		}
+		c.JSON(http.StatusOK, rows)
+	})
+
 	admin := g.Group("")
 	admin.Use(middleware.RequireRoles(sec, "SUPER_ADMIN"))
 
@@ -100,5 +110,18 @@ func RegisterSecurity(r *gin.RouterGroup, sec *security.Service) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"ok": true})
+	})
+
+	admin.POST("/recovery/run", func(c *gin.Context) {
+		stats, err := sec.RecoverMainFromBackup(c.Request.Context())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Recovery failed"})
+			return
+		}
+		if err := sec.SyncBackupNow(c.Request.Context()); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Recovery completed but backup sync failed", "stats": stats})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"ok": true, "stats": stats})
 	})
 }
