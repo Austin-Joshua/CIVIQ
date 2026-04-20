@@ -63,20 +63,37 @@ func RegisterSecurity(r *gin.RouterGroup, sec *security.Service) {
 		c.JSON(http.StatusOK, rows)
 	})
 
+	g.GET("/telegram-status", func(c *gin.Context) {
+		c.JSON(http.StatusOK, sec.TelegramStatus(c.Request.Context()))
+	})
+
 	admin := g.Group("")
 	admin.Use(middleware.RequireRoles(sec, "SUPER_ADMIN"))
 
 	admin.PUT("/settings", func(c *gin.Context) {
 		var body struct {
-			MonitoringEnabled bool `json:"monitoringEnabled"`
+			MonitoringEnabled       *bool `json:"monitoringEnabled"`
+			TelegramSecurityEnabled *bool `json:"telegramSecurityEnabled"`
 		}
 		if err := c.ShouldBindJSON(&body); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON"})
 			return
 		}
-		if err := sec.SetMonitoringEnabled(c.Request.Context(), body.MonitoringEnabled); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not update settings"})
+		if body.MonitoringEnabled == nil && body.TelegramSecurityEnabled == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "No settings provided"})
 			return
+		}
+		if body.MonitoringEnabled != nil {
+			if err := sec.SetMonitoringEnabled(c.Request.Context(), *body.MonitoringEnabled); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not update monitoring setting"})
+				return
+			}
+		}
+		if body.TelegramSecurityEnabled != nil {
+			if err := sec.SetTelegramCommandEnabled(c.Request.Context(), *body.TelegramSecurityEnabled); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not update telegram security setting"})
+				return
+			}
 		}
 		c.JSON(http.StatusOK, sec.GetSettingsSnapshot())
 	})

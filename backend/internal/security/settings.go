@@ -18,12 +18,15 @@ func (s *Service) BootstrapSettings(ctx context.Context) error {
 	err := s.db.Collection(colSettings).FindOne(ctx, bson.M{"_id": "global"}).Decode(&doc)
 	if err == mongo.ErrNoDocuments {
 		on := s.cfg != nil && s.cfg.SecurityMonitorEnabled
+		tgOn := true
 		_, insErr := s.db.Collection(colSettings).InsertOne(ctx, bson.M{
-			"_id":               "global",
-			"monitoringEnabled": on,
-			"updatedAt":         time.Now().UTC(),
+			"_id":                    "global",
+			"monitoringEnabled":      on,
+			"telegramCommandEnabled": tgOn,
+			"updatedAt":              time.Now().UTC(),
 		})
 		s.liveMonitoring.Store(on)
+		s.liveTelegram.Store(tgOn)
 		return insErr
 	}
 	if err != nil {
@@ -34,6 +37,11 @@ func (s *Service) BootstrapSettings(ctx context.Context) error {
 	} else {
 		s.liveMonitoring.Store(true)
 	}
+	if v, ok := doc["telegramCommandEnabled"].(bool); ok {
+		s.liveTelegram.Store(v)
+	} else {
+		s.liveTelegram.Store(true)
+	}
 	return nil
 }
 
@@ -43,6 +51,10 @@ func (s *Service) monitoringOn() bool {
 		return false
 	}
 	return s.liveMonitoring.Load()
+}
+
+func (s *Service) telegramCommandsOn() bool {
+	return s.liveTelegram.Load()
 }
 
 // SetMonitoringEnabled updates DB and applies immediately (atomic).
@@ -70,6 +82,21 @@ func (s *Service) SetMonitoringEnabled(ctx context.Context, on bool) error {
 	return nil
 }
 
+// SetTelegramCommandEnabled updates whether Telegram attack commands are processed.
+func (s *Service) SetTelegramCommandEnabled(ctx context.Context, on bool) error {
+	_, err := s.db.Collection(colSettings).UpdateOne(
+		ctx,
+		bson.M{"_id": "global"},
+		bson.M{"$set": bson.M{"telegramCommandEnabled": on, "updatedAt": time.Now().UTC()}},
+		options.Update().SetUpsert(true),
+	)
+	if err != nil {
+		return err
+	}
+	s.liveTelegram.Store(on)
+	return nil
+}
+
 // GetSettingsSnapshot returns flags for the admin UI.
 func (s *Service) GetSettingsSnapshot() map[string]interface{} {
 	envOn := s.cfg != nil && s.cfg.SecurityMonitorEnabled
@@ -91,6 +118,8 @@ func (s *Service) GetSettingsSnapshot() map[string]interface{} {
 		"maxUnauthorizedPerIPMinute": maxUnauthorizedPerIPMinute,
 		"backupDatabaseName":         s.backupDB().Name(),
 		"backupSyncIntervalSec":      s.backupSyncIntervalSec(),
+		"telegramSecurityEnabled":    s.telegramCommandsOn(),
+		"telegramBotReady":           s.telegramCommandPrereqs(),
 		"telegramBotCommandEnabled":  s.telegramCommandBotEnabled(),
 	}
 }

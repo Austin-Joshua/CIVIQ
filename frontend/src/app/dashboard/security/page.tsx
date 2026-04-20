@@ -40,6 +40,8 @@ interface SecuritySettings {
   envSecurityMonitorEnabled: boolean;
   detectionIntervalSec: number;
   maxRequestsPerIPPerMinute: number;
+  telegramSecurityEnabled?: boolean;
+  telegramBotReady?: boolean;
 }
 
 interface MLThreatAlert {
@@ -56,6 +58,28 @@ interface MLThreatAlert {
   timestamp: string;
 }
 
+interface SecurityAttackLog {
+  id: string;
+  command: string;
+  status: 'executed' | 'blocked' | 'recovery' | 'sync';
+  message: string;
+  telegramUser?: number;
+  telegramChat?: string;
+  affectedIds?: string[];
+  timestamp: string;
+}
+
+interface TelegramStatus {
+  enabled: boolean;
+  hasToken: boolean;
+  allowedUsersCount: number;
+  pollIntervalSec: number;
+  workerExpected: boolean;
+  telegramApiReachable: boolean;
+  botUsername?: string;
+  message?: string;
+}
+
 export default function SecurityMonitorPage() {
   const router = useRouter();
   const { token, user, hasHydrated } = useAuthStore();
@@ -63,14 +87,18 @@ export default function SecurityMonitorPage() {
   const [blocks, setBlocks] = useState<SecurityBlock[]>([]);
   const [settings, setSettings] = useState<SecuritySettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'events' | 'blocks' | 'ml'>('events');
+  const [tab, setTab] = useState<'events' | 'blocks' | 'ml' | 'attacks'>('events');
   const [mlAlerts, setMlAlerts] = useState<MLThreatAlert[]>([]);
+  const [attackLogs, setAttackLogs] = useState<SecurityAttackLog[]>([]);
+  const [telegramStatus, setTelegramStatus] = useState<TelegramStatus | null>(null);
   const lastMlIdRef = useRef<string | null>(null);
   const [severityFilter, setSeverityFilter] = useState('');
   const [manualType, setManualType] = useState<'ip' | 'user'>('ip');
   const [manualValue, setManualValue] = useState('');
   const [manualMinutes, setManualMinutes] = useState(60);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [savingTelegramSecurity, setSavingTelegramSecurity] = useState(false);
+  const [runningRecovery, setRunningRecovery] = useState(false);
 
   const canView = user?.role && ADMIN_ROLES.has(user.role);
   const canUnblock = user?.role === 'SUPER_ADMIN';
@@ -85,11 +113,13 @@ export default function SecurityMonitorPage() {
     try {
       const base = getApiBaseUrl();
       const q = severityFilter ? `?severity=${encodeURIComponent(severityFilter)}&limit=200` : '?limit=200';
-      const [evRes, blRes, stRes, mlRes] = await Promise.all([
+      const [evRes, blRes, stRes, mlRes, atkRes, tgRes] = await Promise.all([
         fetch(`${base}/security/events${q}`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${base}/security/blocks`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${base}/security/settings`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${base}/security/ml-alerts?limit=120`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${base}/security/attack-logs?limit=120`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${base}/security/telegram-status`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       if (evRes.status === 403 || blRes.status === 403) {
         toast.error('You do not have access to security monitoring.');
@@ -113,6 +143,12 @@ export default function SecurityMonitorPage() {
         if (newest) {
           lastMlIdRef.current = newest.id;
         }
+      }
+      if (atkRes.ok) {
+        setAttackLogs(await atkRes.json());
+      }
+      if (tgRes.ok) {
+        setTelegramStatus(await tgRes.json());
       }
     } catch {
       toast.error('Could not load security data.');
@@ -179,6 +215,29 @@ export default function SecurityMonitorPage() {
     }
   };
 
+  const handleToggleTelegramSecurity = async (next: boolean) => {
+    if (!canControl || !token) return;
+    setSavingTelegramSecurity(true);
+    try {
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/security/settings`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegramSecurityEnabled: next }),
+      });
+      if (!res.ok) throw new Error();
+      setSettings(await res.json());
+      toast.success(next ? 'Telegram security enabled' : 'Telegram security disabled');
+    } catch {
+      toast.error('Could not update Telegram security mode.');
+    } finally {
+      setSavingTelegramSecurity(false);
+    }
+  };
+
   const handleManualBlock = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canControl || !token || !manualValue.trim()) return;
@@ -204,6 +263,30 @@ export default function SecurityMonitorPage() {
       load();
     } catch {
       toast.error('Could not apply block.');
+    }
+  };
+
+  const handleRunRecovery = async () => {
+    if (!canControl || !token) return;
+    setRunningRecovery(true);
+    try {
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/security/recovery/run`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'failed');
+      toast.success(
+        `Recovery complete: restored ${data.stats?.restored ?? 0}, cleaned ${data.stats?.cleaned ?? 0}, replaced ${
+          data.stats?.replaced ?? 0
+        }`
+      );
+      load();
+    } catch {
+      toast.error('Recovery run failed.');
+    } finally {
+      setRunningRecovery(false);
     }
   };
 
@@ -260,22 +343,60 @@ export default function SecurityMonitorPage() {
                     {settings.maxRequestsPerIPPerMinute} req/min per IP (configurable on server).
                   </span>
                 )}
+                {telegramStatus && (
+                  <span className="block mt-2">
+                    Telegram bot:{' '}
+                    <span className={telegramStatus.telegramApiReachable ? 'text-emerald-500 font-medium' : 'text-amber-500 font-medium'}>
+                      {telegramStatus.telegramApiReachable ? 'reachable' : 'not ready'}
+                    </span>
+                    {telegramStatus.botUsername ? ` (@${telegramStatus.botUsername})` : ''} · allowed users:{' '}
+                    {telegramStatus.allowedUsersCount}
+                    {telegramStatus.message ? <span className="block mt-1">{telegramStatus.message}</span> : null}
+                  </span>
+                )}
+                {settings.telegramSecurityEnabled !== undefined && (
+                  <span className="block mt-2">
+                    Telegram command security:{' '}
+                    <span className={settings.telegramSecurityEnabled ? 'text-emerald-500 font-medium' : 'text-amber-500 font-medium'}>
+                      {settings.telegramSecurityEnabled ? 'ON' : 'OFF'}
+                    </span>
+                  </span>
+                )}
               </p>
             </div>
             {canControl && settings.envSecurityMonitorEnabled && (
-              <button
-                type="button"
-                disabled={savingSettings}
-                onClick={() => handleToggleMonitoring(!settings.monitoringEnabled)}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  settings.monitoringEnabled
-                    ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                    : 'bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25'
-                )}
-              >
-                {savingSettings ? 'Saving…' : settings.monitoringEnabled ? 'Turn monitoring OFF' : 'Turn monitoring ON'}
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={savingSettings}
+                  onClick={() => handleToggleMonitoring(!settings.monitoringEnabled)}
+                  className={cn(
+                    'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                    settings.monitoringEnabled
+                      ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                      : 'bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25'
+                  )}
+                >
+                  {savingSettings ? 'Saving…' : settings.monitoringEnabled ? 'Turn monitoring OFF' : 'Turn monitoring ON'}
+                </button>
+                <button
+                  type="button"
+                  disabled={savingTelegramSecurity || settings.telegramBotReady === false}
+                  onClick={() => handleToggleTelegramSecurity(!(settings.telegramSecurityEnabled ?? true))}
+                  className={cn(
+                    'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                    (settings.telegramSecurityEnabled ?? true)
+                      ? 'bg-primary/15 text-primary hover:bg-primary/25'
+                      : 'bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25'
+                  )}
+                >
+                  {savingTelegramSecurity
+                    ? 'Saving…'
+                    : (settings.telegramSecurityEnabled ?? true)
+                      ? 'Turn Telegram security OFF'
+                      : 'Turn Telegram security ON'}
+                </button>
+              </div>
             )}
           </div>
 
@@ -317,6 +438,14 @@ export default function SecurityMonitorPage() {
                 className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
               >
                 Apply
+              </button>
+              <button
+                type="button"
+                onClick={handleRunRecovery}
+                disabled={runningRecovery}
+                className="px-4 py-2 rounded-lg bg-amber-500/20 text-amber-700 dark:text-amber-300 text-sm font-medium hover:bg-amber-500/30 disabled:opacity-60"
+              >
+                {runningRecovery ? 'Recovering…' : 'Run Backup Recovery'}
               </button>
             </form>
           )}
@@ -394,6 +523,20 @@ export default function SecurityMonitorPage() {
             <span className="text-xs bg-amber-500/20 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">
               {mlAlerts.length}
             </span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('attacks')}
+          className={cn(
+            'px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2',
+            tab === 'attacks' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-muted/50'
+          )}
+        >
+          <AlertTriangle className="w-4 h-4" />
+          Attack logs
+          {attackLogs.length > 0 && (
+            <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">{attackLogs.length}</span>
           )}
         </button>
         <button
@@ -537,6 +680,72 @@ export default function SecurityMonitorPage() {
                           {a.method} {a.path}
                         </td>
                         <td className="p-3 text-xs text-muted-foreground max-w-[220px] truncate">{a.message || '—'}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'attacks' && (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Telegram commands (/insert, /delete, /manipulate, /duplicate), blocked threats, backup sync, and recovery actions.
+          </p>
+          <div className="rounded-xl border border-border overflow-hidden liquid-glass">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-muted-foreground">
+                    <th className="p-3 font-medium">Time</th>
+                    <th className="p-3 font-medium">Command</th>
+                    <th className="p-3 font-medium">Status</th>
+                    <th className="p-3 font-medium">Telegram User</th>
+                    <th className="p-3 font-medium">Affected IDs</th>
+                    <th className="p-3 font-medium">Message</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                        Loading…
+                      </td>
+                    </tr>
+                  ) : attackLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                        No attack/recovery logs yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    attackLogs.map((a) => (
+                      <tr key={a.id} className="border-b border-border/60 hover:bg-muted/30">
+                        <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">
+                          {new Date(a.timestamp).toLocaleString()}
+                        </td>
+                        <td className="p-3 font-mono text-xs">{a.command}</td>
+                        <td className="p-3 text-xs">
+                          <span
+                            className={cn(
+                              'font-medium',
+                              a.status === 'blocked' && 'text-amber-600 dark:text-amber-400',
+                              a.status === 'executed' && 'text-destructive',
+                              a.status === 'recovery' && 'text-emerald-600 dark:text-emerald-400',
+                              a.status === 'sync' && 'text-primary'
+                            )}
+                          >
+                            {a.status}
+                          </span>
+                        </td>
+                        <td className="p-3 font-mono text-xs">{a.telegramUser ?? '—'}</td>
+                        <td className="p-3 text-xs">{a.affectedIds?.length ? a.affectedIds.slice(0, 2).join(', ') : '—'}</td>
+                        <td className="p-3 text-xs text-muted-foreground max-w-[280px] truncate" title={a.message}>
+                          {a.message}
+                        </td>
                       </tr>
                     ))
                   )}

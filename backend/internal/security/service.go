@@ -59,6 +59,7 @@ type Service struct {
 	cfg *config.Config
 
 	liveMonitoring atomic.Bool // runtime toggle from MongoDB (see settings.go)
+	liveTelegram   atomic.Bool // runtime toggle for telegram attack command processing
 
 	stopBG        context.CancelFunc
 	stopDetection context.CancelFunc

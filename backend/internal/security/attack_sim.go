@@ -289,9 +289,28 @@ func (s *Service) authorizedTelegramUser(userID int64) bool {
 
 func (s *Service) ExecuteTelegramAttackCommand(ctx context.Context, command string, telegramUser int64, chatID string) (string, error) {
 	cmd := strings.ToLower(strings.TrimSpace(command))
+	if cmd == "/help" || cmd == "/commands" {
+		return "Available commands:\n/security_on\n/security_off\n/insert\n/delete\n/manipulate\n/duplicate\n/help", nil
+	}
 	if !s.authorizedTelegramUser(telegramUser) {
 		s.logAttack(ctx, cmd, "blocked", "unauthorized telegram user", telegramUser, chatID, nil, nil)
 		return "Unauthorized command source.", nil
+	}
+	if cmd == "/security_on" {
+		if err := s.SetMonitoringEnabled(ctx, true); err != nil {
+			return "Could not turn security ON.", err
+		}
+		return "Security mode turned ON. Threat attacks are now blocked.", nil
+	}
+	if cmd == "/security_off" {
+		if err := s.SetMonitoringEnabled(ctx, false); err != nil {
+			return "Could not turn security OFF.", err
+		}
+		return "Security mode turned OFF. Attack simulation commands are allowed.", nil
+	}
+	if !s.telegramCommandsOn() {
+		s.logAttack(ctx, cmd, "blocked", "telegram security toggle is OFF", telegramUser, chatID, nil, nil)
+		return "Telegram attack command processing is disabled by security settings.", nil
 	}
 	if s.monitoringOn() {
 		s.logAttack(ctx, cmd, "blocked", "security mode is ON", telegramUser, chatID, nil, nil)
