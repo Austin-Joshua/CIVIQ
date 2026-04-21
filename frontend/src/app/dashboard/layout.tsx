@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!hasHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground text-sm">
-        Loading dashboard...
+        Loading workspace…
       </div>
     );
   }

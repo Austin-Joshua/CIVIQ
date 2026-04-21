@@ -26,6 +26,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 import { getApiBaseUrl } from '@/lib/api/baseUrl';
+import { userFacingError } from '@/lib/userFacingMessage';
 
 const API_URL = getApiBaseUrl();
 
@@ -70,7 +71,7 @@ export default function SignupPage() {
       );
       router.push('/dashboard');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Sign up failed. Please try again.');
+      toast.error(userFacingError(error, { context: 'auth' }));
     } finally {
       setLoading(false);
     }

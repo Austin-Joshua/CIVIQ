@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from 'next-themes';
 import { useSearchParams } from 'next/navigation';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
+import { userFacingApiMessage, userFacingError } from '@/lib/userFacingMessage';
 import { downloadCsvFile } from '@/lib/download';
 import { getApiBaseUrl } from '@/lib/api/baseUrl';
 
@@ -95,14 +96,13 @@ export default function SettingsPage() {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.message || 'Failed to save profile');
+        throw new Error(userFacingApiMessage(err?.message, 'Your profile could not be saved.'));
       }
       const updated = await res.json();
       updateUser({ name: updated.name, email: updated.email });
       toast.success('Profile updated!', { description: 'Your name and email have been saved.' });
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Could not save profile';
-      toast.error(message);
+      toast.error(userFacingError(error, { fallback: 'Your profile could not be saved. Please try again.' }));
     } finally {
       setIsSaving(false);
     }
@@ -130,13 +130,12 @@ export default function SettingsPage() {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.message || 'Failed to update password');
+        throw new Error(userFacingApiMessage(err?.message, 'Your password could not be updated.'));
       }
       toast.success('Password updated!', { description: 'Your credentials have been changed.' });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Could not update password';
-      toast.error(message);
+      toast.error(userFacingError(error, { fallback: 'Your password could not be updated. Please verify your current password.' }));
     } finally {
       setIsSaving(false);
     }
@@ -167,8 +166,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-right" />
-      <SectionHeader title="Account Settings" subtitle="Manage your dashboard preferences and security configurations." />
+      <SectionHeader
+        title="Account Settings"
+        subtitle="Manage your profile, notifications, and organization preferences."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Tabs */}

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { ExportButton } from '@/components/reports/ExportButton';
 import { getApiBaseUrl } from '@/lib/api/baseUrl';
+import { userFacingApiMessage, userFacingError } from '@/lib/userFacingMessage';
 
 interface OrgUser {
   id: string;
@@ -47,9 +48,13 @@ export default function UsersPage() {
       });
       if (!res.ok) throw new Error('Failed to fetch users');
       const data = await res.json();
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
-      toast.error('Could not load users');
+      toast.error(
+        userFacingError(error, {
+          fallback: 'The user directory could not be loaded. Please refresh the page or try again later.',
+        })
+      );
     } finally {
       setIsLoading(false);
     }
@@ -76,18 +81,19 @@ export default function UsersPage() {
       
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Failed to invite user');
+        throw new Error(userFacingApiMessage(error?.message, 'The invitation could not be sent.'));
       }
       
-      toast.success('User invited successfully');
+      toast.success('Invitation sent', { description: 'The new user will receive access instructions.' });
       setInviteEmail('');
       setInviteName('');
       setInviteRole('VIEWER');
       setIsInviteModalOpen(false);
       fetchUsers();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Could not invite user';
-      toast.error(message);
+      toast.error(
+        userFacingError(error, { fallback: 'The invitation could not be completed. Please verify the details and try again.' })
+      );
     }
   };
 
@@ -102,14 +108,15 @@ export default function UsersPage() {
       
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Failed to delete user');
+        throw new Error(userFacingApiMessage(error?.message, 'This account could not be removed.'));
       }
       
-      toast.success('User removed');
+      toast.success('Access removed', { description: 'The user account has been deactivated.' });
       fetchUsers();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Could not remove user';
-      toast.error(message);
+      toast.error(
+        userFacingError(error, { fallback: 'This account could not be removed. Please try again later.' })
+      );
     }
   };
 
@@ -127,15 +134,14 @@ export default function UsersPage() {
       
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Failed to update role');
+        throw new Error(userFacingApiMessage(error?.message, 'The role could not be updated.'));
       }
       
-      toast.success('Role updated');
+      toast.success('Role updated', { description: 'Permissions will apply on the user’s next request.' });
       setEditingUserId(null);
       fetchUsers();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Could not update role';
-      toast.error(message);
+      toast.error(userFacingError(error, { fallback: 'The role could not be updated. Please try again.' }));
     }
   };
 

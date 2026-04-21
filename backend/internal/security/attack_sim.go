@@ -96,6 +96,10 @@ func (s *Service) logAttack(ctx context.Context, command, status, msg string, te
 		Timestamp:    time.Now().UTC(),
 	}
 	_, _ = s.db.Collection(colAttackLogs).InsertOne(ctx, row)
+	// Visible in the terminal where the Go API is running (e.g. npm run dev [api] or go run ./cmd/server).
+	if strings.HasPrefix(command, "/") {
+		log.Printf("[CIVIQ security] simulation %s %s — %s", status, command, msg)
+	}
 }
 
 func stableNormalize(v any) any {

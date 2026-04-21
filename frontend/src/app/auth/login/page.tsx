@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { getApiBaseUrl } from '@/lib/api/baseUrl';
 import { toast } from 'sonner';
+import { userFacingError } from '@/lib/userFacingMessage';
 
 function normalizeUsername(input: string) {
   const value = input.trim().toLowerCase();
@@ -103,9 +104,9 @@ export default function LoginPage() {
         },
         data.token as string
       );
-      toast.success(`Welcome, ${u.name}`);
+      toast.success('Signed in successfully', { description: `Welcome, ${u.name}.` });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Sign in failed. Please try again.');
+      toast.error(userFacingError(error, { context: 'auth' }));
     } finally {
       setLoading(false);
     }
@@ -141,9 +142,9 @@ export default function LoginPage() {
         },
         data.token as string
       );
-      toast.success('Signed in with quick access.');
+      toast.success('Quick access enabled', { description: 'You are signed in with limited access.' });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Guest access failed.');
+      toast.error(userFacingError(error, { context: 'network' }));
     } finally {
       setLoading(false);
     }

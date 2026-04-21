@@ -9,8 +9,13 @@ import { ShieldAlert, RefreshCw, Ban, Unlock, AlertTriangle } from 'lucide-react
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ensureThreatNotifyPermission, notifyThreatDesktop } from '@/lib/security/threatDesktopNotify';
+import { userFacingApiMessage, userFacingError } from '@/lib/userFacingMessage';
 
 const ADMIN_ROLES = new Set(['SUPER_ADMIN', 'GOV_ADMIN']);
+
+function asArray<T>(v: unknown): T[] {
+  return Array.isArray(v) ? v : [];
+}
 
 interface SecurityEvent {
   id: string;
@@ -123,36 +128,44 @@ export default function SecurityMonitorPage() {
         fetch(`${base}/security/telegram-status`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       if (evRes.status === 403 || blRes.status === 403) {
-        toast.error('You do not have access to security monitoring.');
+        toast.error('Access not authorized', {
+          description: 'Your account does not include security monitoring.',
+        });
         router.replace('/dashboard');
         return;
       }
       if (!evRes.ok || !blRes.ok) throw new Error('fetch failed');
-      setEvents(await evRes.json());
-      setBlocks(await blRes.json());
+      setEvents(asArray<SecurityEvent>(await evRes.json()));
+      setBlocks(asArray<SecurityBlock>(await blRes.json()));
       if (stRes.ok) {
         setSettings(await stRes.json());
       }
       if (mlRes.ok) {
-        const rows: MLThreatAlert[] = await mlRes.json();
+        const rows = asArray<MLThreatAlert>(await mlRes.json());
         setMlAlerts(rows);
         const newest = rows[0];
         if (newest && newest.severity === 'critical' && lastMlIdRef.current && newest.id !== lastMlIdRef.current) {
-          toast.error(`ML threat: ${newest.label} (${newest.path})`);
-          notifyThreatDesktop('CIVIQ security alert', `${newest.label} · ${newest.method} ${newest.path}`);
+          toast.error('Critical security signal', {
+            description: `${newest.label}. Review the ML alerts tab for details.`,
+          });
+          notifyThreatDesktop('CIVIQ security alert', `${newest.label} (${newest.method})`);
         }
         if (newest) {
           lastMlIdRef.current = newest.id;
         }
       }
       if (atkRes.ok) {
-        setAttackLogs(await atkRes.json());
+        setAttackLogs(asArray<SecurityAttackLog>(await atkRes.json()));
       }
       if (tgRes.ok) {
         setTelegramStatus(await tgRes.json());
       }
-    } catch {
-      toast.error('Could not load security data.');
+    } catch (err) {
+      toast.error(
+        userFacingError(err, {
+          fallback: 'Security data could not be refreshed. Please try again shortly.',
+        })
+      );
     } finally {
       setLoading(false);
     }
@@ -186,10 +199,10 @@ export default function SecurityMonitorPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
-      toast.success('Block removed.');
+      toast.success('Restriction lifted', { description: 'The block has been removed.' });
       load();
     } catch {
-      toast.error('Could not remove block.');
+      toast.error('The block could not be removed. Please try again.');
     }
   };
 
@@ -208,9 +221,13 @@ export default function SecurityMonitorPage() {
       });
       if (!res.ok) throw new Error();
       setSettings(await res.json());
-      toast.success(next ? 'Security monitoring enabled' : 'Security monitoring paused');
+      toast.success(next ? 'Monitoring is active' : 'Monitoring paused', {
+        description: next
+          ? 'Security events will continue to be recorded.'
+          : 'Automated monitoring is temporarily suspended.',
+      });
     } catch {
-      toast.error('Could not update monitoring mode.');
+      toast.error('Monitoring settings could not be updated.');
     } finally {
       setSavingSettings(false);
     }
@@ -231,9 +248,11 @@ export default function SecurityMonitorPage() {
       });
       if (!res.ok) throw new Error();
       setSettings(await res.json());
-      toast.success(next ? 'Telegram security enabled' : 'Telegram security disabled');
+      toast.success(next ? 'External notifications enabled' : 'External notifications disabled', {
+        description: 'Telegram alert preferences have been saved.',
+      });
     } catch {
-      toast.error('Could not update Telegram security mode.');
+      toast.error('Notification preferences could not be updated.');
     } finally {
       setSavingTelegramSecurity(false);
     }
@@ -257,13 +276,13 @@ export default function SecurityMonitorPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'failed');
-      if (data.blocks) setBlocks(data.blocks);
-      toast.success('Block applied immediately.');
+      if (!res.ok) throw new Error(userFacingApiMessage(data?.message, 'This restriction could not be applied.'));
+      if (Array.isArray(data.blocks)) setBlocks(data.blocks);
+      toast.success('Restriction applied', { description: 'The block is now in effect.' });
       setManualValue('');
       load();
-    } catch {
-      toast.error('Could not apply block.');
+    } catch (err) {
+      toast.error(userFacingError(err, { fallback: 'This restriction could not be applied.' }));
     }
   };
 
@@ -277,15 +296,15 @@ export default function SecurityMonitorPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'failed');
-      toast.success(
-        `Recovery complete: restored ${data.stats?.restored ?? 0}, cleaned ${data.stats?.cleaned ?? 0}, replaced ${
+      if (!res.ok) throw new Error(userFacingApiMessage(data?.message, 'Recovery could not be completed.'));
+      toast.success('Recovery completed', {
+        description: `Restored ${data.stats?.restored ?? 0}, cleaned ${data.stats?.cleaned ?? 0}, replaced ${
           data.stats?.replaced ?? 0
-        }`
-      );
+        }.`,
+      });
       load();
-    } catch {
-      toast.error('Recovery run failed.');
+    } catch (err) {
+      toast.error(userFacingError(err, { fallback: 'Recovery could not be completed. Please try again later.' }));
     } finally {
       setRunningRecovery(false);
     }
@@ -305,12 +324,17 @@ export default function SecurityMonitorPage() {
         body: JSON.stringify({ command }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'failed');
-      toast.success(data.message || `Attack command ${command} executed`);
+      if (!res.ok) throw new Error(userFacingApiMessage(data?.message, 'The security exercise could not be run.'));
+      const okMsg = userFacingApiMessage(
+        typeof data?.message === 'string' ? data.message : '',
+        'Security validation step completed.'
+      );
+      toast.success('Security exercise completed', { description: okMsg });
       load();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : `Attack command ${command} failed`;
-      toast.error(msg);
+      toast.error(
+        userFacingError(err, { fallback: 'The security exercise could not be completed. Please try again.' })
+      );
     } finally {
       setRunningAttackCmd(null);
     }
@@ -329,8 +353,8 @@ export default function SecurityMonitorPage() {
   return (
     <div className="flex flex-col gap-6 max-w-[1400px] mx-auto w-full">
       <SectionHeader
-        title="Security monitor"
-        subtitle="Controllable monitoring, ML traffic intelligence (async batched), Telegram alerts, and blocks."
+        title="Security monitoring"
+        subtitle="Review security events, apply access restrictions, and manage automated detection settings."
         icon={ShieldAlert}
       />
 
@@ -338,12 +362,18 @@ export default function SecurityMonitorPage() {
         <button
           type="button"
           className="text-xs px-3 py-1.5 rounded-lg border border-border bg-muted/30 hover:bg-muted/50"
-          onClick={() => void ensureThreatNotifyPermission().then((p) => toast.message(`Notifications: ${p}`))}
+          onClick={() =>
+            void ensureThreatNotifyPermission().then((p) =>
+              toast.message('Desktop notifications', {
+                description: p === 'granted' ? 'Alerts will appear on this workstation.' : `Status: ${p}`,
+              })
+            )
+          }
         >
-          Enable desktop threat notifications
+          Enable desktop notifications
         </button>
         <span className="text-[11px] text-muted-foreground self-center">
-          Firebase FCM can target the same channel via a registered service worker; this build uses the Web Notifications API.
+          Uses the browser notification service for high-priority security notices on this device.
         </span>
       </div>
 
@@ -359,14 +389,15 @@ export default function SecurityMonitorPage() {
                 </span>
                 {settings.envSecurityMonitorEnabled === false && (
                   <span className="block mt-1">
-                    Server env <code className="text-[10px] bg-muted px-1 rounded">SECURITY_MONITOR_ENABLED</code> is false — set
-                    it true and restart the API to allow monitoring.
+                    Monitoring is turned off in the server environment. Contact your system administrator to enable it and
+                    restart the application service.
                   </span>
                 )}
                 {settings.envSecurityMonitorEnabled && (
                   <span className="block mt-1 text-muted-foreground">
-                    Detection sweep every {settings.detectionIntervalSec}s · excessive traffic &gt;{' '}
-                    {settings.maxRequestsPerIPPerMinute} req/min per IP (configurable on server).
+                    Detection runs about every {settings.detectionIntervalSec} seconds. Elevated traffic above{' '}
+                    {settings.maxRequestsPerIPPerMinute} requests per minute per network address may trigger a review (server
+                    policy).
                   </span>
                 )}
                 {telegramStatus && (
@@ -475,7 +506,7 @@ export default function SecurityMonitorPage() {
               </button>
               <div className="w-full pt-2 border-t border-border/70 mt-1 flex flex-wrap gap-2">
                 <span className="text-[10px] uppercase tracking-wide text-muted-foreground w-full">
-                  Attack simulation (for OFF-mode testing)
+                  Controlled validation (sandbox, for testing only)
                 </span>
                 {(['insert', 'delete', 'manipulate', 'duplicate'] as const).map((cmd) => (
                   <button
@@ -497,31 +528,25 @@ export default function SecurityMonitorPage() {
       <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm space-y-2">
         <p className="font-semibold text-foreground flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-500" />
-          Presenter demo (internal attack, not password guessing)
+          Administrator reference — training exercise
         </p>
         <ol className="list-decimal list-inside text-muted-foreground space-y-1.5">
           <li>
-            Copy a JWT from your logged-in session (browser DevTools → Application → local storage for the auth store, or Network tab → any{' '}
-            <code className="text-xs bg-muted px-1 rounded">/api</code> request → Authorization header).
+            Obtain a session token from your signed-in browser session (developer tools: application storage or an authorized
+            request header). Do not share tokens outside approved testing.
           </li>
           <li>
-            From the repo, run:{' '}
-            <code className="text-xs bg-muted px-1 rounded break-all">
-              $env:CIVIQ_DEMO_TOKEN=&quot;…jwt…&quot;; .\scripts\demo-internal-security-attack.ps1 -Mode MutatingFlood
-            </code>
-            <br />
-            <span className="text-xs">
-              (Uses 22 fast PATCH calls to <code className="bg-muted px-1 rounded">/api/users/me</code> — simulates API abuse with a valid token. For
-              admin-route spam demo, use <code className="bg-muted px-1 rounded">-Mode ForbiddenFlood</code> with a <strong>VIEWER</strong> token.)
-            </span>
+            Optional scripted exercise: run the repository demo script with your token to generate controlled traffic for rule
+            testing. See the project <code className="text-xs bg-muted px-1 rounded">scripts</code> folder for the approved
+            command-line example.
           </li>
           <li>
-            Keep this page open on <strong>Event log</strong>; open Telegram on your phone. You should see <strong>critical</strong> rows and a Telegram
-            alert when a rule fires.
+            Keep this page on <strong>Event log</strong>. If external alerting is configured, confirm notifications on the
+            approved device when a rule is triggered.
           </li>
           <li>
-            <strong>Recovery:</strong> blocked user or IP appears under <strong>Blocked IPs &amp; users</strong> — a super admin can <strong>Unblock</strong>,
-            or wait until the block window in server config expires, then refresh the app.
+            <strong>Recovery:</strong> active restrictions appear under <strong>Blocked IPs &amp; users</strong>. A super
+            administrator may lift a block, or you may wait until the restriction period ends and refresh this page.
           </li>
         </ol>
       </div>
@@ -576,7 +601,7 @@ export default function SecurityMonitorPage() {
           )}
         >
           <AlertTriangle className="w-4 h-4" />
-          Attack logs
+          Audit log
           {attackLogs.length > 0 && (
             <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">{attackLogs.length}</span>
           )}
@@ -760,7 +785,7 @@ export default function SecurityMonitorPage() {
                   ) : attackLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                        No attack/recovery logs yet.
+                        No audit entries yet.
                       </td>
                     </tr>
                   ) : (

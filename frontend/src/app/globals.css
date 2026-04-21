@@ -44,9 +44,10 @@
 
 @layer base {
   :root {
-    --background: 180 20% 98%; 
-    --background-secondary: 161 72% 95%;
-    --foreground: 220 40% 10%;
+    /* Neutral, high-readability surfaces (public-sector portal) */
+    --background: 210 25% 98%;
+    --background-secondary: 210 20% 96%;
+    --foreground: 222 35% 12%;
     
     --card: 0 0% 100%;
     --card-foreground: 220 40% 10%;
@@ -86,7 +87,7 @@
     --chart-grid: 220 10% 10% / 0.05;
     --chart-axis: 220 10% 45%;
     
-    --radius: 1.25rem;
+    --radius: 0.625rem;
   }
   
   .dark {
